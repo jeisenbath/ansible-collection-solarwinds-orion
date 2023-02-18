@@ -12,7 +12,7 @@ description:
     - Adds or removes an APM Appliction Template to Node in Solarwinds Orion NPM.
     - This module requires the Application Template to already exist in Solarwinds APM.
     - If the Application Template required credentials, they also need to already exist.
-version_added: "1.1.0"
+version_added: "1.0.0"
 author: "Josh M. Eisenbath (@jeisenbath)"
 options:
     hostname:
