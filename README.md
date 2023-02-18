@@ -4,6 +4,23 @@
 <!-- Describe the collection and why a user would want to use it. What does the collection do? -->
 Collection for managing Nodes in Solarwinds Orion.
 
+## Included Content
+
+<!--start collection content-->
+### Modules
+Name | Description
+--- | ---
+solarwinds.orion.orion_custom_property | Manage custom properties on Node.
+solarwinds.orion.orion_node | Creates, Removes, Manage, or Mute Node.
+solarwinds.orion.orion_node_application | Manages APM application templates assigned to Nodes.
+solarwinds.orion.orion_node_custom_poller | Creates/Removes custom pollers on a Node.
+solarwinds.orion.orion_node_info | Gets info about a Node.
+solarwinds.orion.orion_node_interface | Manage interfaces on Nodes.
+solarwinds.orion.orion_node_poller | Manage Pollers on Nodes.
+solarwinds.orion.orion_update_node | Updates Node properties.
+solarwinds.orion.orion_volume | Manage Volumes on Nodes.
+solarwinds.orion.orion_volume_info | Gets info about a Volume assigned to a Node.
+
 ## Tested with Ansible
 
 <!-- List the versions of Ansible the collection has been tested with. Must match what is in galaxy.yml. -->
