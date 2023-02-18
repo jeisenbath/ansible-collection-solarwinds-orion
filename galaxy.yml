@@ -1,0 +1,19 @@
+---
+namespace: solarwinds
+name: orion
+version: 1.0.0
+readme: README.md
+authors:
+  - Josh Eisenbath (@jeisenbath)
+description: Modules for Solarwinds Orion
+repository: https://github.com/jeisenbath/ansible-collection-solarwinds-orion
+homepage: https://github.com/jeisenbath/ansible-collection-solarwinds-orion
+issues: https://github.com/jeisenbath/ansible-collection-solarwinds-orion
+tags:
+  - solarwinds
+  - orion
+dependencies: {}
+license:
+  - GPL-3.0-or-later
+build_ignore:
+  - releases
