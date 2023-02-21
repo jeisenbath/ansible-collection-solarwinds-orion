@@ -21,36 +21,43 @@ options:
         description:
             - Name of Orion host running SWIS service.
         required: true
+        type: str
     username:
         description:
             - Orion Username.
             - Active Directory users must use DOMAIN\\username format.
         required: true
+        type: str
     password:
         description:
             - Password for Orion user.
         required: true
+        type: str
     node_id:
         description:
             - Node ID of the node.
             - One of I(ip_address), I(node_id), or I(name) is required.
         required: false
+        type: str
     name:
         description:
             - Name of the node.
             - One of I(ip_address), I(node_id), or I(name) is required.
         required: false
+        type: str
         aliases: [ 'caption' ]
     ip_address:
         description:
             - IP Address of the node.
             - One of I(ip_address), I(node_id), or I(name) is required.
         required: false
+        type: str
     state:
         description:
             - Desired state of the custom property on the node.
             - When I(state=absent), sets value of property for the node to None.
         required: True
+        type: str
         choices:
             - present
             - absent
@@ -121,7 +128,7 @@ requests.packages.urllib3.disable_warnings()
 def main():
     argument_spec = orion_argument_spec
     argument_spec.update(
-        state=dict(required=True, choices=['present', 'absent', 'create']),
+        state=dict(required=True, choices=['present', 'absent']),
         property_name=dict(required=True, type='str'),
         property_value=dict(required=False, type='str')
     )
