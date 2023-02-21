@@ -30,13 +30,13 @@ class OrionModule:
 
     def get_node(self):
         node = {}
-        fields = """NodeID, Caption, Unmanaged, UnManageFrom, UnManageUntil, Uri, 
+        fields = """NodeID, Caption, Unmanaged, UnManageFrom, UnManageUntil, Uri,
                   ObjectSubType, IP_Address, Status, StatusDescription"""
 
         if self.module.params['node_id']:
             results = self.swis.query(
                 "SELECT {0} FROM Orion.Nodes WHERE NodeID = '{1}'".format(fields, self.module.params['node_id'])
-                )
+            )
         elif self.module.params['ip_address']:
             results = self.swis.query(
                 "SELECT {0} FROM Orion.Nodes WHERE IPAddress = '{1}'".format(fields, self.module.params['ip_address'])
@@ -141,7 +141,7 @@ class OrionModule:
 
     def get_volume(self, node, volume):
         volume_info = {}
-        fields = """volumeid, displayname, volumeindex, status, type, caption, pollinterval, 
+        fields = """volumeid, displayname, volumeindex, status, type, caption, pollinterval,
                     statcollection, rediscoveryinterval, volumedescription, icon, uri"""
 
         volume_query = self.swis.query(

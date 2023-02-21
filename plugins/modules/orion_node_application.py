@@ -108,7 +108,7 @@ orion_node:
         "unmanagefrom": "1899-12-30T00:00:00+00:00",
         "unmanageuntil": "1899-12-30T00:00:00+00:00",
         "uri": "swis://host.domain.com/Orion/Orion.Nodes/NodeID=12345"
-    } 
+    }
 '''
 
 import requests
@@ -155,7 +155,7 @@ def main():
         module.fail_json(
             msg='Failed to query Orion. '
                 'Check Hostname, Username, and/or Password: {0}'.format(str(AuthException))
-            )
+        )
 
     orion = OrionModule(module, __SWIS__)
 

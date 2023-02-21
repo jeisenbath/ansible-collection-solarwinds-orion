@@ -93,7 +93,7 @@ orion_node:
         "unmanagefrom": "1899-12-30T00:00:00+00:00",
         "unmanageuntil": "1899-12-30T00:00:00+00:00",
         "uri": "swis://host.domain.com/Orion/Orion.Nodes/NodeID=12345"
-    } 
+    }
 orion_volume:
     description: Info about an orion volume.
     returned: always

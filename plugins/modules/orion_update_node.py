@@ -71,7 +71,7 @@ EXAMPLES = r'''
     properties:
       Caption: "{{ new_node_caption }}"
   delegate_to: localhost
-  
+
 - name: Update node to SNMP polling
   solarwinds.orion.orion_update_node:
     hostname: "{{ solarwinds_server }}"
@@ -83,7 +83,7 @@ EXAMPLES = r'''
       SNMPVersion: 2
       Community: "{{ ro_community_string }}"
   delegate_to: localhost
-  
+
 '''
 
 RETURN = r'''
@@ -103,7 +103,7 @@ orion_node:
         "unmanagefrom": "1899-12-30T00:00:00+00:00",
         "unmanageuntil": "1899-12-30T00:00:00+00:00",
         "uri": "swis://host.domain.com/Orion/Orion.Nodes/NodeID=12345"
-    } 
+    }
 '''
 
 import requests
@@ -148,7 +148,7 @@ def main():
         module.fail_json(
             msg='Failed to query Orion. '
                 'Check Hostname, Username, and/or Password: {0}'.format(str(AuthException))
-            )
+        )
 
     orion = OrionModule(module, __SWIS__)
     node = orion.get_node()

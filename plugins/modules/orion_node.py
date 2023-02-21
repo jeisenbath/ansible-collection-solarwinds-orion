@@ -15,7 +15,7 @@ short_description: Created/Removes/Edits Nodes in Solarwinds Orion NPM
 description:
     - "Create or Remove Nodes in Orion NPM."
 version_added: "1.0.0"
-author: 
+author:
     - "Jarett D Chaiken (@jdchaiken)"
     - "Josh M. Eisenbath (@jeisenbath)"
 options:
@@ -152,7 +152,7 @@ EXAMPLES = '''
     username: "{{ solarwinds_username }}"
     password: "{{ solarwinds_password }}"
     name: "{{ node_name }}"
-    state: muted       
+    state: muted
   delegate_to: localhost
 '''
 
@@ -173,7 +173,7 @@ orion_node:
         "unmanagefrom": "1899-12-30T00:00:00+00:00",
         "unmanageuntil": "1899-12-30T00:00:00+00:00",
         "uri": "swis://host.domain.com/Orion/Orion.Nodes/NodeID=12345"
-    } 
+    }
 '''
 
 from datetime import datetime, timedelta
@@ -195,9 +195,10 @@ def _add_wmi_credentials(module, node):
 
     # Check if passed credential is valid
     cred = __SWIS__.query(
-          "SELECT ID FROM Orion.Credential WHERE Name = "
-          "@wmi_credential",
-          wmi_credential=module.params['wmi_credential'])
+        "SELECT ID FROM Orion.Credential WHERE Name = "
+        "@wmi_credential",
+        wmi_credential=module.params['wmi_credential']
+    )
 
     if cred['ID']:  # Valid credential passed - Add to Orion.NodeSettings
         nodesettings = {
@@ -315,14 +316,14 @@ def unmanage_node(module, node):
 
     try:
         __SWIS__.invoke(
-               'Orion.Nodes',
-               'Unmanage',
-               node['netobjectid'],
-               unmanage_from,
-               unmanage_until,
-               False  # use Absolute Time
+            'Orion.Nodes',
+            'Unmanage',
+            node['netobjectid'],
+            unmanage_from,
+            unmanage_until,
+            False  # use Absolute Time
         )
-        module.exit_json(changed=True,  orion_node=node)
+        module.exit_json(changed=True, orion_node=node)
     except Exception as OrionException:
         module.fail_json(msg='Error unmanaging node: {0}'.format(str(OrionException)))
 
@@ -338,7 +339,7 @@ def mute_node(module, node):
         unmanage_from = now.isoformat()
     if not unmanage_until:
         unmanage_until = tomorrow.isoformat()
-    
+
     try:
         suppressed_state = __SWIS__.invoke('Orion.AlertSuppression', 'GetAlertSuppressionState', [node['uri']])[0]
 
