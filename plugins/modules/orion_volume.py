@@ -149,6 +149,7 @@ orion_volume:
         "volumedescription": "/",
         "icon": "FixedDisk.gif",
         "uri": "swis://host.domain.com/Orion/Orion.Nodes/NodeID=12345/Volumes/VolumeID=67890"
+    }
 '''
 
 import requests
