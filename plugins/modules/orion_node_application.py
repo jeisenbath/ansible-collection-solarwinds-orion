@@ -25,7 +25,7 @@ options:
         choices:
             - present
             - absent
-    application_name:
+    application_template_name:
         description:
             - Name of the application template.
         required: True
@@ -105,7 +105,7 @@ def main():
         state=dict(required=True, choices=['present', 'absent']),
         application_template_name=dict(required=True, type='str'),
         credential_name=dict(required=False, type='str'),
-        skip_duplicate=dict(required=False, default=True, type='bool')
+        skip_duplicates=dict(required=False, default=True, type='bool')
     )
     module = AnsibleModule(
         argument_spec,
