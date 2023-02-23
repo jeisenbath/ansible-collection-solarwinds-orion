@@ -21,6 +21,7 @@ options:
         description:
             - The desired state of the interface.
         required: True
+        type: str
         choices:
             - present
             - absent
