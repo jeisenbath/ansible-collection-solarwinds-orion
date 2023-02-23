@@ -22,16 +22,15 @@ options:
     state:
         description:
             - The desired state of the node.
-        required: false
+        required: true
+        type: str
         choices:
             - present
             - absent
-            - remanaged
+            - managed
             - unmanaged
             - muted
             - unmuted
-        default:
-            - managed
     node_id:
         description:
             - Node ID of the node.
@@ -59,6 +58,7 @@ options:
             - If not provided, module defaults to now.
             - "ex: 2017-02-21T12:00:00Z"
         required: false
+        type: str
     unmanage_until:
         description:
             - "The date and time (in ISO 8601 UTC format) to end the unmanage period."
@@ -66,6 +66,7 @@ options:
             - If not provided, module defaults to 24 hours from now.
             - "ex: 2017-02-21T12:00:00Z"
         required: false
+        type: str
     polling_method:
         description:
             - Polling method to use.
@@ -75,48 +76,55 @@ options:
             - SNMP
             - WMI
             - Agent
-        default: snmp
+        default: ICMP
         required: false
+        type: str
     ro_community_string:
         description:
             - SNMP Read-Only Community string.
             - Required if I(polling_method=snmp).
         required: false
+        type: str
     rw_community_string:
         description:
             - SNMP Read-Write Community string
         required: false
+        type: str
     snmp_version:
         description:
             - SNMPv2c is used by default.
             - SNMPv3 not supported at this time due to a bug with the orionsdk and orion API.
         choices:
             - 2
-        default: 'snmpv2c'
+        default: 2
         required: false
+        type: str
     snmp_port:
         description:
             - Port that SNMP server listens on.
         required: false
-        default: '161'
+        default: 161
+        type: str
     snmp_allow_64:
         description:
             - Set true if device supports 64-bit counters.
         type: bool
         default: true
         required: false
-    wmi_credential:
+    wmi_credentials:
         description:
             - 'Credential Name already configured in NPM  Found under "Manage Windows Credentials" section of the Orion website (Settings)'
             - "Note: creation of credentials are not supported at this time"
             - Required if I(polling_method=wmi).
         required: false
+        type: str
     polling_engine:
         description:
             - ID of polling engine that NPM will use to poll this device.
             - If not passed, will query for the Polling Engine with least nodes assigned.
             - Not recommended to use I(polling_engine=1), which should be the main app server.
         required: false
+        type: str
 extends_documentation_fragment:
     - solarwinds.orion.orion_auth_options
 requirements:
@@ -364,13 +372,13 @@ def unmute_node(module, node):
 def main():
     argument_spec = orion_argument_spec
     argument_spec.update(
-        state=dict(required=True, choices=['present', 'absent', 'remanaged', 'unmanaged', 'muted', 'unmuted']),
+        state=dict(required=True, choices=['present', 'absent', 'managed', 'unmanaged', 'muted', 'unmuted']),
         unmanage_from=dict(required=False, default=None),
         unmanage_until=dict(required=False, default=None),
-        polling_method=dict(required=False, choices=['External', 'ICMP', 'SNMP', 'WMI', 'Agent']),
+        polling_method=dict(required=False, default='ICMP', choices=['External', 'ICMP', 'SNMP', 'WMI', 'Agent']),
         ro_community_string=dict(required=False, no_log=True),
         rw_community_string=dict(required=False, no_log=True),
-        snmp_version=dict(required=False, default='2'),
+        snmp_version=dict(required=False, choices=['2']),
         snmp_port=dict(required=False, default='161'),
         snmp_allow_64=dict(required=False, default=True),
         wmi_credentials=dict(required=False, no_log=True),
