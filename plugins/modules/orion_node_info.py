@@ -15,36 +15,9 @@ description:
     - "Get info about a Node in Solarwinds Orion NPM."
 version_added: "1.0.0"
 author: "Josh M. Eisenbath (@jeisenbath)"
-options:
-    hostname:
-        description:
-            - Name of Orion host running SWIS service.
-        required: true
-    username:
-        description:
-            - Orion Username.
-            - Active Directory users must use DOMAIN\\username format.
-        required: true
-    password:
-        description:
-            - Password for Orion user.
-        required: true
-    node_id:
-        description:
-            - Node ID of the node.
-            - One of I(ip_address), I(node_id), or I(name) is required.
-        required: false
-    name:
-        description:
-            - Name of the node.
-            - One of I(ip_address), I(node_id), or I(name) is required.
-        required: false
-        aliases: [ 'caption' ]
-    ip_address:
-        description:
-            - IP Address of the node.
-            - One of I(ip_address), I(node_id), or I(name) is required.
-        required: false
+extends_documentation_fragment:
+    - solarwinds.orion.orion_auth_options
+    - solarwinds.orion.orion_node_options
 requirements:
     - orionsdk
     - requests

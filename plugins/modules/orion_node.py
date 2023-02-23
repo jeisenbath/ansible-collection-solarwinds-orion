@@ -19,19 +19,6 @@ author:
     - "Jarett D Chaiken (@jdchaiken)"
     - "Josh M. Eisenbath (@jeisenbath)"
 options:
-    hostname:
-        description:
-            - Name of Orion host running SWIS service.
-        required: true
-    username:
-        description:
-            - Orion Username.
-            - Active Directory users must use DOMAIN\\username format.
-        required: true
-    password:
-        description:
-            - Password for Orion user.
-        required: true
     state:
         description:
             - The desired state of the node.
@@ -50,17 +37,21 @@ options:
             - Node ID of the node.
             - One of I(ip_address), I(node_id), or I(name) is required.
         required: false
+        type: str
     name:
         description:
             - Name of the node.
             - When I(state=present), this field is required.
             - When state is other than present, one of I(ip_address), I(node_id), or I(name) is required.
         required: false
+        aliases: [ 'caption' ]
+        type: str
     ip_address:
         description:
             - IP Address of the node.
             - One of I(ip_address), I(node_id), or I(name) is required.
         required: false
+        type: str
     unmanage_from:
         description:
             - "The date and time (in ISO 8601 UTC format) to begin the unmanage period."
@@ -126,6 +117,8 @@ options:
             - If not passed, will query for the Polling Engine with least nodes assigned.
             - Not recommended to use I(polling_engine=1), which should be the main app server.
         required: false
+extends_documentation_fragment:
+    - solarwinds.orion.orion_auth_options
 requirements:
     - orionsdk
     - python-dateutil
