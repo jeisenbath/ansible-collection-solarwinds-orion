@@ -378,9 +378,9 @@ def main():
         polling_method=dict(required=False, default='ICMP', choices=['External', 'ICMP', 'SNMP', 'WMI', 'Agent']),
         ro_community_string=dict(required=False, no_log=True),
         rw_community_string=dict(required=False, no_log=True),
-        snmp_version=dict(required=False, choices=['2']),
+        snmp_version=dict(required=False, default='2', choices=['2']),
         snmp_port=dict(required=False, default='161'),
-        snmp_allow_64=dict(required=False, default=True),
+        snmp_allow_64=dict(required=False, default=True, type='bool'),
         wmi_credentials=dict(required=False, no_log=True),
         polling_engine=dict(required=False),
     )

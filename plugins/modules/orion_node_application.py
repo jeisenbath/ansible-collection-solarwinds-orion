@@ -22,6 +22,7 @@ options:
         description:
             - Desired state of the application on the node.
         required: True
+        type: str
         choices:
             - present
             - absent
