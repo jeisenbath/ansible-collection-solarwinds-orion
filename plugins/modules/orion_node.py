@@ -92,10 +92,10 @@ options:
         type: str
     snmp_version:
         description:
-            - SNMPv2c is used by default.
-            - SNMPv3 not supported at this time due to a bug with the orionsdk and orion API.
+            - SNMPv2c or SNMPv3 for snmp polling.
         choices:
             - 2
+            - 3
         default: 2
         required: false
         type: str
@@ -110,6 +110,56 @@ options:
             - Set true if device supports 64-bit counters.
         type: bool
         default: true
+        required: false
+    snmpv3_username:
+        description:
+            - Read-Only SNMPv3 username.
+            - Note: Manually setting username, auth and privacy keys will create new credential sets per node.
+        type: str
+        required: false
+    snmpv3_auth_method:
+        description:
+            - Authentication method for SNMPv3.
+        type: str
+        default: SHA1
+        choices:
+            - SHA1
+            - MD5
+        required: false
+    snmpv3_auth_key:
+        description:
+            - Authentication passphrase for SNMPv3.
+        type: str
+        required: false
+    snmpv3_auth_key_is_pwd:
+        description:
+            - SNMPv3 Authentication Password is a key.
+            - Confusingly, value of True corresponds to web GUI checkbox being unchecked.
+        type: bool
+        default: True
+        required: false
+    snmpv3_priv_method:
+        description:
+            - Privacy method for SNMPv3.
+        type: str
+        default: AES128
+        choices:
+            - DES56
+            - AES128
+            - AES192
+            - AES256
+        required: false
+    snmpv3_priv_key:
+        description:
+            - Privacy passphrase for SNMPv3
+        type: str
+        required: false
+    snmpv3_priv_key_is_pwd:
+        description:
+            - SNMPv3 Privacy Password is a key.
+            - Confusingly, value of True corresponds to web GUI checkbox being unchecked.
+        type: bool
+        default: True
         required: false
     wmi_credentials:
         description:
@@ -221,6 +271,13 @@ def add_node(module, orion):
         'Community': module.params['ro_community_string'],
         'RWCommunity': module.params['rw_community_string'],
         'SNMPVersion': module.params['snmp_version'],
+        'SNMPV3Username': module.params['snmpv3_username'],
+        'SNMPV3PrivMethod': module.params['snmpv3_priv_method'],
+        'SNMPV3PrivKeyIsPwd': module.params['snmpv3_priv_key_is_pwd'],
+        'SNMPV3PrivKey': module.params['snmpv3_priv_key'],
+        'SNMPV3AuthMethod': module.params['snmpv3_auth_method'],
+        'SNMPV3AuthKeyIsPwd': module.params['snmpv3_auth_key_is_pwd'],
+        'SNMPV3AuthKey': module.params['snmpv3_auth_key'],
         'AgentPort': module.params['snmp_port'],
         'Allow64BitCounters': module.params['snmp_allow_64'],
         'External': lambda x: True if module.params['polling_method'] == 'EXTERNAL' else False,
@@ -378,7 +435,14 @@ def main():
         polling_method=dict(required=False, default='ICMP', choices=['External', 'ICMP', 'SNMP', 'WMI', 'Agent']),
         ro_community_string=dict(required=False, no_log=True),
         rw_community_string=dict(required=False, no_log=True),
-        snmp_version=dict(required=False, default='2', choices=['2']),
+        snmp_version=dict(required=False, default='2', choices=['2', '3']),
+        snmpv3_username=dict(required=False, type=str),
+        snmpv3_auth_method=dict(required=False, type=str, default='SHA1', choices=['SHA1', 'MD5']),
+        snmpv3_auth_key=dict(required=False, type=str, no_log=True),
+        snmpv3_auth_key_is_pwd=dict(required=False, default=True, type=bool),
+        snmpv3_priv_method=dict(required=False, type=str, default='AES128', choices=['DES56', 'AES128', 'AES192', 'AES256']),
+        snmpv3_priv_key=dict(required=False, type=str, no_log=True),
+        snmpv3_priv_key_is_pwd=dict(required=False, default=True, type=bool),
         snmp_port=dict(required=False, default='161'),
         snmp_allow_64=dict(required=False, default=True, type='bool'),
         wmi_credentials=dict(required=False, no_log=True),
@@ -391,8 +455,9 @@ def main():
         required_one_of=[('name', 'node_id', 'ip_address')],
         required_if=[
             ('state', 'present', ('name', 'ip_address', 'polling_method')),
-            ('polling_method', 'SNMP', ['ro_community_string']),
-            ('polling_method', 'WMI', ['wmi_credentials'])
+            ('snmp_version', '2', ['ro_community_string']),
+            ('polling_method', 'WMI', ['wmi_credentials']),
+            ('snmp_version', '3', ['snmpv3_username', 'snmpv3_priv_key', 'snmpv3_auth_key'])
         ],
     )
 
