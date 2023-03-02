@@ -94,16 +94,16 @@ options:
         description:
             - SNMPv2c or SNMPv3 for snmp polling.
         choices:
-            - 2
-            - 3
-        default: 2
+            - "2"
+            - "3"
+        default: "2"
         required: false
         type: str
     snmp_port:
         description:
             - Port that SNMP server listens on.
         required: false
-        default: 161
+        default: "161"
         type: str
     snmp_allow_64:
         description:
@@ -114,7 +114,7 @@ options:
     snmpv3_username:
         description:
             - Read-Only SNMPv3 username.
-            - Note: Manually setting username, auth and privacy keys will create new credential sets per node.
+            - Note that manually setting username, auth and privacy keys will create new credential sets per node.
         type: str
         required: false
     snmpv3_auth_method:
