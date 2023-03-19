@@ -101,7 +101,7 @@ def main():
     )
     module = AnsibleModule(
         argument_spec,
-        supports_check_mode=False,
+        supports_check_mode=True,
         required_one_of=[('name', 'node_id', 'ip_address')],
     )
     if not HAS_ORION:
@@ -130,8 +130,11 @@ def main():
         module.fail_json(skipped=True, msg='Node not found')
 
     try:
-        __SWIS__.update(node['uri'], **module.params['properties'])
-        module.exit_json(changed=True, orion_node=node)
+        if module.check_mode:
+            module.exit_json(changed=True, orion_node=node)
+        else:
+            __SWIS__.update(node['uri'], **module.params['properties'])
+            module.exit_json(changed=True, orion_node=node)
     except Exception as OrionException:
         module.fail_json(msg='Failed to update {0}'.format(str(OrionException)))
 

@@ -110,7 +110,7 @@ def main():
     )
     module = AnsibleModule(
         argument_spec,
-        supports_check_mode=False,
+        supports_check_mode=True,
         required_one_of=[('name', 'node_id', 'ip_address')],
     )
     if not HAS_ORION:
@@ -151,10 +151,13 @@ def main():
 
             application_id = orion.get_application_id(node, module.params['application_template_name'])
             if application_id:
-                module.exit_json(changed=False, application_id=application_id)
+                module.exit_json(changed=False, orion_node=node)
             else:
-                application = orion.add_application_template_to_node(node, application_template_id, credential_id, module.params['skip_duplicate'])
-                module.exit_json(changed=True, application_id=application)
+                if module.check_mode:
+                    module.exit_json(changed=True, orion_node=node)
+                else:
+                    orion.add_application_template_to_node(node, application_template_id, credential_id, module.params['skip_duplicate'])
+                    module.exit_json(changed=True, orion_node=node)
         except Exception as OrionException:
             module.fail_json(msg='Failed to add application to node: {0}'.format(OrionException))
 
@@ -163,10 +166,13 @@ def main():
             application_id = orion.get_application_id(node, module.params['application_template_name'])
 
             if application_id:
-                application = orion.remove_application_template_from_node(application_id)
-                module.exit_json(changed=True, application_id=application)
+                if module.check_mode:
+                    module.exit_json(changed=True, orion_node=node)
+                else:
+                    orion.remove_application_template_from_node(application_id)
+                    module.exit_json(changed=True, orion_node=node)
             else:
-                module.exit_json(changed=False)
+                module.exit_json(changed=False, orion_node=node)
         except Exception as OrionException:
             module.fail_json(msg='Failed to remove application from node: {0}'.format(OrionException))
 

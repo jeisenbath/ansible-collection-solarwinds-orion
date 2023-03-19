@@ -102,7 +102,7 @@ def main():
     )
     module = AnsibleModule(
         argument_spec,
-        supports_check_mode=False,
+        supports_check_mode=True,
         required_one_of=[('name', 'node_id', 'ip_address')],
         required_if=[
             ('state', 'present', ['property_value'])
@@ -137,16 +137,22 @@ def main():
             if prop_value == module.params['property_value']:
                 module.exit_json(changed=False, orion_node=node)
             else:
-                orion.add_custom_property(node, module.params['property_name'], module.params['property_value'])
-                module.exit_json(changed=True, orion_node=node)
+                if module.check_mode:
+                    module.exit_json(changed=True, orion_node=node)
+                else:
+                    orion.add_custom_property(node, module.params['property_name'], module.params['property_value'])
+                    module.exit_json(changed=True, orion_node=node)
         except Exception as OrionException:
             module.fail_json(msg='Failed to add custom properties: {}'.format(OrionException))
     elif module.params['state'] == 'absent':
         try:
             prop_name, prop_value = orion.get_node_custom_property_value(node, module.params['property_name'])
             if prop_value:
-                orion.add_custom_property(node, module.params['property_name'], None)
-                module.exit_json(changed=True, orion_node=node)
+                if module.check_mode:
+                    module.exit_json(changed=True, orion_node=node)
+                else:
+                    orion.add_custom_property(node, module.params['property_name'], None)
+                    module.exit_json(changed=True, orion_node=node)
             else:
                 module.exit_json(changed=False, orion_node=node)
         except Exception as OrionException:

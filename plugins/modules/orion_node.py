@@ -451,7 +451,7 @@ def main():
 
     module = AnsibleModule(
         argument_spec,
-        supports_check_mode=False,
+        supports_check_mode=True,
         required_one_of=[('name', 'node_id', 'ip_address')],
         required_if=[
             ('state', 'present', ('name', 'ip_address', 'polling_method')),
@@ -488,26 +488,43 @@ def main():
         if node:
             module.exit_json(changed=False, orion_node=node)
 
-        new_node = add_node(module, orion)
-
-        module.exit_json(changed=True, orion_node=new_node)
+        if module.check_mode:
+            module.exit_json(changed=True, orion_node=node)
+        else:
+            new_node = add_node(module, orion)
+            module.exit_json(changed=True, orion_node=new_node)
     elif module.params['state'] == 'absent':
         if not node:
             module.exit_json(changed=False)
 
-        remove_node(module, node)
+        if module.check_mode:
+            module.exit_json(changed=True, orion_node=node)
+        else:
+            remove_node(module, node)
     else:
         if not node:
             module.exit_json(skipped=True, msg='Node not found')
 
         if module.params['state'] == 'remanaged':
-            remanage_node(module, node)
+            if module.check_mode:
+                module.exit_json(changed=True, orion_node=node)
+            else:
+                remanage_node(module, node)
         elif module.params['state'] == 'unmanaged':
-            unmanage_node(module, node)
+            if module.check_mode:
+                module.exit_json(changed=True, orion_node=node)
+            else:
+                unmanage_node(module, node)
         elif module.params['state'] == 'muted':
-            mute_node(module, node)
+            if module.check_mode:
+                module.exit_json(changed=True, orion_node=node)
+            else:
+                mute_node(module, node)
         elif module.params['state'] == 'unmuted':
-            unmute_node(module, node)
+            if module.check_mode:
+                module.exit_json(changed=True, orion_node=node)
+            else:
+                unmute_node(module, node)
 
 
 if __name__ == "__main__":

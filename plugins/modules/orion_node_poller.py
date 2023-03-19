@@ -128,7 +128,7 @@ def main():
     )
     module = AnsibleModule(
         argument_spec,
-        supports_check_mode=False,
+        supports_check_mode=True,
         required_one_of=[('name', 'node_id', 'ip_address')],
     )
     if not HAS_ORION:
@@ -162,8 +162,11 @@ def main():
             if poller and poller['Enabled'] == module.params['enabled']:
                 module.exit_json(changed=False, orion_node=node)
             else:
-                orion.add_poller('N', str(node['nodeid']), module.params['poller'], module.params['enabled'])
-                module.exit_json(changed=True, orion_node=node)
+                if module.check_mode:
+                    module.exit_json(changed=True, orion_node=node)
+                else:
+                    orion.add_poller('N', str(node['nodeid']), module.params['poller'], module.params['enabled'])
+                    module.exit_json(changed=True, orion_node=node)
         except Exception as OrionException:
             module.fail_json(msg='Failed to add poller: {0}'.format(str(OrionException)))
 
@@ -171,8 +174,11 @@ def main():
         try:
             poller = orion.get_poller('N', str(node['nodeid']), module.params['poller'])
             if poller:
-                orion.remove_poller('N', str(node['nodeid']), module.params['poller'])
-                module.exit_json(changed=True, orion_node=node)
+                if module.check_mode:
+                    module.exit_json(changed=True, orion_node=node)
+                else:
+                    orion.remove_poller('N', str(node['nodeid']), module.params['poller'])
+                    module.exit_json(changed=True, orion_node=node)
             else:
                 module.exit_json(changed=False, orion_node=node)
         except Exception as OrionException:

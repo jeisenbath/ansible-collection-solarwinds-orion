@@ -96,7 +96,7 @@ def main():
     )
     module = AnsibleModule(
         argument_spec,
-        supports_check_mode=False,
+        supports_check_mode=True,
         required_one_of=[('name', 'node_id', 'ip_address')],
     )
     if not HAS_ORION:
@@ -135,8 +135,11 @@ def main():
             if orion.get_custom_poller_uri(node, module.params['custom_poller']):
                 module.exit_json(changed=False, orion_node=node)
             else:
-                orion.add_custom_poller(node, module.params['custom_poller'])
-                module.exit_json(changed=True, orion_node=node)
+                if module.check_mode:
+                    module.exit_json(changed=True, orion_node=node)
+                else:
+                    orion.add_custom_poller(node, module.params['custom_poller'])
+                    module.exit_json(changed=True, orion_node=node)
         except Exception as OrionException:
             module.fail_json(msg='Failed to create custom poller: {0}'.format(str(OrionException)))
     elif module.params['state'] == 'absent':
@@ -144,8 +147,11 @@ def main():
             if not orion.get_custom_poller_uri(node, module.params['custom_poller']):
                 module.exit_json(changed=False, orion_node=node)
             else:
-                orion.remove_custom_poller(node, module.params['custom_poller'])
-                module.exit_json(changed=True, orion_node=node)
+                if module.check_mode:
+                    module.exit_json(changed=True, orion_node=node)
+                else:
+                    orion.remove_custom_poller(node, module.params['custom_poller'])
+                    module.exit_json(changed=True, orion_node=node)
         except Exception as OrionException:
             module.fail_json(msg='Failed to remove custom poller: {0}'.format(str(OrionException)))
     # TODO create custom pollers

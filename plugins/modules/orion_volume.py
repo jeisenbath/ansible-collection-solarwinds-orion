@@ -165,7 +165,7 @@ def main():
     )
     module = AnsibleModule(
         argument_spec,
-        supports_check_mode=False,
+        supports_check_mode=True,
         required_one_of=[('name', 'node_id', 'ip_address')],
     )
     if not HAS_ORION:
@@ -200,12 +200,15 @@ def main():
             module.exit_json(changed=False, orion_node=node, orion_volume=volume)
         else:
             try:
-                orion.add_volume(node, module.params['volume'])
-                volume = orion.get_volume(node, module.params['volume'])
-                orion.add_poller('V', str(volume['volumeid']), 'V.Status.SNMP.Generic', True)
-                orion.add_poller('V', str(volume['volumeid']), 'V.Details.SNMP.Generic', True)
-                orion.add_poller('V', str(volume['volumeid']), 'V.Statistics.SNMP.Generic', True)
-                module.exit_json(changed=True, orion_node=node, orion_volume=volume)
+                if module.check_mode:
+                    module.exit_json(changed=True, orion_node=node, orion_volume=volume)
+                else:
+                    orion.add_volume(node, module.params['volume'])
+                    volume = orion.get_volume(node, module.params['volume'])
+                    orion.add_poller('V', str(volume['volumeid']), 'V.Status.SNMP.Generic', True)
+                    orion.add_poller('V', str(volume['volumeid']), 'V.Details.SNMP.Generic', True)
+                    orion.add_poller('V', str(volume['volumeid']), 'V.Statistics.SNMP.Generic', True)
+                    module.exit_json(changed=True, orion_node=node, orion_volume=volume)
             except Exception as OrionException:
                 module.fail_json(msg='Failed to add volume: {0}'.format(str(OrionException)))
     elif module.params['state'] == 'absent':
@@ -213,8 +216,11 @@ def main():
             module.exit_json(changed=False, orion_node=node, orion_volume=volume)
         else:
             try:
-                orion.remove_volume(node, module.params['volume'])
-                module.exit_json(changed=True, orion_node=node, orion_volume=volume)
+                if module.check_mode:
+                    module.exit_json(changed=True, orion_node=node, orion_volume=volume)
+                else:
+                    orion.remove_volume(node, module.params['volume'])
+                    module.exit_json(changed=True, orion_node=node, orion_volume=volume)
             except Exception as OrionException:
                 module.fail_json(msg='Failed to remove volume: {0}'.format(str(OrionException)))
     else:
