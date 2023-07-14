@@ -96,7 +96,6 @@ options:
         choices:
             - "2"
             - "3"
-        default: "2"
         required: false
         type: str
     snmp_port:
@@ -435,7 +434,7 @@ def main():
         polling_method=dict(required=False, default='ICMP', choices=['External', 'ICMP', 'SNMP', 'WMI', 'Agent']),
         ro_community_string=dict(required=False, no_log=True),
         rw_community_string=dict(required=False, no_log=True),
-        snmp_version=dict(required=False, default='2', choices=['2', '3']),
+        snmp_version=dict(required=False, default=None, choices=['2', '3']),
         snmpv3_username=dict(required=False, type=str),
         snmpv3_auth_method=dict(required=False, type=str, default='SHA1', choices=['SHA1', 'MD5']),
         snmpv3_auth_key=dict(required=False, type=str, no_log=True),
