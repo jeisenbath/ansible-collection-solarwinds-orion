@@ -505,7 +505,7 @@ def main():
         if not node:
             module.exit_json(skipped=True, msg='Node not found')
 
-        if module.params['state'] == 'remanaged':
+        if module.params['state'] == 'managed':
             if module.check_mode:
                 module.exit_json(changed=True, orion_node=node)
             else:
