@@ -357,7 +357,7 @@ def remanage_node(module, node):
 
 
 def unmanage_node(module, node):
-    now = datetime.utcnow()
+    now = datetime.now()
     tomorrow = now + timedelta(days=1)
 
     unmanage_from = module.params['unmanage_from']
@@ -386,7 +386,7 @@ def unmanage_node(module, node):
 
 
 def mute_node(module, node):
-    now = datetime.utcnow()
+    now = datetime.now()
     tomorrow = now + timedelta(days=1)
 
     unmanage_from = module.params['unmanage_from']
