@@ -455,6 +455,7 @@ def main():
         required_if=[
             ('state', 'present', ('name', 'ip_address', 'polling_method')),
             ('snmp_version', '2', ['ro_community_string']),
+            ('polling_method', 'SNMP', ['snmp_version']),
             ('polling_method', 'WMI', ['wmi_credentials']),
             ('snmp_version', '3', ['snmpv3_username', 'snmpv3_priv_key', 'snmpv3_auth_key'])
         ],
