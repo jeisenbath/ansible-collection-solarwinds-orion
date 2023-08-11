@@ -30,6 +30,7 @@ options:
             - The name of the interface.
             - Required if I(state=absent).
             - If omitted and I(state=present), default will discover and add all interfaces.
+            - Accepts regex pattern matching for interface name(s).
         required: False
         type: str
 extends_documentation_fragment:
@@ -50,6 +51,16 @@ EXAMPLES = r'''
     password: "{{ solarwinds_pass }}"
     name: "{{ node_name }}"
     state: present
+  delegate_to: localhost
+
+- name: Add all interfaces matching regex pattern "Ethernet [0-9]$"
+  solarwinds.orion.orion_node_interface:
+    hostname: "{{ solarwinds_server }}"
+    username: "{{ solarwinds_user }}"
+    password: "{{ solarwinds_pass }}"
+    name: "{{ node_name }}"
+    state: present
+    interface: "Ethernet [0-9]$"
   delegate_to: localhost
 
 - name: Remove an interface from node
