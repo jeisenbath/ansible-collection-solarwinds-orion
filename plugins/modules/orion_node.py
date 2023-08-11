@@ -270,13 +270,6 @@ def add_node(module, orion):
         'Community': module.params['ro_community_string'],
         'RWCommunity': module.params['rw_community_string'],
         'SNMPVersion': module.params['snmp_version'],
-        'SNMPV3Username': module.params['snmpv3_username'],
-        'SNMPV3PrivMethod': module.params['snmpv3_priv_method'],
-        'SNMPV3PrivKeyIsPwd': module.params['snmpv3_priv_key_is_pwd'],
-        'SNMPV3PrivKey': module.params['snmpv3_priv_key'],
-        'SNMPV3AuthMethod': module.params['snmpv3_auth_method'],
-        'SNMPV3AuthKeyIsPwd': module.params['snmpv3_auth_key_is_pwd'],
-        'SNMPV3AuthKey': module.params['snmpv3_auth_key'],
         'AgentPort': module.params['snmp_port'],
         'Allow64BitCounters': module.params['snmp_allow_64'],
         'External': lambda x: True if module.params['polling_method'] == 'EXTERNAL' else False,
@@ -289,6 +282,22 @@ def add_node(module, orion):
 
     if props['ObjectSubType'] == 'EXTERNAL':
         props['ObjectSubType'] = 'ICMP'
+
+    if module.params['snmp_version'] == '3' and props['ObjectSubType'] == 'SNMP':
+        if module.params['snmpv3_username']:
+            props['SNMPV3Username'] = module.params['snmpv3_username']
+        if module.params['snmpv3_priv_method']:
+            props['SNMPV3PrivMethod'] = module.params['snmpv3_priv_method']
+        if module.params['snmpv3_priv_key_is_pwd']:
+            props['SNMPV3PrivKeyIsPwd'] = module.params['snmpv3_priv_key_is_pwd']
+        if module.params['snmpv3_priv_key']:
+            props['SNMPV3PrivKey'] = module.params['snmpv3_priv_key']
+        if module.params['snmpv3_auth_method']:
+            props['SNMPV3AuthMethod'] = module.params['snmpv3_auth_method']
+        if module.params['snmpv3_auth_key_is_pwd']:
+            props['SNMPV3AuthKeyIsPwd'] = module.params['snmpv3_auth_key_is_pwd']
+        if module.params['snmpv3_auth_key']:
+            props['SNMPV3AuthKey'] = module.params['snmpv3_auth_key']
 
     # Add Node
     try:
