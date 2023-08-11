@@ -170,17 +170,30 @@ def main():
             except Exception as OrionException:
                 module.fail_json(msg='Failed to add interface: {0}'.format(str(OrionException)))
     elif module.params['state'] == 'absent':
-        try:
-            if orion.get_interface(node, module.params['interface']):
+        if not module.params['interface']:
+            try:
                 if module.check_mode:
                     module.exit_json(changed=True, orion_node=node)
                 else:
-                    orion.remove_interface(node, module.params['interface'])
+                    discovered_interfaces = orion.discover_interfaces(node)
+                    for interface in discovered_interfaces:
+                        if orion.get_interface(node, interface['Caption']):
+                            orion.remove_interface(node, interface['Caption'])
                     module.exit_json(changed=True, orion_node=node)
-            else:
-                module.exit_json(changed=False, orion_node=node)
-        except Exception as OrionException:
-            module.fail_json(msg='Failed to remove interface: {0}'.format(str(OrionException)))
+            except Exception as OrionException:
+                module.fail_json(msg='Failed to remove interfaces: {0}'.format(str(OrionException)))
+        else:
+            try:
+                if orion.get_interface(node, module.params['interface']):
+                    if module.check_mode:
+                        module.exit_json(changed=True, orion_node=node)
+                    else:
+                        orion.remove_interface(node, module.params['interface'])
+                        module.exit_json(changed=True, orion_node=node)
+                else:
+                    module.exit_json(changed=False, orion_node=node)
+            except Exception as OrionException:
+                module.fail_json(msg='Failed to remove interface: {0}'.format(str(OrionException)))
     else:
         module.exit_json(changed=False, orion_node=node)
 
