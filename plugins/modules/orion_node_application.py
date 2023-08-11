@@ -156,7 +156,7 @@ def main():
                 if module.check_mode:
                     module.exit_json(changed=True, orion_node=node)
                 else:
-                    orion.add_application_template_to_node(node, application_template_id, credential_id, module.params['skip_duplicate'])
+                    orion.add_application_template_to_node(node, application_template_id, credential_id, module.params['skip_duplicates'])
                     module.exit_json(changed=True, orion_node=node)
         except Exception as OrionException:
             module.fail_json(msg='Failed to add application to node: {0}'.format(OrionException))
