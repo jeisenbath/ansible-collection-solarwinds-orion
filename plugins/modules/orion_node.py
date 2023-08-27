@@ -241,24 +241,20 @@ except Exception:
 requests.packages.urllib3.disable_warnings()
 
 
-def _add_wmi_credentials(module, node):
-
-    # Check if passed credential is valid
-    cred = __SWIS__.query(
-        "SELECT ID FROM Orion.Credential WHERE Name = "
-        "@wmi_credential",
-        wmi_credential=module.params['wmi_credential']
+def add_credential_set(node, credential_set_name, credential_set_type):
+    credential_set_type_valid = ['WMICredential', 'ROSNMPCredentialID', 'RWSNMPCredentialID']
+    cred_id_query = __SWIS__.query(
+        "SELECT ID FROM Orion.Credential WHERE Name = '{0}'".format(credential_set_name)
     )
 
-    if cred['ID']:  # Valid credential passed - Add to Orion.NodeSettings
+    credential_id = cred_id_query['results'][0]['ID']
+    if credential_id and credential_set_type in credential_set_type_valid:
         nodesettings = {
             'nodeid': node['nodeid'],
-            'SettingName': 'WMICredential',
-            'SettingValue': str(cred['ID']),
+            'SettingName': credential_set_type,
+            'SettingValue': str(credential_id),
         }
         __SWIS__.create('Orion.NodeSettings', **nodesettings)
-    else:  # Invalid Credential
-        module.fail_json(msg='Invalid Credential id {0}'.format(module.params['wmi_credential']), **cred)
 
 
 def add_node(module, orion):
@@ -284,20 +280,28 @@ def add_node(module, orion):
         props['ObjectSubType'] = 'ICMP'
 
     if module.params['snmp_version'] == '3' and props['ObjectSubType'] == 'SNMP':
-        if module.params['snmpv3_username']:
-            props['SNMPV3Username'] = module.params['snmpv3_username']
+        # Even when using credential set, node creation fails without providing all three properties
+        props['SNMPV3Username'] = module.params['snmpv3_username']
+        props['SNMPV3PrivKey'] = module.params['snmpv3_priv_key']
+        props['SNMPV3AuthKey'] = module.params['snmpv3_auth_key']
+
+        # Set defaults here instead of at module level, since we only want for snmpv3 nodes
         if module.params['snmpv3_priv_method']:
             props['SNMPV3PrivMethod'] = module.params['snmpv3_priv_method']
+        else:
+            props['SNMPV3PrivMethod'] = 'AES128'
         if module.params['snmpv3_priv_key_is_pwd']:
             props['SNMPV3PrivKeyIsPwd'] = module.params['snmpv3_priv_key_is_pwd']
-        if module.params['snmpv3_priv_key']:
-            props['SNMPV3PrivKey'] = module.params['snmpv3_priv_key']
+        else:
+            props['SNMPV3PrivKeyIsPwd'] = True
         if module.params['snmpv3_auth_method']:
             props['SNMPV3AuthMethod'] = module.params['snmpv3_auth_method']
+        else:
+            props['SNMPV3AuthMethod'] = 'SHA1'
         if module.params['snmpv3_auth_key_is_pwd']:
             props['SNMPV3AuthKeyIsPwd'] = module.params['snmpv3_auth_key_is_pwd']
-        if module.params['snmpv3_auth_key']:
-            props['SNMPV3AuthKey'] = module.params['snmpv3_auth_key']
+        else:
+            props['SNMPV3AuthKeyIsPwd'] = True
 
     # Add Node
     try:
@@ -308,9 +312,14 @@ def add_node(module, orion):
     # Get node after being created
     node = orion.get_node()
 
+    # If we don't use credential sets, each snmpv3 node will create its own credential set
+    # TODO option for read/write sets?
+    if props['ObjectSubType'] == 'SNMP' and props['SNMPVersion'] == '3':
+        add_credential_set(node, module.params['snmpv3_credential_set'], 'ROSNMPCredentialID')
+
     # If Node is a WMI node, assign credential
     if props['ObjectSubType'] == 'WMI':
-        _add_wmi_credentials(module, node)
+        add_credential_set(node, module.params['wmi_credential_set'], 'WMICredential')
 
     # Add Standard Default Pollers
     icmp_pollers = {
@@ -444,16 +453,17 @@ def main():
         ro_community_string=dict(required=False, no_log=True),
         rw_community_string=dict(required=False, no_log=True),
         snmp_version=dict(required=False, default=None, choices=['2', '3']),
+        snmpv3_credential_set=dict(required=False, default=None, type=str),
         snmpv3_username=dict(required=False, type=str),
-        snmpv3_auth_method=dict(required=False, type=str, default='SHA1', choices=['SHA1', 'MD5']),
+        snmpv3_auth_method=dict(required=False, type=str, choices=['SHA1', 'MD5']),
         snmpv3_auth_key=dict(required=False, type=str, no_log=True),
-        snmpv3_auth_key_is_pwd=dict(required=False, default=True, type=bool),
-        snmpv3_priv_method=dict(required=False, type=str, default='AES128', choices=['DES56', 'AES128', 'AES192', 'AES256']),
+        snmpv3_auth_key_is_pwd=dict(required=False, type=bool),
+        snmpv3_priv_method=dict(required=False, type=str, choices=['DES56', 'AES128', 'AES192', 'AES256']),
         snmpv3_priv_key=dict(required=False, type=str, no_log=True),
-        snmpv3_priv_key_is_pwd=dict(required=False, default=True, type=bool),
+        snmpv3_priv_key_is_pwd=dict(required=False, type=bool),
         snmp_port=dict(required=False, default='161'),
         snmp_allow_64=dict(required=False, default=True, type='bool'),
-        wmi_credentials=dict(required=False, no_log=True),
+        wmi_credential_set=dict(required=False, no_log=True),
         polling_engine=dict(required=False),
     )
 
@@ -464,9 +474,9 @@ def main():
         required_if=[
             ('state', 'present', ('name', 'ip_address', 'polling_method')),
             ('snmp_version', '2', ['ro_community_string']),
+            ('snmp_version', '3', ['snmpv3_credential_set', 'snmpv3_username', 'snmpv3_auth_key', 'snmpv3_priv_key']),
             ('polling_method', 'SNMP', ['snmp_version']),
-            ('polling_method', 'WMI', ['wmi_credentials']),
-            ('snmp_version', '3', ['snmpv3_username', 'snmpv3_priv_key', 'snmpv3_auth_key'])
+            ('polling_method', 'WMI', ['wmi_credential_set']),
         ],
     )
 
