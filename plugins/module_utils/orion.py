@@ -294,9 +294,9 @@ class OrionModule:
 
     def get_least_used_polling_engine(self):
         queryengines = self.swis.query("SELECT count(EngineId) as NumEngines FROM Orion.Engines")
-        totalpollingengines = queryengines['results'][0]['NumEngines']
+        totalpollingengines = int(queryengines['results'][0]['NumEngines'])
 
-        if totalpollingengines != "1":
+        if totalpollingengines > 1:
             queryleast = self.swis.query(
                 "SELECT TOP 1 Nodes, EngineID FROM Orion.Engines WHERE EngineID != 1 ORDER BY Nodes asc"
             )
