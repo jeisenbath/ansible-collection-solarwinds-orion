@@ -110,15 +110,20 @@ options:
         type: bool
         default: true
         required: false
+    snmpv3_credential_set:
+        description:
+            - Credential set name for SNMPv3 credentials.
+            - Required when SNMP version is 3.
     snmpv3_username:
         description:
             - Read-Only SNMPv3 username.
-            - Note that manually setting username, auth and privacy keys will create new credential sets per node.
+            - Required when SNMP version is 3.
         type: str
         required: false
     snmpv3_auth_method:
         description:
             - Authentication method for SNMPv3.
+            - Required when SNMP version is 3.
         type: str
         default: SHA1
         choices:
@@ -128,6 +133,7 @@ options:
     snmpv3_auth_key:
         description:
             - Authentication passphrase for SNMPv3.
+            - Required when SNMP version is 3.
         type: str
         required: false
     snmpv3_auth_key_is_pwd:
@@ -160,7 +166,7 @@ options:
         type: bool
         default: True
         required: false
-    wmi_credentials:
+    wmi_credential_set:
         description:
             - 'Credential Name already configured in NPM  Found under "Manage Windows Credentials" section of the Orion website (Settings)'
             - "Note: creation of credentials are not supported at this time"
