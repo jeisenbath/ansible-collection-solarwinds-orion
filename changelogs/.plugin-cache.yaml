@@ -1,0 +1,67 @@
+objects:
+  role: {}
+plugins:
+  become: {}
+  cache: {}
+  callback: {}
+  cliconf: {}
+  connection: {}
+  httpapi: {}
+  inventory: {}
+  lookup: {}
+  module:
+    orion_custom_property:
+      description: Manage custom properties on Node in Solarwinds Orion NPM
+      name: orion_custom_property
+      namespace: ''
+      version_added: 1.0.0
+    orion_node:
+      description: Created/Removes/Edits Nodes in Solarwinds Orion NPM
+      name: orion_node
+      namespace: ''
+      version_added: 1.0.0
+    orion_node_application:
+      description: Manages APM application templates assigned to nodes.
+      name: orion_node_application
+      namespace: ''
+      version_added: 1.0.0
+    orion_node_custom_poller:
+      description: Creates/Removes custom pollers to a Node in Solarwinds Orion NPM
+      name: orion_node_custom_poller
+      namespace: ''
+      version_added: 1.0.0
+    orion_node_info:
+      description: Gets info about a Node in Solarwinds Orion NPM
+      name: orion_node_info
+      namespace: ''
+      version_added: 1.0.0
+    orion_node_interface:
+      description: Manage interfaces on Nodes in Solarwinds Orion NPM
+      name: orion_node_interface
+      namespace: ''
+      version_added: 1.0.0
+    orion_node_poller:
+      description: Manage Pollers on Nodes in Solarwinds Orion NPM
+      name: orion_node_poller
+      namespace: ''
+      version_added: 1.0.0
+    orion_update_node:
+      description: Updates Node in Solarwinds Orion NPM
+      name: orion_update_node
+      namespace: ''
+      version_added: 1.0.0
+    orion_volume:
+      description: Manage Volumes on Nodes in Solarwinds Orion NPM
+      name: orion_volume
+      namespace: ''
+      version_added: 1.0.0
+    orion_volume_info:
+      description: Gets info about a Volume in Solarwinds Orion NPM
+      name: orion_volume_info
+      namespace: ''
+      version_added: 1.0.0
+  netconf: {}
+  shell: {}
+  strategy: {}
+  vars: {}
+version: 1.0.3

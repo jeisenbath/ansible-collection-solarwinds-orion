@@ -1,0 +1,97 @@
+ancestor: null
+releases:
+  1.0.0:
+    changes:
+      release_summary: '| Released 2023-03-18
+
+        '
+    fragments:
+    - release_summary_1.0.0.yml
+    modules:
+    - description: Manage custom properties on Node in Solarwinds Orion NPM
+      name: orion_custom_property
+      namespace: ''
+    - description: Created/Removes/Edits Nodes in Solarwinds Orion NPM
+      name: orion_node
+      namespace: ''
+    - description: Manages APM application templates assigned to nodes.
+      name: orion_node_application
+      namespace: ''
+    - description: Creates/Removes custom pollers to a Node in Solarwinds Orion NPM
+      name: orion_node_custom_poller
+      namespace: ''
+    - description: Gets info about a Node in Solarwinds Orion NPM
+      name: orion_node_info
+      namespace: ''
+    - description: Manage interfaces on Nodes in Solarwinds Orion NPM
+      name: orion_node_interface
+      namespace: ''
+    - description: Manage Pollers on Nodes in Solarwinds Orion NPM
+      name: orion_node_poller
+      namespace: ''
+    - description: Updates Node in Solarwinds Orion NPM
+      name: orion_update_node
+      namespace: ''
+    - description: Manage Volumes on Nodes in Solarwinds Orion NPM
+      name: orion_volume
+      namespace: ''
+    - description: Gets info about a Volume in Solarwinds Orion NPM
+      name: orion_volume_info
+      namespace: ''
+    release_date: '2023-09-26'
+  1.0.1:
+    changes:
+      bugfixes:
+      - orion_node module - add snmp_version required_if polling_method == 'SNMP'
+      - orion_node module - fix typo in logic for state 'managed'
+      - orion_node module - unset default for snmp version in parameters, to fix issue
+        2
+      minor_changes:
+      - orion_node module - use datetime.now() instead of datetime.utcnow() for muting
+        and unmanaging. utcnow() works fine for managing, but for muting the time
+        needs to match server time to work correctly.
+      release_summary: '| Released 2023-07-14
+
+        '
+    fragments:
+    - bugfixes_1.0.1.yml
+    - minor_changes_1.0.1.yml
+    - release_summary_1.0.1.yml
+    release_date: '2023-09-26'
+  1.0.2:
+    changes:
+      bugfixes:
+      - orion.py add_interface function - only regex pattern match if exact interface
+        name is not found
+      - orion_node module - don't set snmpv3 properties for node unless parameters
+        are passed
+      - orion_node_application module - typo with param name 'skip_duplicates'
+      - orion_node_interface - add to documentation and examples to clarify regex
+        pattern matching is supported
+      minor_changes:
+      - orion_node_interface module - add support for removing all interfaces if one
+        is not specified
+      release_summary: '| Released 2023-08-10
+
+        '
+    fragments:
+    - bugfixes_1.0.2.yml
+    - minor_changes_1.0.2.yml
+    - release_summary_1.0.2.yml
+    release_date: '2023-09-26'
+  1.0.3:
+    changes:
+      bugfixes:
+      - orion.py get_least_used_polling_engine - convert the query count to an int,
+        to fix an issue with a deployment with only one poller
+      minor_changes:
+      - orion_node module - add support for using credential sets for SNMPv3 nodes,
+        updated documentation with params that are required for SNMPv3
+      release_summary: '| Released 2023-08-27
+
+        '
+    fragments:
+    - bugfixes_1.0.3.yml
+    - minor_changes_1.0.3.yml
+    - release_summary_1.0.3.yml
+    release_date: '2023-09-26'
