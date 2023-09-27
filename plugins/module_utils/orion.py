@@ -222,23 +222,23 @@ class OrionModule:
         if interface_uri['results']:
             return interface_uri['results'][0]['Uri']
 
-    def add_interface(self, node, interface_name):
+    def add_interface(self, node, interface_name, regex):
         discovered_interfaces = self.discover_interfaces(node)
-        discovered_interface_exact = [
-            x for x
-            in discovered_interfaces
-            if interface_name == x['Caption']
-        ]
-        discovered_interface_regex = [
-            x for x
-            in discovered_interfaces
-            if re.search(interface_name, x['Caption'])
-        ]
+        if regex:
+            discovered_interface = [
+                x for x
+                in discovered_interfaces
+                if re.search(interface_name, x['Caption'])
+            ]
+        else:
+            discovered_interface = [
+                x for x
+                in discovered_interfaces
+                if interface_name == x['Caption']
+            ]
 
-        if discovered_interface_exact:
-            self.swis.invoke('Orion.NPM.Interfaces', 'AddInterfacesOnNode', node['nodeid'], discovered_interface_exact, 'AddDefaultPollers')
-        elif discovered_interface_regex:
-            self.swis.invoke('Orion.NPM.Interfaces', 'AddInterfacesOnNode', node['nodeid'], discovered_interface_regex, 'AddDefaultPollers')
+        if discovered_interface:
+            self.swis.invoke('Orion.NPM.Interfaces', 'AddInterfacesOnNode', node['nodeid'], discovered_interface, 'AddDefaultPollers')
 
     def remove_interface(self, node, interface_name):
         interface_uri = self.get_interface(node, interface_name)

@@ -30,9 +30,14 @@ options:
             - The name of the interface.
             - Required if I(state=absent).
             - If omitted and I(state=present), default will discover and add all interfaces.
-            - Accepts regex pattern matching for interface name(s).
         required: False
         type: str
+    regex:
+        description:
+            - Whether or not to use regex pattern matching when adding an interface
+        required: False
+        type: bool
+        default: False
 extends_documentation_fragment:
     - solarwinds.orion.orion_auth_options
     - solarwinds.orion.orion_node_options
@@ -61,6 +66,7 @@ EXAMPLES = r'''
     name: "{{ node_name }}"
     state: present
     interface: "Ethernet [0-9]$"
+    regex: True
   delegate_to: localhost
 
 - name: Remove an interface from node
@@ -112,7 +118,8 @@ def main():
     argument_spec = orion_argument_spec
     argument_spec.update(
         state=dict(required=True, choices=['present', 'absent']),
-        interface=dict(required=False, type='str')
+        interface=dict(required=False, type='str'),
+        regex=dict(required=False, type=bool, default=False),
     )
     module = AnsibleModule(
         argument_spec,
@@ -153,7 +160,7 @@ def main():
                     discovered_interfaces = orion.discover_interfaces(node)
                     for interface in discovered_interfaces:
                         if not orion.get_interface(node, interface['Caption']):
-                            orion.add_interface(node, interface['Caption'])
+                            orion.add_interface(node, interface['Caption'], False)
                     module.exit_json(changed=True, orion_node=node)
             except Exception as OrionException:
                 module.fail_json(msg='Failed to discover interfaces: {0}'.format(str(OrionException)))
@@ -163,7 +170,7 @@ def main():
                     if module.check_mode:
                         module.exit_json(changed=True, orion_node=node)
                     else:
-                        orion.add_interface(node, module.params['interface'])
+                        orion.add_interface(node, module.params['interface'], module.params['regex'])
                         module.exit_json(changed=True, orion_node=node)
                 else:
                     module.exit_json(changed=False, orion_node=node)

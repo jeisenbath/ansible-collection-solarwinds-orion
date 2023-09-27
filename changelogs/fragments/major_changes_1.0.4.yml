@@ -1,0 +1,2 @@
+major_changes:
+  - orion_node_interface module - add param 'regex' to explicitly state if you want to do pattern matching in interface name
