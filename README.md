@@ -25,10 +25,9 @@ solarwinds.orion.orion_volume_info | Gets info about a Volume assigned to a Node
 
 <!-- List the versions of Ansible the collection has been tested with. Must match what is in galaxy.yml. -->
 2.9
-
 2.12.2
-
 2.13.3
+2.14.2
 
 ## External requirements
 
