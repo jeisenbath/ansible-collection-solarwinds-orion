@@ -5,6 +5,25 @@ Solarwinds.Orion Release Notes
 .. contents:: Topics
 
 
+v1.0.4
+======
+
+Release Summary
+---------------
+
+| Released 2023-09-26
+
+
+Major Changes
+-------------
+
+- orion_node_interface module - add param 'regex' to explicitly state if you want to do pattern matching in interface name
+
+Bugfixes
+--------
+
+- orion_node module - fix functionality for adding External nodes
+
 v1.0.3
 ======
 
