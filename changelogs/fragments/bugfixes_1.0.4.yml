@@ -1,0 +1,2 @@
+bugfixes:
+  - orion_node module - fix functionality for adding External nodes

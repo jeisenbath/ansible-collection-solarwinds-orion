@@ -274,7 +274,7 @@ def add_node(module, orion):
         'SNMPVersion': module.params['snmp_version'],
         'AgentPort': module.params['snmp_port'],
         'Allow64BitCounters': module.params['snmp_allow_64'],
-        'External': lambda x: True if module.params['polling_method'] == 'EXTERNAL' else False,
+        'External': False,
     }
 
     if module.params['polling_engine']:
@@ -284,6 +284,9 @@ def add_node(module, orion):
 
     if props['ObjectSubType'] == 'EXTERNAL':
         props['ObjectSubType'] = 'ICMP'
+
+    if module.params['polling_method'].upper() == 'EXTERNAL':
+        props['External'] = True
 
     if module.params['snmp_version'] == '3' and props['ObjectSubType'] == 'SNMP':
         # Even when using credential set, node creation fails without providing all three properties
