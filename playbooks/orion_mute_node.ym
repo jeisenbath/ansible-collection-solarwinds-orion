@@ -1,0 +1,18 @@
+---
+- hosts: "{{ target }}"
+  gather_facts: true
+
+  vars:
+    solarwinds_info: &solarwinds_info
+      hostname: "{{ solarwinds_server }}"
+      username: "{{ solarwinds_user }}"
+      password: "{{ solarwinds_pass }}"
+
+  tasks:
+  - name: Mute node in Solarwinds for 30 minutes
+    solarwinds.orion.orion_node:
+      <<: *solarwinds_info
+      state: muted
+      ip_address: "{{ ip_address }}"
+      unmanage_until: "{{ '%Y-%m-%dT%H:%M:%S'|strftime( (ansible_date_time.epoch|int) + (1800)) }}Z" # this variable uses UTC time and adds 1800 seconds to it
+    delegate_to: localhost
