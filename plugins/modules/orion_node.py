@@ -190,7 +190,7 @@ requirements:
 
 EXAMPLES = '''
 ---
-- name:  Add an SNMP node to Orion
+- name: Add an SNMP node to Orion
   solarwinds.orion.orion_node:
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_username }}"
@@ -202,13 +202,14 @@ EXAMPLES = '''
     ro_community_string: "{{ snmp_ro_community_string }}"
   delegate_to: localhost
 
-- name: Mute a node
+- name: Mute node in Solarwinds for 30 minutes
   solarwinds.orion.orion_node:
     hostname: "{{ solarwinds_host }}"
     username: "{{ solarwinds_username }}"
     password: "{{ solarwinds_password }}"
-    name: "{{ node_name }}"
     state: muted
+    ip_address: "{{ ip_address }}"
+    unmanage_until: "{{ '%Y-%m-%dT%H:%M:%S' | strftime((now(fmt='%s')|int) + 1800) }}Z"
   delegate_to: localhost
 '''
 
