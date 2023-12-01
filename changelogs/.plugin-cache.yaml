@@ -7,7 +7,11 @@ plugins:
   cliconf: {}
   connection: {}
   httpapi: {}
-  inventory: {}
+  inventory:
+    orion_nodes_inventory:
+      description: Solarwinds Orion nodes inventory source
+      name: orion_nodes_inventory
+      version_added: null
   lookup: {}
   module:
     orion_custom_property:
@@ -64,4 +68,4 @@ plugins:
   shell: {}
   strategy: {}
   vars: {}
-version: 1.0.4
+version: 1.1.0

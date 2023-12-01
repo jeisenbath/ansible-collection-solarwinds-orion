@@ -8,18 +8,24 @@ Collection for managing Nodes in Solarwinds Orion.
 
 <!--start collection content-->
 ### Modules
-Name | Description
---- | ---
-solarwinds.orion.orion_custom_property | Manage custom properties on Node.
-solarwinds.orion.orion_node | Creates, Removes, Manage, or Mute Node.
-solarwinds.orion.orion_node_application | Manages APM application templates assigned to Nodes.
-solarwinds.orion.orion_node_custom_poller | Creates/Removes custom pollers on a Node.
-solarwinds.orion.orion_node_info | Gets info about a Node.
-solarwinds.orion.orion_node_interface | Manage interfaces on Nodes.
-solarwinds.orion.orion_node_poller | Manage Pollers on Nodes.
-solarwinds.orion.orion_update_node | Updates Node properties.
-solarwinds.orion.orion_volume | Manage Volumes on Nodes.
-solarwinds.orion.orion_volume_info | Gets info about a Volume assigned to a Node.
+| Name                                       | Description                                          |
+|--------------------------------------------|------------------------------------------------------|
+| solarwinds.orion.orion_custom_property     | Manage custom properties on Node.                    |
+| solarwinds.orion.orion_node                | Creates, Removes, Manage, or Mute Node.              |
+| solarwinds.orion.orion_node_application    | Manages APM application templates assigned to Nodes. |
+| solarwinds.orion.orion_node_custom_poller  | Creates/Removes custom pollers on a Node.            |
+| solarwinds.orion.orion_node_info           | Gets info about a Node.                              |
+| solarwinds.orion.orion_node_interface      | Manage interfaces on Nodes.                          |
+| solarwinds.orion.orion_node_poller         | Manage Pollers on Nodes.                             |
+| solarwinds.orion.orion_update_node         | Updates Node properties.                             |
+| solarwinds.orion.orion_volume              | Manage Volumes on Nodes.                             |
+| solarwinds.orion.orion_volume_info         | Gets info about a Volume assigned to a Node.         |
+
+### Plugins
+| Name                                   | Description                                   |
+|----------------------------------------|-----------------------------------------------|
+| solarwinds.orion.orion_nodes_inventory | Dynamic Inventory Plugin for Solarwinds Orion |
+
 
 ## Tested with Ansible
 

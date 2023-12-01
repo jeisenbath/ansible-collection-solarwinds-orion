@@ -110,3 +110,13 @@ releases:
     - major_changes_1.0.4.yml
     - release_summary_1.0.4.yml
     release_date: '2023-09-26'
+  1.1.0:
+    changes:
+      major_changes:
+      - Add dynamic inventory plugin solarwinds.orion.orion_nodes_inventory
+      release_summary: '| Released 2023-12-1
+
+        '
+    fragments:
+    - major_changes_1.1.0.yml
+    release_date: '2023-12-01'

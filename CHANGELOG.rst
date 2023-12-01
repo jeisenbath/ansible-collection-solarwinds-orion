@@ -5,6 +5,20 @@ Solarwinds.Orion Release Notes
 .. contents:: Topics
 
 
+v1.1.0
+======
+
+Release Summary
+---------------
+
+| Released 2023-12-1
+
+
+Major Changes
+-------------
+
+- Add dynamic inventory plugin solarwinds.orion.orion_nodes_inventory
+
 v1.0.4
 ======
 
