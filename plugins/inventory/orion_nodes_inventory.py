@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2023, Josh Eisenbath <josh.eisenbath@panerabread.com>
+# Copyright: (c) 2023, Josh Eisenbath <j.m.eisenbath@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import (absolute_import, division, print_function)
@@ -131,7 +131,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
             if path.endswith(('orion.yaml', 'orion.yml', 'solarwinds.yaml', 'solarwinds.yml')):
                 valid = True
             else:
-                self.display.vvv("Inventory source doesn't match 'datapantry' or 'pdp', skipping...")
+                self.display.vvv("Inventory source doesn't match 'solarwinds' or 'orion', skipping...")
         return valid
 
     def parse(self, inventory, loader, path, cache=True):
