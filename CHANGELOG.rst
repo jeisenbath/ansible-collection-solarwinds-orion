@@ -5,6 +5,20 @@ Solarwinds.Orion Release Notes
 .. contents:: Topics
 
 
+v1.2.0
+======
+
+Release Summary
+---------------
+
+Released 2024-03-01
+
+Major Changes
+-------------
+
+- Added a role orion_node
+- Updated the example playbook to use the new role
+
 v1.1.0
 ======
 
