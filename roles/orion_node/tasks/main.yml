@@ -1,0 +1,106 @@
+---
+# tasks file for orion_node
+- name: Create node
+  solarwinds.orion.orion_node:
+    hostname: "{{ orion_node_solarwinds_server }}"
+    username: "{{ orion_node_solarwinds_username }}"
+    password: "{{ orion_node_solarwinds_password }}"
+    state: present
+    name: "{{ orion_node_caption_name }}"
+    ip_address: "{{ orion_node_ip_address }}"
+    polling_method: "{{ orion_node_polling_method }}"
+    snmp_version: "{{ orion_node_snmp_version | default(omit) }}"
+    ro_community_string: "{{ orion_node_ro_community_string | default(omit) }}"
+    rw_community_string: "{{ orion_node_rw_community_string | default(omit) }}"
+    snmpv3_credential_set: "{{ orion_node_snmpv3_credential_set | default(omit) }}"
+    snmpv3_username: "{{ orion_node_snmpv3_username | default(omit) }}"
+    snmpv3_auth_key: "{{ orion_node_snmpv3_auth_key | default(omit) }}"
+    snmpv3_priv_key: "{{ orion_node_snmpv3_priv_key | default(omit) }}"
+    snmp_port: "{{ orion_node_snmp_port | default(omit) }}"
+    snmp_allow_64: "{{ orion_node_snmp_allow_64 | default(omit) }}"
+  delegate_to: localhost
+
+- name: Add SNMP pollers to node if polling method is SNMP
+  when: orion_node_polling_method == 'SNMP'
+  solarwinds.orion.orion_node_poller:
+    hostname: "{{ orion_node_solarwinds_server }}"
+    username: "{{ orion_node_solarwinds_username }}"
+    password: "{{ orion_node_solarwinds_password }}"
+    state: present
+    name: "{{ orion_node_caption_name }}"
+    poller: "{{ item.name }}"
+    enabled: "{{ item.enabled }}"
+  loop: "{{ orion_node_snmp_pollers }}"
+  delegate_to: localhost
+
+- name: Add Custom Pollers when orion_node_custom_pollers is defined
+  when: orion_node_polling_method == 'SNMP' and orion_node_custom_pollers is defined
+  solarwinds.orion.orion_node_custom_poller:
+    hostname: "{{ orion_node_solarwinds_server }}"
+    username: "{{ orion_node_solarwinds_username }}"
+    password: "{{ orion_node_solarwinds_password }}"
+    state: present
+    name: "{{ orion_node_caption_name }}"
+    custom_poller: "{{ item }}"
+  loop: "{{ orion_node_custom_pollers }}"
+  delegate_to: localhost
+
+- name: Add interfaces to node if polling method is SNMP and orion_node_interfaces list of interfaces is defined
+  when: orion_node_polling_method == 'SNMP' and orion_node_interfaces is defined and not orion_node_discover_interfaces
+  solarwinds.orion.orion_node_interface:
+    hostname: "{{ orion_node_solarwinds_server }}"
+    username: "{{ orion_node_solarwinds_username }}"
+    password: "{{ orion_node_solarwinds_password }}"
+    state: present
+    name: "{{ orion_node_caption_name }}"
+    interface: "{{ item }}"
+  loop: "{{ orion_node_interfaces }}"
+  delegate_to: localhost
+
+- name: Discover and add interfaces if orion_node_discover_interfaces is true
+  when: orion_node_polling_method == 'SNMP' and orion_node_discover_interfaces
+  solarwinds.orion.orion_node_interface:
+    hostname: "{{ orion_node_solarwinds_server }}"
+    username: "{{ orion_node_solarwinds_username }}"
+    password: "{{ orion_node_solarwinds_password }}"
+    state: present
+    name: "{{ orion_node_caption_name }}"
+  delegate_to: localhost
+
+- name: Add volumes to node if orion_node_volumes is defined and polling method is SNMP
+  when: orion_node_polling_method == 'SNMP' and orion_node_volumes is defined
+  solarwinds.orion.orion_volume:
+    hostname: "{{ orion_node_solarwinds_server }}"
+    username: "{{ orion_node_solarwinds_username }}"
+    password: "{{ orion_node_solarwinds_password }}"
+    state: present
+    name: "{{ orion_node_caption_name }}"
+    volume:
+      name: "{{ item }}"
+  loop: "{{ orion_node_volumes }}"
+  delegate_to: localhost
+
+- name: Add APM Application template to node if orion_node_applications is defined
+  when: orion_node_applications is defined
+  solarwinds.orion.orion_node_application:
+    hostname: "{{ orion_node_solarwinds_server }}"
+    username: "{{ orion_node_solarwinds_username }}"
+    password: "{{ orion_node_solarwinds_password }}"
+    state: present
+    name: "{{ orion_node_caption_name }}"
+    application_template_name: "{{ item }}"
+  loop: "{{ orion_node_applications }}"
+  delegate_to: localhost
+
+- name: Add Custom Properties when orion_node_custom_properties is defined
+  when: orion_node_custom_properties is defined
+  solarwinds.orion.orion_custom_property:
+    hostname: "{{ orion_node_solarwinds_server }}"
+    username: "{{ orion_node_solarwinds_username }}"
+    password: "{{ orion_node_solarwinds_password }}"
+    state: present
+    name: "{{ orion_node_caption_name }}"
+    property_name: "{{ item.name }}"
+    property_value: "{{ item.value }}"
+  loop: "{{ orion_node_custom_properties }}"
+  delegate_to: localhost

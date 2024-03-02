@@ -1,0 +1,14 @@
+---
+# defaults file for orion_node
+orion_node_solarwinds_server: "{{ solarwinds_server }}"
+orion_node_solarwinds_username: "{{ solarwinds_username }}"
+orion_node_solarwinds_password: "{{ solarwinds_password }}"
+orion_node_caption_name: "{{ ansible_facts.nodename }}"
+orion_node_ip_address: "{{ ansible_facts.default_ipv4.address }}"
+orion_node_polling_method: ICMP
+orion_node_snmp_pollers:
+  - name: N.Cpu.SNMP.HrProcessorLoad
+    enabled: true
+  - name: N.Memory.SNMP.NetSnmpReal
+    enabled: true
+orion_node_discover_interfaces: false
