@@ -1,96 +1,48 @@
 ---
-- hosts: "{{ target }}"
-  gather_facts: true
+- name: Add Linux host as node to Solarwinds
+  hosts: "{{ target }}"
+  gather_facts: true # if you don't want to use ansible facts, make sure to then override default caption and IP variables
 
-  vars:
-    solarwinds_info: &solarwinds_info
-      hostname: "{{ solarwinds_server }}"
-      username: "{{ solarwinds_user }}"
-      password: "{{ solarwinds_pass }}"
-
-  tasks:
-  - name: Add SNMP node to Solarwinds
-    solarwinds.orion.orion_node:
-      <<: *solarwinds_info
-      state: present
-      name: "{{ node_name }}"
-      ip_address: "{{ ip_address }}"
-      polling_method: SNMP
-      polling_engine: "{{ polling_engine }}"
-      ro_community_string: "{{ snmp_ro_community_string }}"
-    delegate_to: localhost
-
-  - name: Add Linux CPU, Memory, Load Average pollers
-    when: ansible_facts['os_family'] != 'Windows'
-    solarwinds.orion.orion_node_poller:
-      <<: *solarwinds_info
-      name: "{{ node_name }}"
-      state: present
-      poller: "{{ item }}"
-      enabled: True
-    loop:
-      - N.LoadAverage.SNMP.Linux
-      - N.Cpu.SNMP.HrProcessorLoad
-      - N.Memory.SNMP.NetSnmpReal
-    delegate_to: localhost
-
-  - name: Add Linux volumes to node
-    when: ansible_facts['os_family'] != 'Windows'
-    solarwinds.orion.orion_volume:
-      <<: *solarwinds_info
-      name: "{{ node_name }}"
-      state: present
-      volume:
-        name: "{{ item }}"
-    loop:
+  vars: # Be sure to check out the role README for a full list of variables
+    solarwinds_server: 127.0.0.1
+    solarwinds_username: admin
+    solarwinds_password: changeme2345
+    orion_node_polling_method: SNMP
+    orion_node_snmp_version: 2
+    orion_node_ro_community_string: community
+    orion_node_discover_interfaces: true
+    orion_node_volumes:
       - /
-      - /opt
-      - /var
-      - /boot
       - /home
       - /var/log
-    delegate_to: localhost
+    # These are the basic pollers for a Linux node
+    # If you have other pollers enabled, such as Topology Layer 3, you can find a list by adding a node manually,
+    # then run the following query against the orion database:
 
-  - name: Discover and add Linux interfaces
-    when: ansible_facts['os_family'] != 'Windows'
-    solarwinds.orion.orion_node_interface:
-      <<: *solarwinds_info
-      name: "{{ node_name }}"
-      state: present
-      interface: "{{ item }}"
-    loop:
-      - eth0
-      - eth1
-      - eth2
-    delegate_to: localhost
-
-  - name: Add Windows SNMP pollers
-    when: ansible_facts['os_family'] = 'Windows'
-    solarwinds.orion.orion_node_poller:
-      <<: *solarwinds_info
-      name: "{{ node_name }}"
-      state: present
-      poller: "{{ item.name }}"
-      enabled: "{{ item.enabled }}"
-    loop:
+    # SELECT n.Caption, p.PollerType, p.Enabled
+    # from Orion.Nodes n
+    # left join Orion.Pollers as p on p.NetObjectID = n.NodeId
+    # where n.Caption = 'your_node_caption_here'
+    orion_node_snmp_pollers:
+      - name: N.LoadAverage.SNMP.Linux
+        enabled: true
       - name: N.Cpu.SNMP.HrProcessorLoad
-        enabled: True
+        enabled: true
       - name: N.Memory.SNMP.NetSnmpReal
-        enabled: True
-    delegate_to: localhost
+        enabled: true
 
-# I use regex matching for Windows interfaces, as SNMP seems to report the full device name.
-  - name: Add Windows interfaces
-    when: ansible_facts['os_family'] != 'Windows'
-    solarwinds.orion.orion_node_interface:
-      <<: *solarwinds_info
-      name: "{{ node_name }}"
-      state: present
-      interface: "{{ item }}"
-    loop:
-      - "Ethernet$"
-      - "Ethernet 1$"
-      - "Ethernet 2$"
-    delegate_to: localhost
+    # The same can be done for custom pollers, if you have any.
+    # This query can get a list of Custom Pollers assigned to a node:
 
-# Windows Volumes with SNMP are reported with Serial Number. Currently, Volume module doesn't do volume discovery, so it is omitted.
+    # SELECT n.Caption, c.CustomPollerName
+    # from Orion.Nodes n
+    # left join Orion.NPM.CustomPollerAssignment as c on c.NodeID = n.NodeID
+    # where n.Caption = 'your_node_caption_here'
+
+    # You can also get a full list of custom pollers available with this query:
+    # SELECT GroupName, UniqueName
+    # FROM Orion.NPM.CustomPollers
+    # Order By GroupName
+
+  roles:
+     - { role: solarwinds.orion.orion_node }
