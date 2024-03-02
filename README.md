@@ -26,6 +26,10 @@ Collection for managing Nodes in Solarwinds Orion.
 |----------------------------------------|-----------------------------------------------|
 | solarwinds.orion.orion_nodes_inventory | Dynamic Inventory Plugin for Solarwinds Orion |
 
+### Roles
+| Name                        | Description                    |
+|-----------------------------|--------------------------------|
+| solarwinds.orion.orion_node | Add a node to solarwinds orion |
 
 ## Tested with Ansible
 
