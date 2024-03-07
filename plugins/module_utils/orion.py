@@ -27,6 +27,11 @@ class OrionModule:
         self.module = module
         self.swis = swis
 
+    def swis_query(self, query):
+        results = self.swis.query(query)
+        if results['results']:
+            return results['results']
+
     def get_node(self):
         node = {}
         fields = """NodeID, Caption, Unmanaged, UnManageFrom, UnManageUntil, Uri,
@@ -304,3 +309,18 @@ class OrionModule:
             return leastusedpollingengine
         else:
             return "1"
+
+    def get_ncm_node(self, node):
+        cirrus_node_query = self.swis.query(
+            "SELECT NodeID from Cirrus.Nodes WHERE CoreNodeID = '{0}'".format(node['nodeid'])
+        )
+        if cirrus_node_query['results']:
+            return cirrus_node_query['results'][0]['NodeID']
+
+    def add_node_to_ncm(self, node):
+        self.swis.invoke('Cirrus.Nodes', 'AddNodeToNCM', node['nodeid'])
+
+    def remove_node_from_ncm(self, node):
+        cirrus_node_id = self.get_ncm_node(node)
+
+        self.swis.invoke('Cirrus.Nodes', 'RemoveNode', cirrus_node_id)
