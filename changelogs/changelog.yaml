@@ -129,3 +129,27 @@ releases:
     fragments:
     - major_changes.yml
     release_date: '2024-03-01'
+  1.3.0:
+    changes:
+      major_changes:
+      - Add module orion_node_ncm - Adds/Removes an existing node to be managed in
+        NCM.
+      - Add module orion_node_poller_info - Gets pollers assigned to a node and their
+        enabled status.
+      - Add module orion_query - Runs a SWQL query against Orion database, outputs
+        to json and optional CSV.
+      release_summary: Released 2024-03-07
+    fragments:
+    - major_changes.yml
+    modules:
+    - description: Manages a node in Solarwinds NCM
+      name: orion_node_ncm
+      namespace: ''
+    - description: Gets info about pollers assigned to a Node in Solarwinds Orion
+        NPM
+      name: orion_node_poller_info
+      namespace: ''
+    - description: Queries the Solarwinds Orion database
+      name: orion_query
+      namespace: ''
+    release_date: '2024-03-07'

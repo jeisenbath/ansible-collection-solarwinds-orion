@@ -5,6 +5,28 @@ Solarwinds.Orion Release Notes
 .. contents:: Topics
 
 
+v1.3.0
+======
+
+Release Summary
+---------------
+
+Released 2024-03-07
+
+Major Changes
+-------------
+
+- Add module orion_node_ncm - Adds/Removes an existing node to be managed in NCM.
+- Add module orion_node_poller_info - Gets pollers assigned to a node and their enabled status.
+- Add module orion_query - Runs a SWQL query against Orion database, outputs to json and optional CSV.
+
+New Modules
+-----------
+
+- solarwinds.orion.orion_node_ncm - Manages a node in Solarwinds NCM
+- solarwinds.orion.orion_node_poller_info - Gets info about pollers assigned to a Node in Solarwinds Orion NPM
+- solarwinds.orion.orion_query - Queries the Solarwinds Orion database
+
 v1.2.0
 ======
 
