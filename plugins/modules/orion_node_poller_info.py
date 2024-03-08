@@ -108,6 +108,7 @@ def main():
         'hostname': module.params['hostname'],
         'username': module.params['username'],
         'password': module.params['password'],
+        'port': module.params['port'],
     }
 
     __SWIS__ = SwisClient(**options)

@@ -42,7 +42,7 @@ requirements:
 EXAMPLES = r'''
 ---
 
-- name: Get info pollers assigned to a node
+- name: Run a query for the top 10 nodes in Orion.Nodes
   solarwinds.orion.orion_query:
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_user }}"
@@ -120,6 +120,7 @@ def main():
         'hostname': module.params['hostname'],
         'username': module.params['username'],
         'password': module.params['password'],
+        'port': module.params['port'],
     }
 
     __SWIS__ = SwisClient(**options)
