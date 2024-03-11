@@ -64,6 +64,7 @@ pollers:
     description: List of pollers assigned to the orion node.
     returned: always
     type: list
+    elements: dict
     sample: [
         {
             "Enabled": false,
