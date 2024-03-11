@@ -28,13 +28,13 @@ options:
     interface:
         description:
             - The name of the interface.
-            - Required if I(state=absent).
-            - If omitted and I(state=present), default will discover and add all interfaces.
+            - If omitted, the module will discover and manage all interfaces.
         required: False
         type: str
     regex:
         description:
-            - Whether or not to use regex pattern matching when adding an interface
+            - Whether or not to use regex pattern matching for I(interface).
+            - When I(regex=true), check mode will always show changed.
         required: False
         type: bool
         default: False
@@ -66,7 +66,7 @@ EXAMPLES = r'''
     name: "{{ node_name }}"
     state: present
     interface: "Ethernet [0-9]$"
-    regex: True
+    regex: true
   delegate_to: localhost
 
 - name: Remove an interface from node
@@ -98,6 +98,53 @@ orion_node:
         "unmanageuntil": "1899-12-30T00:00:00+00:00",
         "uri": "swis://host.domain.com/Orion/Orion.Nodes/NodeID=12345"
     }
+discovered:
+    description: List of discovered interfaces.
+    returned: always
+    type: list
+    elements: dict
+    sample: [
+            {
+                "Caption": "lo",
+                "InterfaceID": 0,
+                "Manageable": true,
+                "ifAdminStatus": 1,
+                "ifIndex": 1,
+                "ifOperStatus": 1,
+                "ifSpeed": 0.0,
+                "ifSubType": 0,
+                "ifType": 24
+            },
+            {
+                "Caption": "eth0",
+                "InterfaceID": 268420,
+                "Manageable": true,
+                "ifAdminStatus": 1,
+                "ifIndex": 2,
+                "ifOperStatus": 1,
+                "ifSpeed": 0.0,
+                "ifSubType": 0,
+                "ifType": 6
+            }
+        ]
+interfaces:
+    description: Interfaces added or removed by task.
+    returned: always, except for when I(state=present), I(interface) is defined and running in check mode.
+    type: list
+    elements: dict
+    sample: [
+            {
+                "Caption": "lo",
+                "InterfaceID": 0,
+                "Manageable": true,
+                "ifAdminStatus": 1,
+                "ifIndex": 1,
+                "ifOperStatus": 1,
+                "ifSpeed": 0.0,
+                "ifSubType": 0,
+                "ifType": 24
+            }
+        ]
 '''
 
 import requests
@@ -152,58 +199,50 @@ def main():
     if not node:
         module.fail_json(skipped=True, msg='Node not found')
 
+    changed = False
+    discovered = orion.discover_interfaces(node)
+    interfaces = []
     if module.params['state'] == 'present':
-        if not module.params['interface']:
-            try:
-                if module.check_mode:
-                    module.exit_json(changed=True, orion_node=node)
-                else:
-                    discovered_interfaces = orion.discover_interfaces(node)
-                    for interface in discovered_interfaces:
-                        if not orion.get_interface(node, interface['Caption']):
-                            orion.add_interface(node, interface['Caption'], False)
-                    module.exit_json(changed=True, orion_node=node)
-            except Exception as OrionException:
-                module.fail_json(msg='Failed to discover interfaces: {0}'.format(str(OrionException)))
-        else:
-            try:
-                if not orion.get_interface(node, module.params['interface']):
+        try:
+            if not module.params['interface']:
+                for interface in discovered:
+                    if not orion.get_interface(node, interface['Caption']):
+                        changed = True
+                        interfaces.append(interface)
+                        if not module.check_mode:
+                            orion.add_interface(node, interface['Caption'], False, discovered)
+            else:
+                get_int = orion.get_interface(node, module.params['interface'])
+                if not get_int:
                     if module.check_mode:
-                        module.exit_json(changed=True, orion_node=node)
+                        changed = True
                     else:
-                        orion.add_interface(node, module.params['interface'], module.params['regex'])
-                        module.exit_json(changed=True, orion_node=node)
-                else:
-                    module.exit_json(changed=False, orion_node=node)
-            except Exception as OrionException:
-                module.fail_json(msg='Failed to add interface: {0}'.format(str(OrionException)))
+                        interfaces = orion.add_interface(node, module.params['interface'], module.params['regex'], discovered)
+                        if interfaces:
+                            changed = True
+        except Exception as OrionException:
+            module.fail_json(msg='Failed to add interfaces: {0}'.format(str(OrionException)))
     elif module.params['state'] == 'absent':
-        if not module.params['interface']:
-            try:
-                if module.check_mode:
-                    module.exit_json(changed=True, orion_node=node)
-                else:
-                    discovered_interfaces = orion.discover_interfaces(node)
-                    for interface in discovered_interfaces:
-                        if orion.get_interface(node, interface['Caption']):
+        try:
+            if not module.params['interface']:
+                for interface in discovered:
+                    if orion.get_interface(node, interface['Caption']):
+                        changed = True
+                        interfaces.append(interface)
+                        if not module.check_mode:
                             orion.remove_interface(node, interface['Caption'])
-                    module.exit_json(changed=True, orion_node=node)
-            except Exception as OrionException:
-                module.fail_json(msg='Failed to remove interfaces: {0}'.format(str(OrionException)))
-        else:
-            try:
-                if orion.get_interface(node, module.params['interface']):
-                    if module.check_mode:
-                        module.exit_json(changed=True, orion_node=node)
-                    else:
+            else:
+                get_int = orion.get_interface(node, module.params['interface'])
+                if get_int:
+                    changed = True
+                    interfaces.append(get_int)
+                    if not module.check_mode:
                         orion.remove_interface(node, module.params['interface'])
-                        module.exit_json(changed=True, orion_node=node)
-                else:
-                    module.exit_json(changed=False, orion_node=node)
-            except Exception as OrionException:
-                module.fail_json(msg='Failed to remove interface: {0}'.format(str(OrionException)))
-    else:
-        module.exit_json(changed=False, orion_node=node)
+
+        except Exception as OrionException:
+            module.fail_json(msg='Failed to remove interface: {0}'.format(str(OrionException)))
+
+    module.exit_json(changed=changed, orion_node=node, discovered=discovered, interfaces=interfaces)
 
 
 if __name__ == "__main__":
