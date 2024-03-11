@@ -32,11 +32,6 @@ DOCUMENTATION = r'''
         description: Password to Authenticate with Orion Server. Accepts ansible-vault encrypted string.
         required: true
         type: string
-      orion_port:
-        description: Port to connect to the Solarwinds Information Service Api.
-        required: false
-        type: string
-        default: 17774
       filter:
         description: Optional WHERE filter used when querying the Orion.Nodes table to filter out hosts.
         required: false
@@ -212,7 +207,6 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
                 'hostname': self.get_option('orion_hostname'),
                 'username': self.get_option('orion_username'),
                 'password': self.get_option('orion_password'),
-                'port': self.get_options('port'),
             }
             __SWIS__ = SwisClient(**swis_options)
             __SWIS__.query('SELECT uri FROM Orion.Environment')

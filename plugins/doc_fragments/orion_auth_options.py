@@ -28,10 +28,4 @@ options:
             - Password for Orion user.
         required: true
         type: str
-    port:
-        description:
-            - Port to connect to the Solarwinds Information Service Api.
-        required: false
-        default: 17774
-        type: str
 """
