@@ -1,3 +1,3 @@
-orionsdk>=0.3.0
+orionsdk>=0.4.0
 python-dateutil
 requests
