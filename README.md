@@ -17,9 +17,12 @@ Collection for managing Nodes in Solarwinds Orion.
 | solarwinds.orion.orion_node_info           | Gets info about a Node.                              |
 | solarwinds.orion.orion_node_interface      | Manage interfaces on Nodes.                          |
 | solarwinds.orion.orion_node_poller         | Manage Pollers on Nodes.                             |
+| solarwinds.orion.orion_node_poller_info    | Query info about pollers assigned to a Node.         |
 | solarwinds.orion.orion_update_node         | Updates Node properties.                             |
 | solarwinds.orion.orion_volume              | Manage Volumes on Nodes.                             |
 | solarwinds.orion.orion_volume_info         | Gets info about a Volume assigned to a Node.         |
+| solarwinds.orion.orion_node_ncm            | Adds or Removes an existing node to NCM.             |
+| solarwinds.orion.orion_query               | Run a SWQL query against the orion database.         |
 
 ### Plugins
 | Name                                   | Description                                   |
