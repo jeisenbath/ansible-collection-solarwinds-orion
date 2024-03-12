@@ -16,7 +16,6 @@ Released 2024-03-11
 Minor Changes
 -------------
 
-- All plugins - added 'port' parameter for swis connection, in case api is on a custom port
 - orion_node_interface - refactored to try and make as idempotent as possible, and return 'discovered' and 'interface'
 
 v1.3.0
