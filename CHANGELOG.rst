@@ -5,6 +5,19 @@ Solarwinds.Orion Release Notes
 .. contents:: Topics
 
 
+v1.3.2
+======
+
+Release Summary
+---------------
+
+Released 2024-04-17
+
+Minor Changes
+-------------
+
+- inventory plugin orion_nodes_inventory - add ansible vault support for the password parameter
+
 v1.3.1
 ======
 
