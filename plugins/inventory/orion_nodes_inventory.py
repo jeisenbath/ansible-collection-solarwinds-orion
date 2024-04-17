@@ -93,6 +93,7 @@ keyed_groups:
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils._text import to_text, to_native
 from ansible.utils.display import Display
+from ansible.parsing.yaml.objects import AnsibleVaultEncryptedUnicode
 
 display = Display()
 
@@ -202,11 +203,14 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
         return inv_hostvars
 
     def get_orion_nodes(self):
+        orion_password = self.get_option('orion_password')
+        if isinstance(orion_password, AnsibleVaultEncryptedUnicode):
+            orion_password = orion_password.data
         try:
             swis_options = {
                 'hostname': self.get_option('orion_hostname'),
                 'username': self.get_option('orion_username'),
-                'password': self.get_option('orion_password'),
+                'password': orion_password,
             }
             __SWIS__ = SwisClient(**swis_options)
             __SWIS__.query('SELECT uri FROM Orion.Environment')
