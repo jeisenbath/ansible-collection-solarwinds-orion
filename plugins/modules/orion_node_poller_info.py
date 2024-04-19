@@ -89,10 +89,13 @@ import requests
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
 try:
+    import orionsdk
     from orionsdk import SwisClient
     HAS_ORION = True
-except Exception as OrionSdkImport:
+except ImportError:
     HAS_ORION = False
+except Exception:
+    raise Exception
 
 requests.packages.urllib3.disable_warnings()
 
@@ -105,23 +108,10 @@ def main():
         required_one_of=[('name', 'node_id', 'ip_address')],
     )
 
-    options = {
-        'hostname': module.params['hostname'],
-        'username': module.params['username'],
-        'password': module.params['password'],
-    }
+    if not HAS_ORION:
+        module.fail_json(msg='orionsdk required for this module')
 
-    __SWIS__ = SwisClient(**options)
-
-    try:
-        __SWIS__.query('SELECT uri FROM Orion.Environment')
-    except Exception as AuthException:
-        module.fail_json(
-            msg='Failed to query Orion. '
-                'Check Hostname, Username, and/or Password: {0}'.format(str(AuthException))
-        )
-
-    orion = OrionModule(module, __SWIS__)
+    orion = OrionModule(module)
 
     node = orion.get_node()
     if node:

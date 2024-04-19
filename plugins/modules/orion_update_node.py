@@ -84,6 +84,7 @@ import requests
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
 try:
+    import orionsdk
     from orionsdk import SwisClient
     HAS_ORION = True
 except ImportError:
@@ -104,27 +105,12 @@ def main():
         supports_check_mode=True,
         required_one_of=[('name', 'node_id', 'ip_address')],
     )
+
     if not HAS_ORION:
         module.fail_json(msg='orionsdk required for this module')
 
-    options = {
-        'hostname': module.params['hostname'],
-        'username': module.params['username'],
-        'password': module.params['password'],
-    }
-
-    global __SWIS__
-    __SWIS__ = SwisClient(**options)
-
-    try:
-        __SWIS__.query('SELECT uri FROM Orion.Environment')
-    except Exception as AuthException:
-        module.fail_json(
-            msg='Failed to query Orion. '
-                'Check Hostname, Username, and/or Password: {0}'.format(str(AuthException))
-        )
-
-    orion = OrionModule(module, __SWIS__)
+    orion = OrionModule(module)
+    
     node = orion.get_node()
     if not node:
         module.fail_json(skipped=True, msg='Node not found')
@@ -133,7 +119,7 @@ def main():
         if module.check_mode:
             module.exit_json(changed=True, orion_node=node)
         else:
-            __SWIS__.update(node['uri'], **module.params['properties'])
+            orion.swis.update(node['uri'], **module.params['properties'])
             module.exit_json(changed=True, orion_node=node)
     except Exception as OrionException:
         module.fail_json(msg='Failed to update {0}'.format(str(OrionException)))
