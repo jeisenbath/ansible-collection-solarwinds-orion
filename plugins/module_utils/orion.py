@@ -9,12 +9,22 @@ __metaclass__ = type
 
 from dateutil.parser import parse
 import re
+from distutils.version import LooseVersion
+try:
+    import orionsdk
+    from orionsdk import SwisClient
+    HAS_ORION = True
+except ImportError:
+    HAS_ORION = False
+except Exception:
+    raise Exception
 
 
 orion_argument_spec = dict(
     hostname=dict(required=True),
     username=dict(required=True, no_log=True),
     password=dict(required=True, no_log=True),
+    port=dict(required=False, type='str', default='17774'),
     node_id=dict(required=False),
     ip_address=dict(required=False),
     name=dict(required=False, aliases=['caption']),
@@ -23,9 +33,31 @@ orion_argument_spec = dict(
 
 class OrionModule:
 
-    def __init__(self, module, swis):
+    def __init__(self, module):
         self.module = module
-        self.swis = swis
+        self.orionsdk_version = orionsdk.__version__
+        if LooseVersion(self.orionsdk_version) <= LooseVersion('0.3.0'):
+            self.swis_options = {
+                'hostname': module.params['hostname'],
+                'username': module.params['username'],
+                'password': module.params['password'],
+            }
+        else:
+            self.swis_options = {
+                'hostname': module.params['hostname'],
+                'username': module.params['username'],
+                'password': module.params['password'],
+                'port': module.params['port'],
+            }
+        self.swis = SwisClient(**self.swis_options)
+
+        try:
+            self.swis.query('SELECT uri FROM Orion.Environment')
+        except Exception as AuthException:
+            self.module.fail_json(
+                msg='Failed to query Orion. '
+                    'Check Hostname, Username, and/or Password: {0}'.format(str(AuthException))
+            )
 
     def swis_query(self, query):
         results = self.swis.query(query)
