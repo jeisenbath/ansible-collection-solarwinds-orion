@@ -5,6 +5,22 @@ Solarwinds.Orion Release Notes
 .. contents:: Topics
 
 
+v2.0.0
+======
+
+Release Summary
+---------------
+
+Released 2024-04-18
+
+Breaking Changes / Porting Guide
+--------------------------------
+
+- All modules - add support for orionsdk 0.4.0
+- If using orionsdk 0.4.0 while still on a version of Solarwinds older than 2024.1.0, must set port to 17778 legacy API
+- SWIS API connection parameter for "port" added, with default "17774" to match orionsdk SwisClient default
+- SWIS API connection parameter for "verify" added, with default of "false" to match orionsdk SwisClient default
+
 v1.3.2
 ======
 
