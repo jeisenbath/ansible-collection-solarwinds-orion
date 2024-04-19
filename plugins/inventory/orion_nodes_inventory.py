@@ -32,6 +32,16 @@ DOCUMENTATION = r'''
         description: Password to Authenticate with Orion Server. Accepts ansible-vault encrypted string.
         required: true
         type: string
+      orion_port:
+        description: Port to connect to the Solarwinds Information Service API. Only supported if orionsdk >= 0.4.0
+        required: false
+        type: string
+        default: 17774
+      verify:
+        description: Verify SSL Certificate for Solarwinds Information Service API.
+        required: false
+        type: bool
+        default: false
       filter:
         description: Optional WHERE filter used when querying the Orion.Nodes table to filter out hosts.
         required: false
@@ -94,6 +104,7 @@ from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils._text import to_text, to_native
 from ansible.utils.display import Display
 from ansible.parsing.yaml.objects import AnsibleVaultEncryptedUnicode
+from distutils.version import LooseVersion
 
 display = Display()
 
@@ -105,6 +116,7 @@ except ImportError:
     HAS_REQUESTS = False
 
 try:
+    import orionsdk
     from orionsdk import SwisClient
     HAS_ORION = True
 except ImportError:
@@ -207,11 +219,20 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
         if isinstance(orion_password, AnsibleVaultEncryptedUnicode):
             orion_password = orion_password.data
         try:
-            swis_options = {
-                'hostname': self.get_option('orion_hostname'),
-                'username': self.get_option('orion_username'),
-                'password': orion_password,
-            }
+            if LooseVersion(orionsdk.__version__) <= LooseVersion('0.3.0'):
+                swis_options = {
+                    'hostname': self.get_option('orion_hostname'),
+                    'username': self.get_option('orion_username'),
+                    'password': orion_password,
+                }
+            else:
+                swis_options = {
+                    'hostname': self.get_option('orion_hostname'),
+                    'username': self.get_option('orion_username'),
+                    'password': orion_password,
+                    'port': self.get_option('orion_port'),
+                    'verify': self.get_option('orion_verify'),
+                }
             __SWIS__ = SwisClient(**swis_options)
             __SWIS__.query('SELECT uri FROM Orion.Environment')
         except Exception as e:
