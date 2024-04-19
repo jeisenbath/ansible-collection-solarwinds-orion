@@ -28,4 +28,20 @@ options:
             - Password for Orion user.
         required: true
         type: str
+    port:
+        description:
+            - Port to connect to the Solarwinds Information Service API.
+            - Solarwinds ver. 2024.1.0 and on has a new API on port 17774, with legacy supported on 17778.
+            - This argument was introduced in orionsdk 0.4.0 to support connecting to either API.
+            - If using an older version of Solarwinds with orionsdk 0.4.0, define this as port 17778.
+        required: false
+        default: 17774
+        type: str
+    verify:
+        description:
+            - Verify SSL Certificate for Solarwinds Information Service API.
+            - Requires orionsdk >= 0.4.0
+        required: false
+        default: false
+        type: bool
 """
