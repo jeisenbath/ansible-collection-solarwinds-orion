@@ -83,7 +83,7 @@ results:
 import requests
 import csv
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule
+from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
 
 try:
     import orionsdk
@@ -107,10 +107,8 @@ def write_to_csv(nodes, csv_file_path):
 
 
 def main():
-    argument_spec = dict(
-        hostname=dict(required=True),
-        username=dict(required=True, no_log=True),
-        password=dict(required=True, no_log=True),
+    argument_spec = orion_argument_spec
+    argument_spec.update(
         query=dict(required=True, type=str),
         csv_path=dict(required=False, type=str),
     )
