@@ -113,17 +113,19 @@ options:
     snmpv3_credential_set:
         description:
             - Credential set name for SNMPv3 credentials.
-            - Required when SNMP version is 3.
+            - Optional, creates a Credenetial set when SNMPv3 credentials are provided.
+        type: str
+        required: false
     snmpv3_username:
         description:
             - Read-Only SNMPv3 username.
-            - Required when SNMP version is 3.
+            - Required when SNMP version is 3
         type: str
         required: false
     snmpv3_auth_method:
         description:
             - Authentication method for SNMPv3.
-            - Required when SNMP version is 3.
+            - Required when SNMP version is 3
         type: str
         default: SHA1
         choices:
@@ -133,7 +135,7 @@ options:
     snmpv3_auth_key:
         description:
             - Authentication passphrase for SNMPv3.
-            - Required when SNMP version is 3.
+            - Required when SNMP version is 3
         type: str
         required: false
     snmpv3_auth_key_is_pwd:
@@ -292,9 +294,12 @@ def add_node(module, orion):
 
     if module.params['snmp_version'] == '3' and props['ObjectSubType'] == 'SNMP':
         # Even when using credential set, node creation fails without providing all three properties
-        props['SNMPV3Username'] = module.params['snmpv3_username']
-        props['SNMPV3PrivKey'] = module.params['snmpv3_priv_key']
-        props['SNMPV3AuthKey'] = module.params['snmpv3_auth_key']
+        if module.params['snmpv3_username']:
+            props['SNMPV3Username'] = module.params['snmpv3_username']
+        if module.params['snmpv3_priv_key']:
+            props['SNMPV3PrivKey'] = module.params['snmpv3_priv_key']
+        if module.params['snmpv3_auth_key']:
+            props['SNMPV3AuthKey'] = module.params['snmpv3_auth_key']
 
         # Set defaults here instead of at module level, since we only want for snmpv3 nodes
         if module.params['snmpv3_priv_method']:
@@ -325,7 +330,7 @@ def add_node(module, orion):
 
     # If we don't use credential sets, each snmpv3 node will create its own credential set
     # TODO option for read/write sets?
-    if props['ObjectSubType'] == 'SNMP' and props['SNMPVersion'] == '3':
+    if props['ObjectSubType'] == 'SNMP' and props['SNMPVersion'] == '3' and module.params['snmpv3_credential_set']:
         add_credential_set(node, module.params['snmpv3_credential_set'], 'ROSNMPCredentialID')
 
     # If Node is a WMI node, assign credential
@@ -485,7 +490,7 @@ def main():
         required_if=[
             ('state', 'present', ('name', 'ip_address', 'polling_method')),
             ('snmp_version', '2', ['ro_community_string']),
-            ('snmp_version', '3', ['snmpv3_credential_set', 'snmpv3_username', 'snmpv3_auth_key', 'snmpv3_priv_key']),
+            ('snmp_version', '3', ['snmpv3_username', 'snmpv3_auth_key', 'snmpv3_priv_key']),
             ('polling_method', 'SNMP', ['snmp_version']),
             ('polling_method', 'WMI', ['wmi_credential_set']),
         ],
