@@ -185,3 +185,15 @@ releases:
     fragments:
     - breaking.yml
     release_date: '2024-04-18'
+  2.0.1:
+    changes:
+      release_summary: Added orion_node_hardware_health module. This module allows
+        for adding and removing hardware health sensors in Solarwinds Orion.
+    fragments:
+    - hardware_health.yml
+    modules:
+    - description: This module enables or disables hardware health polling on a node
+        in Solarwinds Orion.
+      name: orion_node_hardware_health
+      namespace: ''
+    release_date: '2024-07-05'
