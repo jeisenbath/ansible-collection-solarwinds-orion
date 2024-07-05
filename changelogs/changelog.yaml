@@ -206,3 +206,10 @@ releases:
     fragments:
     - snmpv3_credential_set_option.yml
     release_date: '2024-07-05'
+  2.0.3:
+    changes:
+      release_summary: Updated to orion_update_node to allow module to update monitoring
+        from ICMP to SNMPv3
+    fragments:
+    - orion_update_node_update_to_snmpv3.yml
+    release_date: '2024-07-05'

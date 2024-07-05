@@ -4,6 +4,14 @@ Solarwinds.Orion Release Notes
 
 .. contents:: Topics
 
+v2.0.3
+======
+
+Release Summary
+---------------
+
+Updated to orion_update_node to allow module to update monitoring from ICMP to SNMPv3
+
 v2.0.2
 ======
 
