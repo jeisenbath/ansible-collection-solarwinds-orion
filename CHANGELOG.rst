@@ -4,6 +4,14 @@ Solarwinds.Orion Release Notes
 
 .. contents:: Topics
 
+v2.0.2
+======
+
+Release Summary
+---------------
+
+Updated orion_node module to no longer require snmpv3 credential set.
+
 v2.0.1
 ======
 

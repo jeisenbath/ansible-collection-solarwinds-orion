@@ -113,7 +113,7 @@ options:
     snmpv3_credential_set:
         description:
             - Credential set name for SNMPv3 credentials.
-            - Optional, creates a Credenetial set when SNMPv3 credentials are provided.
+            - Optional when SNMP version is 3 
         type: str
         required: false
     snmpv3_username:
@@ -135,7 +135,7 @@ options:
     snmpv3_auth_key:
         description:
             - Authentication passphrase for SNMPv3.
-            - Required when SNMP version is 3
+            - Required when SNMP version is 3 
         type: str
         required: false
     snmpv3_auth_key_is_pwd:

@@ -197,3 +197,12 @@ releases:
       name: orion_node_hardware_health
       namespace: ''
     release_date: '2024-07-05'
+  2.0.2:
+    changes:
+      release_summary: 'Updated orion_node module to no longer require snmpv3 credential
+        set.
+
+        '
+    fragments:
+    - snmpv3_credential_set_option.yml
+    release_date: '2024-07-05'
