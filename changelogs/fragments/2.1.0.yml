@@ -1,0 +1,15 @@
+---
+2.1.0:
+release_summary: |
+  Added orion_node_hardware_health module. This module allows for adding and removing hardware health sensors in Solarwinds Orion.
+  Updated orion_node module to no longer require snmpv3 credential set.
+  Updated orion_update_node to allow module to update monitoring from ICMP to SNMPv3.
+
+minor_changes:
+  - "orion_node - No longer requires snmpv3 credential set."
+  - "orion_update_node - Now allows updating monitoring from ICMP to SNMPv3."
+
+new_modules:
+  - solarwinds.orion.orion_node_hardware_health - Enables or disables hardware health polling on a node in Solarwinds Orion.
+
+release_date: '2024-07-12'

@@ -46,20 +46,20 @@ EXAMPLES = r'''
       Caption: "{{ new_node_caption }}"
   delegate_to: localhost
 
-    - name: Update node to SNMPv3 polling
-      solarwinds.orion.orion_update_node:
-        hostname: "{{ solarwinds_server }}"
-        username: "{{ solarwinds_user }}"
-        password: "{{ solarwinds_password }}"
-        name: "{{ inventory_hostname }}"
-        polling_method: SNMP
-        snmp_version: "3"
-        snmpv3_username: "{{ snmpv3_user }}"
-        snmpv3_auth_method: "{{ snmpv3_auth }}{{ snmpv3_auth_level }}"
-        snmpv3_auth_key: "{{ snmpv3_auth_pass }}"
-        snmpv3_priv_method: "{{ snmpv3_priv }}{{ snmpv3_priv_level }}"
-        snmpv3_priv_key: "{{ snmpv3_priv_pass }}"
-      delegate_to: localhost
+- name: Update node to SNMPv3 polling
+  solarwinds.orion.orion_update_node:
+    hostname: "{{ solarwinds_server }}"
+    username: "{{ solarwinds_user }}"
+    password: "{{ solarwinds_password }}"
+    name: "{{ inventory_hostname }}"
+    polling_method: SNMP
+    snmp_version: "3"
+    snmpv3_username: "{{ snmpv3_user }}"
+    snmpv3_auth_method: "{{ snmpv3_auth }}{{ snmpv3_auth_level }}"
+    snmpv3_auth_key: "{{ snmpv3_auth_pass }}"
+    snmpv3_priv_method: "{{ snmpv3_priv }}{{ snmpv3_priv_level }}"
+    snmpv3_priv_key: "{{ snmpv3_priv_pass }}"
+  delegate_to: localhost
 
 '''
 
@@ -83,7 +83,6 @@ orion_node:
     }
 '''
 
-import requests
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
 
@@ -93,10 +92,6 @@ try:
     HAS_ORION = True
 except ImportError:
     HAS_ORION = False
-except Exception:
-    raise Exception
-
-requests.packages.urllib3.disable_warnings()
 
 def properties_need_update(current_node, desired_properties):
     for key, value in desired_properties.items():
@@ -128,7 +123,6 @@ def main():
 
     orion = OrionModule(module)
     
- 
     node = orion.get_node()
     if not node:
         module.fail_json(skipped=True, msg='Node not found')
@@ -149,14 +143,14 @@ def main():
     
     if module.params['snmpv3_auth_key']:
         update_properties['SNMPV3AuthKey'] = module.params['snmpv3_auth_key']
-        update_properties['SNMPV3AuthKeyIsPwd'] = True
+        update_properties['SNMPV3AuthKeyIsPwd'] = module.params['snmpv3_auth_key_is_pwd']
     
     if module.params['snmpv3_priv_method']:
         update_properties['SNMPV3PrivMethod'] = module.params['snmpv3_priv_method']
     
     if module.params['snmpv3_priv_key']:
         update_properties['SNMPV3PrivKey'] = module.params['snmpv3_priv_key']
-        update_properties['SNMPV3PrivKeyIsPwd'] = True
+        update_properties['SNMPV3PrivKeyIsPwd'] = module.params['snmpv3_priv_key_is_pwd']
 
     try:
         if module.check_mode:
