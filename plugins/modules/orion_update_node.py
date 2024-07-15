@@ -46,19 +46,34 @@ EXAMPLES = r'''
       Caption: "{{ new_node_caption }}"
   delegate_to: localhost
 
+- name: Update node to SNMPv2 polling
+  solarwinds.orion.orion_update_node:
+    hostname: "{{ solarwinds_server }}"
+    username: "{{ solarwinds_user }}"
+    password: "{{ solarwinds_pass }}"
+    name: "{{ node_name }}"
+    properties:
+      ObjectSubType: SNMP
+      SNMPVersion: 2
+      Community: "{{ ro_community_string }}"
+  delegate_to: localhost
+
 - name: Update node to SNMPv3 polling
   solarwinds.orion.orion_update_node:
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_user }}"
-    password: "{{ solarwinds_password }}"
-    name: "{{ inventory_hostname }}"
-    polling_method: SNMP
-    snmp_version: "3"
-    snmpv3_username: "{{ snmpv3_user }}"
-    snmpv3_auth_method: "{{ snmpv3_auth }}{{ snmpv3_auth_level }}"
-    snmpv3_auth_key: "{{ snmpv3_auth_pass }}"
-    snmpv3_priv_method: "{{ snmpv3_priv }}{{ snmpv3_priv_level }}"
-    snmpv3_priv_key: "{{ snmpv3_priv_pass }}"
+    password: "{{ solarwinds_pass }}"
+    name: "{{ node_name }}"
+    properties:
+      ObjectSubType: SNMP
+      SNMPVersion: 3
+      SNMPV3Username: 
+      SNMPV3AuthMethod: 
+      SNMPV3AuthKey: 
+      SNMPV3AuthKeyIsPwd: 
+      SNMPV3PrivMethod: 
+      SNMPV3PrivKey:
+      SNMPV3PrivKeyIsPwd:
   delegate_to: localhost
 
 '''
@@ -83,15 +98,19 @@ orion_node:
     }
 '''
 
+import requests
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
-
 try:
     import orionsdk
     from orionsdk import SwisClient
     HAS_ORION = True
 except ImportError:
     HAS_ORION = False
+except Exception:
+    raise Exception
+
+requests.packages.urllib3.disable_warnings()
 
 def properties_need_update(current_node, desired_properties):
     for key, value in desired_properties.items():
@@ -102,15 +121,7 @@ def properties_need_update(current_node, desired_properties):
 def main():
     argument_spec = orion_argument_spec
     argument_spec.update(
-        polling_method=dict(required=False, choices=['External', 'ICMP', 'SNMP', 'WMI', 'Agent']),
-        snmp_version=dict(required=False, choices=['2', '3']),
-        snmpv3_username=dict(required=False, type='str'),
-        snmpv3_auth_method=dict(required=False, choices=['SHA1', 'MD5']),
-        snmpv3_auth_key=dict(required=False, type='str', no_log=True),
-        snmpv3_priv_method=dict(required=False, choices=['DES56', 'AES128', 'AES192', 'AES256']),
-        snmpv3_priv_key=dict(required=False, type='str', no_log=True),
-        snmpv3_auth_key_is_pwd=dict(required=False, type='bool', default=True),
-        snmpv3_priv_key_is_pwd=dict(required=False, type='bool', default=True),
+        properties=dict(required=False, default={}, type='dict')
     )
     module = AnsibleModule(
         argument_spec,
@@ -127,43 +138,20 @@ def main():
     if not node:
         module.fail_json(skipped=True, msg='Node not found')
 
-    update_properties = {}
-    
-    if module.params['polling_method']:
-        update_properties['ObjectSubType'] = module.params['polling_method'].upper()
-    
-    if module.params['snmp_version']:
-        update_properties['SNMPVersion'] = module.params['snmp_version']
-    
-    if module.params['snmpv3_username']:
-        update_properties['SNMPV3Username'] = module.params['snmpv3_username']
-    
-    if module.params['snmpv3_auth_method']:
-        update_properties['SNMPV3AuthMethod'] = module.params['snmpv3_auth_method']
-    
-    if module.params['snmpv3_auth_key']:
-        update_properties['SNMPV3AuthKey'] = module.params['snmpv3_auth_key']
-        update_properties['SNMPV3AuthKeyIsPwd'] = module.params['snmpv3_auth_key_is_pwd']
-    
-    if module.params['snmpv3_priv_method']:
-        update_properties['SNMPV3PrivMethod'] = module.params['snmpv3_priv_method']
-    
-    if module.params['snmpv3_priv_key']:
-        update_properties['SNMPV3PrivKey'] = module.params['snmpv3_priv_key']
-        update_properties['SNMPV3PrivKeyIsPwd'] = module.params['snmpv3_priv_key_is_pwd']
+    changed = False
 
     try:
         if module.check_mode:
-            module.exit_json(changed=properties_need_update(node, update_properties), orion_node=node)
+            changed = True
         else:
-            if properties_need_update(node, update_properties):
-                orion.swis.update(node['uri'], **update_properties)
-                updated_node = orion.get_node()
-                module.exit_json(changed=True, orion_node=updated_node)
-            else:
-                module.exit_json(changed=False, orion_node=node)
+            if properties_need_update(module.params['properties'], node):
+                orion.swis.update(node['uri'], **module.params['properties'])
+                changed = True
     except Exception as OrionException:
-        module.fail_json(msg='Failed to update node: {0}'.format(str(OrionException)))
-        
+        module.fail_json(msg='Failed to update {0}'.format(str(OrionException)))
+
+    module.exit_json(changed=changed, orion_node=node)
+
+
 if __name__ == "__main__":
     main()
