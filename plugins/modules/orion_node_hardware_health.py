@@ -1,12 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from ansible.module_utils.basic import AnsibleModule
-try:
-    from orionsdk import SwisClient
-    HAS_ORIONSDK = True
-except ImportError:
-    HAS_ORIONSDK = False
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
@@ -82,6 +78,13 @@ EXAMPLES = r'''
 RETURN = r'''
 # Default return values
 '''
+
+from ansible.module_utils.basic import AnsibleModule
+try:
+    from orionsdk import SwisClient
+    HAS_ORIONSDK = True
+except ImportError:
+    HAS_ORIONSDK = False
 
 # Mapping of polling method names to their corresponding IDs
 POLLING_METHOD_MAP = {
