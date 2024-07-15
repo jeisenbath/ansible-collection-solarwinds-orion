@@ -6,7 +6,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: orion_manage_hardware_health
+module: orion_node_hardware_health
 short_description: Manage hardware health polling on a node in Solarwinds Orion
 description:
     - This module enables or disables hardware health polling on a node in Solarwinds Orion.
