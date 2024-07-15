@@ -67,13 +67,11 @@ EXAMPLES = r'''
     properties:
       ObjectSubType: SNMP
       SNMPVersion: 3
-      SNMPV3Username: 
-      SNMPV3AuthMethod: 
-      SNMPV3AuthKey: 
-      SNMPV3AuthKeyIsPwd: 
-      SNMPV3PrivMethod: 
-      SNMPV3PrivKey:
-      SNMPV3PrivKeyIsPwd:
+      SNMPV3Username: "{{ snmpv3_user }}"
+      SNMPV3AuthMethod: "{{ snmpv3_auth }}{{ snmpv3_auth_level }}"
+      SNMPV3AuthKey: "{{ snmpv3_auth_pass }}"
+      SNMPV3PrivMethod: "{{ snmpv3_priv }}{{ snmpv3_priv_level }}"
+      SNMPV3PrivKey: "{{ snmpv3_priv_pass }}"
   delegate_to: localhost
 
 '''
@@ -139,12 +137,19 @@ def main():
         module.fail_json(skipped=True, msg='Node not found')
 
     changed = False
+    
+    # fields to be updated might not necessarily be in the limited scope of orion.get_node(), so we specifically get them here
+    fields = "NodeID, "
+    for key in module.params['properties']:
+        fields += "{0}, ".format(key)
+    query = "SELECT {0} FROM Orion.Nodes WHERE NodeID = '{1}'".format(fields, node['node_id'])
+    current_node_properties = orion.swis_query(query)
 
     try:
         if module.check_mode:
             changed = True
         else:
-            if properties_need_update(module.params['properties'], node):
+            if properties_need_update(current_node_properties, module.params['properties']):
                 orion.swis.update(node['uri'], **module.params['properties'])
                 changed = True
     except Exception as OrionException:
