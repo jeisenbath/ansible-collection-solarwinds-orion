@@ -127,16 +127,22 @@ def main():
     node = orion.get_node()
     if not node:
         module.fail_json(skipped=True, msg='Node not found')
-    changed=False
+    changed = False
 
     try:
         if module.params['state'] == 'present':
-            polling_method_id = POLLING_METHOD_MAP[module.params['polling_method']]
-            orion.swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'EnableHardwareHealth', node['netobjectid'], polling_method_id)
-            changed=True
+            if module.check_mode:
+                changed = True
+            else:
+                polling_method_id = POLLING_METHOD_MAP[module.params['polling_method']]
+                orion.swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'EnableHardwareHealth', node['netobjectid'], polling_method_id)
+                changed = True
         elif module.params['state'] == 'absent':
-            orion.swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'DisableHardwareHealth', node['netobjectid'])
-            changed=True
+            if module.check_mode:
+                changed = True
+            else:
+                orion.swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'DisableHardwareHealth', node['netobjectid'])
+                changed = True
     except Exception as e:
         module.fail_json(msg=str(e))
 
