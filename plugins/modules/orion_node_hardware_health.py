@@ -98,7 +98,10 @@ def main():
     module = AnsibleModule(
         argument_spec,
         required_one_of=[('name', 'node_id', 'ip_address')],
-        supports_check_mode=True
+        supports_check_mode=True,
+        required_if=[
+            ('state', 'present', ['polling_method'])
+        ],
     )
 
     if not HAS_ORIONSDK:
@@ -109,14 +112,11 @@ def main():
     if not node:
         module.fail_json(skipped=True, msg='Node not found')
 
-    polling_method = module.params.get('polling_method')
     state = module.params['state']
 
     try:
         if state == 'present':
-            if not polling_method:
-                module.fail_json(msg="polling_method is required when state is present")
-            polling_method_id = POLLING_METHOD_MAP[polling_method]
+            polling_method_id = POLLING_METHOD_MAP[module.params['polling_method']]
             orion.swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'EnableHardwareHealth', node['netobjectid'], polling_method_id)
             module.exit_json(changed=True)
         elif state == 'absent':
