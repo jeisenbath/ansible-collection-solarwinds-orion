@@ -104,33 +104,23 @@ def main():
     if not HAS_ORIONSDK:
         module.fail_json(msg="The orionsdk module is required")
 
-    hostname = module.params['hostname']
-    username = module.params['username']
-    password = module.params['password']
-    node_name = module.params['node_name']
-    node_id = module.params['node_id']
+    orion = OrionModule(module)
+    node = orion.get_node()
+    if not node:
+        module.fail_json(skipped=True, msg='Node not found')
+
     polling_method = module.params.get('polling_method')
     state = module.params['state']
-
-    swis = SwisClient(hostname, username, password)
-
-    # Resolve node_name to node_id if node_name is provided
-    if node_name:
-        try:
-            results = swis.query(f"SELECT NodeID FROM Orion.Nodes WHERE Caption='{node_name}'")
-            node_id = "N:" + str(results['results'][0]['NodeID'])
-        except Exception as e:
-            module.fail_json(msg=f"Failed to resolve node name to ID: {e}")
 
     try:
         if state == 'present':
             if not polling_method:
                 module.fail_json(msg="polling_method is required when state is present")
             polling_method_id = POLLING_METHOD_MAP[polling_method]
-            swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'EnableHardwareHealth', node_id, polling_method_id)
+            orion.swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'EnableHardwareHealth', node['netobjectid'], polling_method_id)
             module.exit_json(changed=True)
         elif state == 'absent':
-            swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'DisableHardwareHealth', node_id)
+            orion.swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'DisableHardwareHealth', node['netobjectid'])
             module.exit_json(changed=True)
     except Exception as e:
         module.fail_json(msg=str(e))
