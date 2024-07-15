@@ -34,7 +34,7 @@ extends_documentation_fragment:
 EXAMPLES = r'''
 ---
 - name: Enable hardware health polling on Cisco node
-  orion_manage_hardware_health:
+  solarwinds.orion.orion_manage_hardware_health:
     hostname: "server"
     username: "admin"
     password: "pass"
@@ -44,7 +44,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Disable hardware health polling on Juniper node
-  orion_manage_hardware_health:
+  solarwinds.orion.orion_manage_hardware_health:
     hostname: "server"
     username: "admin"
     password: "pass"
