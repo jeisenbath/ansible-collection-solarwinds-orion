@@ -87,7 +87,7 @@ options:
         type: str
     rw_community_string:
         description:
-            - SNMP Read-Write Community string
+            - SNMP Read-Write Community string.
         required: false
         type: str
     snmp_version:
@@ -113,19 +113,19 @@ options:
     snmpv3_credential_set:
         description:
             - Credential set name for SNMPv3 credentials.
-            - Optional when SNMP version is 3 
+            - Optional when SNMP version is 3.
         type: str
         required: false
     snmpv3_username:
         description:
             - Read-Only SNMPv3 username.
-            - Required when SNMP version is 3
+            - Required when SNMP version is 3.
         type: str
         required: false
     snmpv3_auth_method:
         description:
             - Authentication method for SNMPv3.
-            - Required when SNMP version is 3
+            - Required when SNMP version is 3.
         type: str
         default: SHA1
         choices:
@@ -135,7 +135,7 @@ options:
     snmpv3_auth_key:
         description:
             - Authentication passphrase for SNMPv3.
-            - Required when SNMP version is 3 
+            - Required when SNMP version is 3.
         type: str
         required: false
     snmpv3_auth_key_is_pwd:
@@ -158,7 +158,7 @@ options:
         required: false
     snmpv3_priv_key:
         description:
-            - Privacy passphrase for SNMPv3
+            - Privacy passphrase for SNMPv3.
         type: str
         required: false
     snmpv3_priv_key_is_pwd:
@@ -170,8 +170,8 @@ options:
         required: false
     wmi_credential_set:
         description:
-            - 'Credential Name already configured in NPM  Found under "Manage Windows Credentials" section of the Orion website (Settings)'
-            - "Note: creation of credentials are not supported at this time"
+            - 'Credential Name already configured in NPM  Found under "Manage Windows Credentials" section of the Orion website (Settings).'
+            - "Note: creation of credentials are not supported at this time."
             - Required if I(polling_method=wmi).
         required: false
         type: str
