@@ -14,31 +14,6 @@ author: "Andrew Bailey (@Andyjb8)"
 requirements:
     - orionsdk
 options:
-    hostname:
-        description:
-            - The Orion server hostname.
-        required: True
-        type: str
-    username:
-        description:
-            - The Orion username.
-        required: True
-        type: str
-    password:
-        description:
-            - The Orion password.
-        required: True
-        type: str
-    node_name: 
-        description:
-            - The Caption in Orion.
-        required: True if node_id not specified
-        type: str
-    node_id: 
-        description:
-            - The node_id in Orion.
-        required: True if node_name not specified
-        type: str
     polling_method:
         description:
             - The polling method to be used for hardware health.
@@ -51,6 +26,9 @@ options:
         required: True
         choices: ['present', 'absent']
         type: str
+extends_documentation_fragment:
+    - solarwinds.orion.orion_auth_options
+    - solarwinds.orion.orion_node_options
 '''
 
 EXAMPLES = r'''
@@ -80,6 +58,8 @@ RETURN = r'''
 '''
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
+
 try:
     from orionsdk import SwisClient
     HAS_ORIONSDK = True
@@ -110,19 +90,14 @@ POLLING_METHOD_MAP = {
 }
 
 def main():
-    module_args = dict(
-        hostname=dict(type='str', required=True),
-        username=dict(type='str', required=True),
-        password=dict(type='str', required=True, no_log=True),
-        node_name=dict(type='str', required=False),  # Now accept node_name
-        node_id=dict(type='str', required=False),  # Make node_id optional
+    argument_spec = orion_argument_spec
+    argument_spec.update(
+        state=dict(required=True, choices=['present', 'absent']),
         polling_method=dict(type='str', required=False, choices=list(POLLING_METHOD_MAP.keys())),  # Not required for absent state
-        state=dict(type='str', required=True, choices=['present', 'absent']),
     )
-
     module = AnsibleModule(
-        argument_spec=module_args,
-        required_one_of=[('node_name', 'node_id')],  # Require at least one
+        argument_spec,
+        required_one_of=[('name', 'node_id', 'ip_address')],
         supports_check_mode=True
     )
 
