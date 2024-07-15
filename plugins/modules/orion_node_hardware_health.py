@@ -54,7 +54,23 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
-# Default return values
+orion_node:
+    description: Info about an orion node.
+    returned: always
+    type: dict
+    sample: {
+        "caption": "localhost",
+        "ipaddress": "127.0.0.1",
+        "netobjectid": "N:12345",
+        "nodeid": "12345",
+        "objectsubtype": "SNMP",
+        "status": 1,
+        "statusdescription": "Node status is Up.",
+        "unmanaged": false,
+        "unmanagefrom": "1899-12-30T00:00:00+00:00",
+        "unmanageuntil": "1899-12-30T00:00:00+00:00",
+        "uri": "swis://host.domain.com/Orion/Orion.Nodes/NodeID=12345"
+    }
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -111,19 +127,20 @@ def main():
     node = orion.get_node()
     if not node:
         module.fail_json(skipped=True, msg='Node not found')
-
-    state = module.params['state']
+    changed=False
 
     try:
-        if state == 'present':
+        if module.params['state'] == 'present':
             polling_method_id = POLLING_METHOD_MAP[module.params['polling_method']]
             orion.swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'EnableHardwareHealth', node['netobjectid'], polling_method_id)
-            module.exit_json(changed=True)
-        elif state == 'absent':
+            changed=True
+        elif module.params['state'] == 'absent':
             orion.swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'DisableHardwareHealth', node['netobjectid'])
-            module.exit_json(changed=True)
+            changed=True
     except Exception as e:
         module.fail_json(msg=str(e))
+
+    module.exit_json(changed=changed, orion_node=node)
 
 if __name__ == '__main__':
     main()
