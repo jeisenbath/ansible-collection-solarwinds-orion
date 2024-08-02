@@ -20,6 +20,7 @@ orion_node_ip_address - Default {{ ansible_facts.default_ipv4.address }}, overri
 orion_node_polling_method - Default ICMP
 orion_node_snmp_pollers - list, elements are dicts (name, enabled(bool)). Default is only CPU and Memory pollers.
 orion_node_discover_interfaces - Default false, whether to discover and add all interfaces when polling method is SNMP
+orion_node_ncm - Default false, whether to add node to NCM
 
 Optional variables
 orion_node_snmp_version - required when orion_node_polling method is SNMP, set which version of SNMP (choices: 2, 3)
@@ -36,14 +37,15 @@ orion_node_interfaces - list, interfaces to monitor
 orion_node_volumes - list, volumes to monitor
 orion_node_applications - list, APM templates to add to node
 orion_node_custom_properties - list, elements are dicts (name, value), custom property names and values to set
+orion_node_hardware_health_poller - string, Name of the Hardware Health poller to enable on node
 
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+```yaml
 
-    - name: Add servers to Solarwinds as simple ICMP nodes
+    - name: Add servers to Solarwinds as SNMPv2 nodes
       hosts: servers
       gather_facts: true
       vars:
@@ -51,14 +53,15 @@ Including an example of how to use your role (for instance, with variables passe
         solarwinds_username: admin
         solarwinds_password: changeme2345
       roles:
-         - { role: solarwinds.orion.orion_node }
+        - role: solarwinds.orion.orion_node
+          orion_node_polling_method: SNMP
+          orion_node_snmp_version: 2
+          orion_node_ro_community_string: community
+          orion_node_discover_interfaces: true
+
+```
 
 License
 -------
 
 GPL-3.0-or-later
-
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
