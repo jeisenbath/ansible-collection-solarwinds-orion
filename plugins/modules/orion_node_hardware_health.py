@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
+from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
 from ansible.module_utils.basic import AnsibleModule
 try:
     from orionsdk import SwisClient
@@ -33,7 +33,7 @@ options:
             - The Orion password.
         required: True
         type: str
-    node_name: 
+    name: 
         description:
             - The Caption in Orion.
         required: True if node_id not specified
@@ -41,7 +41,7 @@ options:
     node_id: 
         description:
             - The node_id in Orion.
-        required: True if node_name not specified
+        required: True if name not specified
         type: str
     polling_method:
         description:
@@ -64,7 +64,7 @@ EXAMPLES = r'''
     hostname: "server"
     username: "admin"
     password: "pass"
-    node_name: "{{ inventory_hostname }}"
+    name: "{{ inventory_hostname }}"
     polling_method: SnmpCisco
     state: present
   delegate_to: localhost
@@ -74,7 +74,7 @@ EXAMPLES = r'''
     hostname: "server"
     username: "admin"
     password: "pass"
-    node_name: "{{ inventory_hostname }}"
+    name: "{{ inventory_hostname }}"
     state: absent
   delegate_to: localhost
 '''
@@ -107,40 +107,33 @@ POLLING_METHOD_MAP = {
 }
 
 def main():
-    module_args = dict(
-        hostname=dict(type='str', required=True),
-        username=dict(type='str', required=True),
-        password=dict(type='str', required=True, no_log=True),
-        node_name=dict(type='str', required=False),  # Now accept node_name
-        node_id=dict(type='str', required=False),  # Make node_id optional
+    argument_spec = orion_argument_spec
+    argument_spec.update(
+        state=dict(required=True, choices=['present', 'absent']),
         polling_method=dict(type='str', required=False, choices=list(POLLING_METHOD_MAP.keys())),  # Not required for absent state
-        state=dict(type='str', required=True, choices=['present', 'absent']),
+        name=dict(type='str', required=False, aliases=['caption']),
     )
 
     module = AnsibleModule(
-        argument_spec=module_args,
-        required_one_of=[('node_name', 'node_id')],  # Require at least one
+        argument_spec=argument_spec,
+        required_one_of=[('name', 'node_id')],  # Require at least one
         supports_check_mode=True
     )
 
     if not HAS_ORIONSDK:
         module.fail_json(msg="The orionsdk module is required")
 
-    hostname = module.params['hostname']
-    username = module.params['username']
-    password = module.params['password']
-    node_name = module.params['node_name']
+    orion = OrionModule(module)
+
+    name = module.params['name']
     node_id = module.params['node_id']
-    polling_method = module.params.get('polling_method')
     state = module.params['state']
+    polling_method = module.params.get('polling_method')
 
-    swis = SwisClient(hostname, username, password)
-
-    # Resolve node_name to node_id if node_name is provided
-    if node_name:
+    if name:
         try:
-            results = swis.query(f"SELECT NodeID FROM Orion.Nodes WHERE Caption='{node_name}'")
-            node_id = "N:" + str(results['results'][0]['NodeID'])
+            results = orion.swis_query(f"SELECT NodeID FROM Orion.Nodes WHERE Caption='{name}'")
+            node_id = "N:" + str(results[0]['NodeID'])
         except Exception as e:
             module.fail_json(msg=f"Failed to resolve node name to ID: {e}")
 
@@ -149,10 +142,12 @@ def main():
             if not polling_method:
                 module.fail_json(msg="polling_method is required when state is present")
             polling_method_id = POLLING_METHOD_MAP[polling_method]
-            swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'EnableHardwareHealth', node_id, polling_method_id)
+            if orion.swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'IsHardwareHealthEnabled', node_id, polling_method_id):
+                module.exit_json(changed=False)
+            orion.swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'EnableHardwareHealth', node_id, polling_method_id)
             module.exit_json(changed=True)
         elif state == 'absent':
-            swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'DisableHardwareHealth', node_id)
+            orion.swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'DisableHardwareHealth', node_id)
             module.exit_json(changed=True)
     except Exception as e:
         module.fail_json(msg=str(e))
