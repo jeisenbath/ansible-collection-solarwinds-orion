@@ -130,19 +130,24 @@ def main():
     changed = False
 
     try:
+        hh_poller = orion.swis_query("SELECT PollingMethod FROM Orion.HardwareHealth.HardwareInfoBase WHERE ParentObjectID = '{0}'".format(node['nodeid']))
         if module.params['state'] == 'present':
-            if module.check_mode:
-                changed = True
-            else:
-                polling_method_id = POLLING_METHOD_MAP[module.params['polling_method']]
-                orion.swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'EnableHardwareHealth', node['netobjectid'], polling_method_id)
-                changed = True
+            polling_method_id = POLLING_METHOD_MAP[module.params['polling_method']]
+            if not hh_poller:
+                if module.check_mode:
+                    changed = True
+                else:
+                    orion.swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'EnableHardwareHealth', node['netobjectid'], polling_method_id)
+                    changed = True
+            elif hh_poller[0]['PollingMethod'] != polling_method_id:
+                module.fail_json(msg="HardwareHealth montior exists, but does not match provided polling_method parameter.")
         elif module.params['state'] == 'absent':
-            if module.check_mode:
-                changed = True
-            else:
-                orion.swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'DisableHardwareHealth', node['netobjectid'])
-                changed = True
+            if hh_poller:
+                if module.check_mode:
+                    changed = True
+                else:
+                    orion.swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'DisableHardwareHealth', node['netobjectid'])
+                    changed = True
     except Exception as e:
         module.fail_json(msg=str(e))
 
