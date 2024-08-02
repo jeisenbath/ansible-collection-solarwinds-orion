@@ -31,7 +31,6 @@ orion_argument_spec = dict(
     name=dict(required=False, aliases=['caption']),
 )
 
-
 class OrionModule:
 
     def __init__(self, module):
@@ -40,18 +39,19 @@ class OrionModule:
         if LooseVersion(self.orionsdk_version) <= LooseVersion('0.3.0'):
             self.swis_options = {
                 'hostname': module.params['hostname'],
-                'username': module.params['username'],
+                'username': module.params['username'].replace("\\", "", 1), # replace() is used to correct how '\\' is represented
                 'password': module.params['password'],
             }
         else:
             self.swis_options = {
                 'hostname': module.params['hostname'],
-                'username': module.params['username'],
+                'username': module.params['username'].replace("\\", "", 1), # replace() is used to correct how '\\' is represented
                 'password': module.params['password'],
                 'port': module.params['port'],
                 'verify': module.params['verify'],
             }
         self.swis = SwisClient(**self.swis_options)
+
 
         try:
             self.swis.query('SELECT uri FROM Orion.Environment')
@@ -65,6 +65,11 @@ class OrionModule:
         results = self.swis.query(query)
         if results['results']:
             return results['results']
+
+    def swis_get_ncm_connection_profiles(self):
+        """Find all available connection profiles and return a list."""
+        profile_list = self.swis.invoke('Cirrus.Nodes', 'GetAllConnectionProfiles')
+        return profile_list
 
     def get_node(self):
         node = {}
@@ -352,15 +357,49 @@ class OrionModule:
 
     def get_ncm_node(self, node):
         cirrus_node_query = self.swis.query(
-            "SELECT NodeID from Cirrus.Nodes WHERE CoreNodeID = '{0}'".format(node['nodeid'])
+            "SELECT NodeID from Cirrus.Nodes WHERE CoreNodeID = {0}".format(node['nodeid'])
         )
         if cirrus_node_query['results']:
             return cirrus_node_query['results'][0]['NodeID']
+
+    def update_ncm_node_connection_profile(self, profile_dict, new_connection_profile_name, ncm_node_id):
+        """Retrieves an NCM node and alters its connection profile.
+
+        Parameters
+        ----------
+        profile_dict : dictionary
+            Mapping of connection profile name to its ID number
+        new_connection_profile_name : str
+            The name of the desired connection profile
+        ncm_node_id : GUID
+            The ID of the NCM node whose connection profile is being altered
+        
+        Returns
+        -------
+        bool
+            A Boolean denoting success (True) or failure (False)
+        """
+        ncmNode = self.swis.invoke('Cirrus.Nodes', 'GetNode', ncm_node_id)
+        if new_connection_profile_name != '-1': # the -1 denotes no connection profile is set
+            if new_connection_profile_name in profile_dict:
+                if ncmNode['ConnectionProfile'] != profile_dict[new_connection_profile_name]:
+                    ncmNode['ConnectionProfile'] = profile_dict[new_connection_profile_name]
+                else:
+                    return False
+            else:
+                raise ValueError("ValueError: Did not recognize profile name.")
+        else:
+            # set to no connection profile
+            if ncmNode['ConnectionProfile'] != int(new_connection_profile_name):
+                ncmNode['ConnectionProfile'] = int(new_connection_profile_name)
+            else:
+                return False
+        self.swis.invoke('Cirrus.Nodes', 'UpdateNode', ncmNode)
+        return True
 
     def add_node_to_ncm(self, node):
         self.swis.invoke('Cirrus.Nodes', 'AddNodeToNCM', node['nodeid'])
 
     def remove_node_from_ncm(self, node):
         cirrus_node_id = self.get_ncm_node(node)
-
         self.swis.invoke('Cirrus.Nodes', 'RemoveNode', cirrus_node_id)
