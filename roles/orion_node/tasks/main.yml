@@ -112,6 +112,16 @@
     username: "{{ orion_node_solarwinds_username }}"
     password: "{{ orion_node_solarwinds_password }}"
     state: present
+    name: "{{ orion_node_caption_name }}"
     polling_method: "{{ orion_node_hardware_health_poller }}"
   delegate_to: localhost
+
+- name: Add node to NCM if orion_node_ncm is true
+  when: orion_node_ncm
+  solarwinds.orion.orion_node_ncm:
+    hostname: "{{ orion_node_solarwinds_server }}"
+    username: "{{ orion_node_solarwinds_username }}"
+    password: "{{ orion_node_solarwinds_password }}"
+    state: present
+    name: "{{ orion_node_caption_name }}"
 ...
