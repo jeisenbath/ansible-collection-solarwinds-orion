@@ -38,7 +38,7 @@ EXAMPLES = r'''
     hostname: "server"
     username: "admin"
     password: "pass"
-    node_name: "{{ inventory_hostname }}"
+    name: "{{ inventory_hostname }}"
     polling_method: SnmpCisco
     state: present
   delegate_to: localhost
@@ -48,7 +48,7 @@ EXAMPLES = r'''
     hostname: "server"
     username: "admin"
     password: "pass"
-    node_name: "{{ inventory_hostname }}"
+    name: "{{ inventory_hostname }}"
     state: absent
   delegate_to: localhost
 '''
