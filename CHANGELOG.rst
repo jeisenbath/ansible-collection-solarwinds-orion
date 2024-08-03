@@ -4,26 +4,26 @@ Solarwinds.Orion Release Notes
 
 .. contents:: Topics
 
+
 v2.1.0
 ======
 
 Release Summary
 ---------------
 
-Minor Updates to orion_node and orion_update_node modules in addtion to creating orion_node_hardware_health module
+Minor Updates to orion_node and orion_update_node modules in addition to creating orion_node_hardware_health module.
+
+Major Changes
+-------------
+
+- Added orion_node_hardware_health module. This module allows for adding and removing hardware health sensors in Solarwinds Orion.
 
 Minor Changes
 -------------
 
-- Added orion_node_hardware_health module. This module allows for adding and removing hardware health sensors in Solarwinds Orion.
 - Updated orion_node module to no longer require snmpv3 credential set.
-- Updated orion_update_node to allow module to update monitoring from ICMP to SNMPv3.
-
-Known Issues
-------------
-
-- orion_node_hardware_health module not idempotent
-- orion_update_node updates node from icmp to snmp but gets and error when task is run again when it already is configured for snmp
+- Updated orion_update_node exmaples to show updating to SNMPv3.
+- orion_node role - added tasks for new modules orion_node_ncm and orion_node_hardware_health
 
 v2.0.0
 ======
@@ -111,6 +111,7 @@ Release Summary
 
 | Released 2023-12-1
 
+
 Major Changes
 -------------
 
@@ -123,6 +124,7 @@ Release Summary
 ---------------
 
 | Released 2023-09-26
+
 
 Major Changes
 -------------
@@ -142,6 +144,7 @@ Release Summary
 
 | Released 2023-08-27
 
+
 Minor Changes
 -------------
 
@@ -159,6 +162,7 @@ Release Summary
 ---------------
 
 | Released 2023-08-10
+
 
 Minor Changes
 -------------
@@ -181,6 +185,7 @@ Release Summary
 
 | Released 2023-07-14
 
+
 Minor Changes
 -------------
 
@@ -200,6 +205,7 @@ Release Summary
 ---------------
 
 | Released 2023-03-18
+
 
 New Modules
 -----------
