@@ -106,7 +106,7 @@
   delegate_to: localhost
 
 - name: Add Hardware Health poller if orion_node_hardware_health_poller is defined
-  when: orion_node_hardware_health is defined
+  when: orion_node_hardware_health_poller is defined
   solarwinds.orion.orion_node_hardware_health:
     hostname: "{{ orion_node_solarwinds_server }}"
     username: "{{ orion_node_solarwinds_username }}"
