@@ -58,7 +58,7 @@ EXAMPLES = r'''
       Community: "{{ ro_community_string }}"
   delegate_to: localhost
 
-- name: Update node to SNMPv3 polling
+- name: Update node to SNMPv3 polling. Note you will also need to add SNMP pollers if updating from ICMP
   solarwinds.orion.orion_update_node:
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_user }}"
@@ -67,11 +67,13 @@ EXAMPLES = r'''
     properties:
       ObjectSubType: SNMP
       SNMPVersion: 3
-      SNMPV3Username: "{{ snmpv3_user }}"
-      SNMPV3AuthMethod: "{{ snmpv3_auth }}{{ snmpv3_auth_level }}"
-      SNMPV3AuthKey: "{{ snmpv3_auth_pass }}"
-      SNMPV3PrivMethod: "{{ snmpv3_priv }}{{ snmpv3_priv_level }}"
-      SNMPV3PrivKey: "{{ snmpv3_priv_pass }}"
+      SNMPV3Username: "{{ snmpv3_username }}"
+      SNMPV3AuthMethod: "{{ snmpv3_auth_method }}"
+      SNMPV3AuthKey: "{{ snmpv3_auth_passphrase }}"
+      SNMPV3AuthKeyIsPwd: True
+      SNMPV3PrivMethod: "{{ snmpv3_priv_method }}"
+      SNMPV3PrivKey: "{{ snmpv3_priv_passphrase] }}"
+      SNMPV3PrivKeyIsPwd: True
   delegate_to: localhost
 
 '''
@@ -110,12 +112,6 @@ except Exception:
 
 requests.packages.urllib3.disable_warnings()
 
-def properties_need_update(current_node, desired_properties):
-    for key, value in desired_properties.items():
-        if key not in current_node or current_node[key] != value:
-            return True
-    return False
-
 def main():
     argument_spec = orion_argument_spec
     argument_spec.update(
@@ -137,21 +133,13 @@ def main():
         module.fail_json(skipped=True, msg='Node not found')
 
     changed = False
-    
-    # fields to be updated might not necessarily be in the limited scope of orion.get_node(), so we specifically get them here
-    fields = "NodeID, "
-    for key in module.params['properties']:
-        fields += "{0}, ".format(key)
-    query = "SELECT {0} FROM Orion.Nodes WHERE NodeID = '{1}'".format(fields, node['node_id'])
-    current_node_properties = orion.swis_query(query)
 
     try:
         if module.check_mode:
             changed = True
         else:
-            if properties_need_update(current_node_properties, module.params['properties']):
-                orion.swis.update(node['uri'], **module.params['properties'])
-                changed = True
+            orion.swis.update(node['uri'], **module.params['properties'])
+            changed = True
     except Exception as OrionException:
         module.fail_json(msg='Failed to update {0}'.format(str(OrionException)))
 
