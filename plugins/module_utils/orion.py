@@ -69,7 +69,7 @@ class OrionModule:
     def get_node(self):
         node = {}
         fields = """NodeID, Caption, Unmanaged, UnManageFrom, UnManageUntil, Uri,
-                  ObjectSubType, IP_Address, Status, StatusDescription"""
+                  ObjectSubType, IP_Address, Status, StatusDescription, LastSystemUptimePollUtc"""
 
         if self.module.params['node_id']:
             results = self.swis.query(
@@ -96,6 +96,7 @@ class OrionModule:
             node['ipaddress'] = results['results'][0]['IP_Address']
             node['status'] = results['results'][0]['Status']
             node['statusdescription'] = results['results'][0]['StatusDescription']
+            node['lastsystemuptimepollutc'] = results['results'][0]['LastSystemUptimePollUtc']
         return node
 
     def add_custom_property(self, node, prop_name, prop_value):
@@ -364,3 +365,6 @@ class OrionModule:
         cirrus_node_id = self.get_ncm_node(node)
 
         self.swis.invoke('Cirrus.Nodes', 'RemoveNode', cirrus_node_id)
+
+    def poll_now(self, node):
+        self.swis.invoke('Orion.Nodes', 'PollNow', node['netobjectid'])
