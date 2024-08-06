@@ -57,6 +57,8 @@ orion_node:
 '''
 
 import requests
+import dateutil.parser as parser
+from datetime import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
 try:
@@ -80,10 +82,26 @@ def main():
     )
 
     orion = OrionModule(module)
+    changed=False
 
     node = orion.get_node()
+    if not node:
+        module.fail_json(skipped=True, msg='Node not found')
+    
+    # trigger poll if last poll is null or greater than 5 minutes ago
+    object_subtype = node['objectsubtype']
+    if object_subtype == 'SNMP':
+        last_poll = node['lastsystemuptimepollutc']
+        if not last_poll:
+            orion.poll_now(node)
+            node = orion.get_node()
+        elif last_poll:
+            time_since_poll = parser.parse(last_poll).replace(tzinfo=None) - datetime.utcnow()
+            if time_since_poll.seconds > 300:
+                orion.poll_now(node)
+                node = orion.get_node()
 
-    module.exit_json(changed=False, orion_node=node)
+    module.exit_json(changed=changed, orion_node=node)
 
 
 if __name__ == "__main__":
