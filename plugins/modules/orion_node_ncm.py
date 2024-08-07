@@ -24,6 +24,11 @@ options:
         choices:
             - present
             - absent
+    profile_name:
+        description:
+            - Connection Profile Name Predefined on Orion NCM.
+        required: false
+        type: str
 extends_documentation_fragment:
     - solarwinds.orion.orion_auth_options
     - solarwinds.orion.orion_node_options
@@ -42,6 +47,7 @@ EXAMPLES = r'''
     password: "{{ solarwinds_pass }}"
     name: "{{ node_name }}"
     state: present
+    profile_name: "{{ profile_name }}"
   delegate_to: localhost
 
 '''
@@ -80,12 +86,26 @@ except Exception:
 
 requests.packages.urllib3.disable_warnings()
 
+def index_connection_profiles(orion_module):
+    """Takes an Orion module object and enumerates all available connection profiles for later use. Returns a dictionary."""
+    profile_list = orion_module.swis_get_ncm_connection_profiles()
+    profile_dict = {}
+    for k in range(0, len(profile_list)):
+        profile_name = profile_list[k]['Name']
+        profile_id = profile_list[k]['ID']
+        # create a mapping between the profile name (i.e. "Juniper_NCM") and the back-end numeric ID number
+        profile_dict.update({profile_name:profile_id})
+    return profile_dict
 
 def main():
+    # start with generic Orion arguments
     argument_spec = orion_argument_spec
+    # add desired fields to list of module arguments
     argument_spec.update(
         state=dict(required=True, choices=['present', 'absent']),
+        profile_name=dict(default=-1), # required field unless user wants to unset a connection profile
     )
+    # initialize the custom Ansible module
     module = AnsibleModule(
         argument_spec,
         supports_check_mode=True,
@@ -94,30 +114,52 @@ def main():
     if not HAS_ORION:
         module.fail_json(msg='orionsdk required for this module')
 
+    # create an OrionModule object using our custom Ansible module
     orion = OrionModule(module)
-
+ 
     node = orion.get_node()
     if not node:
+        # if get_node() returns None, there's no node
         module.fail_json(skipped=True, msg='Node not found')
 
     if module.params['state'] == 'present':
         try:
             ncm_node = orion.get_ncm_node(node)
             if ncm_node:
-                module.exit_json(changed=False, orion_node=node)
-            else:
+                profile_dict = index_connection_profiles(orion)
                 if module.check_mode:
+                    if orion.get_ncm_node_object(ncm_node)['ConnectionProfile'] != profile_dict[module.params['profile_name']]:
+                        module.exit_json(changed=True, orion_node=node, msg="Check mode: no changes made.")
+                    else:
+                        module.exit_json(changed=False, orion_node=node)
+                was_changed = orion.update_ncm_node_connection_profile(profile_dict, module.params['profile_name'], ncm_node)
+                if was_changed:
                     module.exit_json(changed=True, orion_node=node)
                 else:
+                    module.exit_json(changed=False, orion_node=node)
+            else:
+                # if the node is not already in NCM, add the node and update the connection profile
+                if module.check_mode:
+                    module.exit_json(changed=False, orion_node=node)
+                else:
+                    # add the node to NCM
                     orion.add_node_to_ncm(node)
+                    # collect the NCM node ID of the node
+                    ncm_node = orion.get_ncm_node(node)
+                    profile_dict = index_connection_profiles(orion)
+                    # update the connection profile
+                    was_changed = orion.update_ncm_node_connection_profile(profile_dict, module.params['profile_name'], ncm_node)
                     module.exit_json(changed=True, orion_node=node)
+                    if was_changed:
+                        module.exit_json(changed=True, orion_node=node)
+                    else:
+                        module.exit_json(changed=False, orion_node=node)
         except Exception as OrionException:
-            module.fail_json(msg='Failed to add node to NCM: {0}'.format(OrionException))
+            module.fail_json(msg='Failed to add or update node in NCM: {0}'.format(OrionException))
 
     elif module.params['state'] == 'absent':
         try:
             ncm_node = orion.get_ncm_node(node)
-
             if ncm_node:
                 if module.check_mode:
                     module.exit_json(changed=True, orion_node=node)
@@ -130,7 +172,6 @@ def main():
             module.fail_json(msg='Failed to remove application from node: {0}'.format(OrionException))
 
     module.exit_json(changed=False)
-
 
 if __name__ == "__main__":
     main()
