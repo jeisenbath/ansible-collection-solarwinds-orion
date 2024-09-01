@@ -21,7 +21,7 @@ options:
             - The polling method to be used for hardware health.
             - Required when I(state=present)
         required: False
-        choices: 
+        choices:
             - 'Unknown'
             - 'VMware'
             - 'SnmpDell'

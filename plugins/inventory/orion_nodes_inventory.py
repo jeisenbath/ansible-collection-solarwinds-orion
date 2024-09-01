@@ -24,7 +24,7 @@ DOCUMENTATION = r'''
         description: Hostname of the Solarwinds Orion server.
         required: true
         type: string
-      orion_username: 
+      orion_username:
         description: Username to Authenticate with Orion Server.
         required: true
         type: string
@@ -36,7 +36,7 @@ DOCUMENTATION = r'''
         description: Port to connect to the Solarwinds Information Service API. Only supported if orionsdk >= 0.4.0
         required: false
         type: string
-        default: 17774
+        default: '17774'
       verify:
         description: Verify SSL Certificate for Solarwinds Information Service API.
         required: false
@@ -57,7 +57,7 @@ DOCUMENTATION = r'''
       hostvar_prefix:
         description:
           - String to prepend to the Orion.Nodes field name when converting to a host variable.
-          - E.g. 'hostvar_prefix: orion_' generates variables like 'orion_dns', 'orion_ip_address', 'orion_caption'
+          - For example I(hostvar_prefix=orion_) generates variables like orion_dns, orion_ip_address, orion_caption
         required: false
         type: string
         default: orion_
@@ -78,7 +78,7 @@ EXAMPLES = r'''
 # It will use that DNS field as the host name
 # It will also pull in IP_Address and Caption to create host variables from
 # In this environment, the nodes have a custom property 'Server_Environment'
-# So we will pull that value and create a host variable, 
+# So we will pull that value and create a host variable,
 # then use the keyed_groups function to turn that value into a group.
 ---
 plugin: solarwinds.orion.orion_nodes_inventory
@@ -104,7 +104,16 @@ from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils._text import to_text, to_native
 from ansible.utils.display import Display
 from ansible.parsing.yaml.objects import AnsibleVaultEncryptedUnicode
-from distutils.version import LooseVersion
+from ansible.module_utils.six import raise_from
+try:
+    from ansible.module_utils.compat.version import LooseVersion  # noqa: F401
+except ImportError:
+    try:
+        from distutils.version import LooseVersion  # noqa: F401
+    except ImportError as exc:
+        raise_from(ImportError('To use this plugin or module with ansible-core'
+                               ' < 2.11, you need to use Python < 3.12 with '
+                               'distutils.version present'), exc)
 
 display = Display()
 
@@ -112,8 +121,11 @@ display = Display()
 try:
     import requests
     HAS_REQUESTS = True
+    requests.packages.urllib3.disable_warnings()
 except ImportError:
     HAS_REQUESTS = False
+except Exception:
+    raise Exception
 
 try:
     import orionsdk
@@ -123,8 +135,6 @@ except ImportError:
     HAS_ORION = False
 
 from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, Constructable
-
-requests.packages.urllib3.disable_warnings()
 
 
 class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
@@ -155,7 +165,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
 
             self._consume_options(config)
         except Exception as e:
-            raise AnsibleParserError('Failed to consume options:    {}'.format(to_native(e)))
+            raise AnsibleParserError('Failed to consume options:    {0}'.format(to_native(e)))
 
         cache_key = self.get_cache_key(path)
         update_cache = False
@@ -210,7 +220,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
                     inv_hostvars[node_hostname] = node_hostvars
                     self.add_host(node_hostname, node_hostvars)
                 except Exception as e:
-                    raise AnsibleParserError('Error iterating over query results: {}'.format(to_native(e)))
+                    raise AnsibleParserError('Error iterating over query results: {0}'.format(to_native(e)))
 
         return inv_hostvars
 
@@ -236,15 +246,15 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
             __SWIS__ = SwisClient(**swis_options)
             __SWIS__.query('SELECT uri FROM Orion.Environment')
         except Exception as e:
-            raise AnsibleError('Failed to connect to Orion database:   {}'.format(to_native(e)))
+            raise AnsibleError('Failed to connect to Orion database:   {0}'.format(to_native(e)))
 
         hostname_field = self.get_option('hostname_field')
-        select_string = "SELECT NodeID, node.{}".format(hostname_field)
+        select_string = "SELECT NodeID, node.{0}".format(hostname_field)
         for hostvar_field in self.get_option('hostvar_fields'):
-            select_string = select_string + ", node.{}".format(hostvar_field)
+            select_string = select_string + ", node.{0}".format(hostvar_field)
         if self.get_option('hostvar_custom_properties'):
             for custom_property in self.get_option('hostvar_custom_properties'):
-                select_string = select_string + ", custom.{0} as {1}".format(custom_property, custom_property)
+                select_string = select_string + ", custom.{0} as {0}".format(custom_property)
 
         query = "{0} FROM Orion.Nodes as node ".format(select_string)
 
@@ -254,7 +264,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
         if self.get_option('filter'):
             query = query + self.get_option('filter')
 
-        self.display.vvv('Using query "{}"'.format(to_text(query)))
+        self.display.vvv('Using query "{0}"'.format(to_text(query)))
 
         results = __SWIS__.query(query)
 

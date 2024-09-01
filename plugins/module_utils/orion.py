@@ -380,6 +380,7 @@ class OrionModule:
 
         if cirrus_node_query['results']:
             return cirrus_node_query['results'][0]['NodeID']
+
     def update_ncm_node_connection_profile(self, profile_dict, new_connection_profile_name, ncm_node_id):
         """Retrieves an NCM node and alters its connection profile.
 
