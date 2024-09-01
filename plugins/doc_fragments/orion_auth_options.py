@@ -35,7 +35,7 @@ options:
             - This argument was introduced in orionsdk 0.4.0 to support connecting to either API.
             - If using an older version of Solarwinds with orionsdk 0.4.0, define this as port 17778.
         required: false
-        default: 17774
+        default: '17774'
         type: str
     verify:
         description:
