@@ -108,7 +108,7 @@ except Exception:
 
 
 def main():
-    argument_spec = orion_argument_spec
+    argument_spec = orion_argument_spec()
     argument_spec.update(
         volume=dict(
             required=True, type='dict',

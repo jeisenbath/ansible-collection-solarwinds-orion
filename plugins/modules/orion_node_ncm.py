@@ -107,7 +107,7 @@ def index_connection_profiles(orion_module):
 
 def main():
     # start with generic Orion arguments
-    argument_spec = orion_argument_spec
+    argument_spec = orion_argument_spec()
     # add desired fields to list of module arguments
     argument_spec.update(
         state=dict(required=True, choices=['present', 'absent']),

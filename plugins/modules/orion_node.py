@@ -467,7 +467,7 @@ def unmute_node(module, node):
 
 
 def main():
-    argument_spec = orion_argument_spec
+    argument_spec = orion_argument_spec()
     argument_spec.update(
         state=dict(required=True, choices=['present', 'absent', 'managed', 'unmanaged', 'muted', 'unmuted']),
         unmanage_from=dict(required=False, default=None),

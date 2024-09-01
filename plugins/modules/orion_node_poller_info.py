@@ -106,7 +106,7 @@ except Exception:
 
 
 def main():
-    argument_spec = orion_argument_spec
+    argument_spec = orion_argument_spec()
     module = AnsibleModule(
         argument_spec,
         supports_check_mode=True,

@@ -95,7 +95,7 @@ except Exception:
 
 
 def main():
-    argument_spec = orion_argument_spec
+    argument_spec = orion_argument_spec()
     argument_spec.update(
         state=dict(required=True, choices=['present', 'absent']),
         custom_poller=dict(required=True, type='str')

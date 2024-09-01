@@ -107,7 +107,7 @@ except Exception:
 
 
 def main():
-    argument_spec = orion_argument_spec
+    argument_spec = orion_argument_spec()
     argument_spec.update(
         state=dict(required=True, choices=['present', 'absent']),
         application_template_name=dict(required=True, type='str'),

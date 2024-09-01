@@ -119,7 +119,7 @@ except Exception:
 
 
 def main():
-    argument_spec = orion_argument_spec
+    argument_spec = orion_argument_spec()
     argument_spec.update(
         properties=dict(required=False, default={}, type='dict')
     )

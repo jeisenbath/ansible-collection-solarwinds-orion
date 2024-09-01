@@ -37,16 +37,17 @@ except Exception:
     raise Exception
 
 
-orion_argument_spec = dict(
-    hostname=dict(required=True),
-    username=dict(required=True, no_log=True),
-    password=dict(required=True, no_log=True),
-    port=dict(required=False, type='str', default='17774'),
-    verify=dict(required=False, type='bool', default=False),
-    node_id=dict(required=False),
-    ip_address=dict(required=False),
-    name=dict(required=False, aliases=['caption']),
-)
+def orion_argument_spec():
+    return dict(
+        hostname=dict(required=True),
+        username=dict(required=True, no_log=True),
+        password=dict(required=True, no_log=True),
+        port=dict(required=False, type='str', default='17774'),
+        verify=dict(required=False, type='bool', default=False),
+        node_id=dict(required=False),
+        ip_address=dict(required=False),
+        name=dict(required=False, aliases=['caption']),
+    )
 
 
 class OrionModule:
