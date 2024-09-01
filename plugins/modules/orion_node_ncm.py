@@ -27,6 +27,7 @@ options:
     profile_name:
         description:
             - Connection Profile Name Predefined on Orion NCM.
+        default: '-1'
         required: false
         type: str
 extends_documentation_fragment:
@@ -72,9 +73,16 @@ orion_node:
     }
 '''
 
-import requests
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
+try:
+    import requests
+    HAS_REQUESTS = True
+    requests.packages.urllib3.disable_warnings()
+except ImportError:
+    HAS_REQUESTS = False
+except Exception:
+    raise Exception
 try:
     import orionsdk
     from orionsdk import SwisClient
@@ -84,7 +92,6 @@ except ImportError:
 except Exception:
     raise Exception
 
-requests.packages.urllib3.disable_warnings()
 
 def index_connection_profiles(orion_module):
     """Takes an Orion module object and enumerates all available connection profiles for later use. Returns a dictionary."""
@@ -94,8 +101,9 @@ def index_connection_profiles(orion_module):
         profile_name = profile_list[k]['Name']
         profile_id = profile_list[k]['ID']
         # create a mapping between the profile name (i.e. "Juniper_NCM") and the back-end numeric ID number
-        profile_dict.update({profile_name:profile_id})
+        profile_dict.update({profile_name: profile_id})
     return profile_dict
+
 
 def main():
     # start with generic Orion arguments
@@ -103,7 +111,7 @@ def main():
     # add desired fields to list of module arguments
     argument_spec.update(
         state=dict(required=True, choices=['present', 'absent']),
-        profile_name=dict(default=-1), # required field unless user wants to unset a connection profile
+        profile_name=dict(required=False, type='str', default='-1'),  # required field unless user wants to unset a connection profile
     )
     # initialize the custom Ansible module
     module = AnsibleModule(
@@ -116,7 +124,7 @@ def main():
 
     # create an OrionModule object using our custom Ansible module
     orion = OrionModule(module)
- 
+
     node = orion.get_node()
     if not node:
         # if get_node() returns None, there's no node
@@ -172,6 +180,7 @@ def main():
             module.fail_json(msg='Failed to remove application from node: {0}'.format(OrionException))
 
     module.exit_json(changed=False)
+
 
 if __name__ == "__main__":
     main()

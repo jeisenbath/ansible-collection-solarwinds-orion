@@ -56,21 +56,32 @@ orion_node:
     }
 '''
 
-import requests
-import dateutil.parser as parser
 from datetime import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
 try:
+    from dateutil import parser
+    HAS_DATEUTIL = True
+except ImportError:
+    HAS_DATEUTIL = False
+except Exception:
+    raise Exception
+try:
+    import requests
+    HAS_REQUESTS = True
+    requests.packages.urllib3.disable_warnings()
+except ImportError:
+    HAS_REQUESTS = False
+except Exception:
+    raise Exception
+try:
     import orionsdk
     from orionsdk import SwisClient
     HAS_ORION = True
-except Exception as OrionSdkImport:
+except ImportError:
     HAS_ORION = False
 except Exception:
     raise Exception
-
-requests.packages.urllib3.disable_warnings()
 
 
 def main():
@@ -82,12 +93,12 @@ def main():
     )
 
     orion = OrionModule(module)
-    changed=False
+    changed = False
 
     node = orion.get_node()
     if not node:
         module.fail_json(skipped=True, msg='Node not found')
-    
+
     # trigger poll if last poll is null or greater than 5 minutes ago
     object_subtype = node['objectsubtype']
     if object_subtype == 'SNMP':

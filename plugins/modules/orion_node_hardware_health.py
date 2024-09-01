@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
@@ -17,8 +19,28 @@ options:
     polling_method:
         description:
             - The polling method to be used for hardware health.
-        required: True when state is present
-        choices: ['Unknown', 'VMware', 'SnmpDell', 'SnmpHP', 'SnmpIBM', 'VMwareAPI', 'WmiDell', 'WmiHP', 'WmiIBM', 'SnmpCisco', 'SnmpJuniper', 'SnmpNPMHP', 'SnmpF5', 'SnmpDellPowerEdge', 'SnmpDellPowerConnect', 'SnmpDellBladeChassis', 'SnmpHPBladeChassis', 'Forwarded', 'SnmpArista']
+            - Required when I(state=present)
+        required: False
+        choices: 
+            - 'Unknown'
+            - 'VMware'
+            - 'SnmpDell'
+            - 'SnmpHP'
+            - 'SnmpIBM'
+            - 'VMwareAPI'
+            - 'WmiDell'
+            - 'WmiHP'
+            - 'WmiIBM'
+            - 'SnmpCisco'
+            - 'SnmpJuniper'
+            - 'SnmpNPMHP'
+            - 'SnmpF5'
+            - 'SnmpDellPowerEdge'
+            - 'SnmpDellPowerConnect'
+            - 'SnmpDellBladeChassis'
+            - 'SnmpHPBladeChassis'
+            - 'Forwarded'
+            - 'SnmpArista'
         type: str
     state:
         description:
@@ -75,7 +97,14 @@ orion_node:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
-
+try:
+    import requests
+    HAS_REQUESTS = True
+    requests.packages.urllib3.disable_warnings()
+except ImportError:
+    HAS_REQUESTS = False
+except Exception:
+    raise Exception
 try:
     from orionsdk import SwisClient
     HAS_ORIONSDK = True
@@ -104,6 +133,7 @@ POLLING_METHOD_MAP = {
     'Forwarded': 17,
     'SnmpArista': 18
 }
+
 
 def main():
     argument_spec = orion_argument_spec
@@ -152,6 +182,7 @@ def main():
         module.fail_json(msg=str(e))
 
     module.exit_json(changed=changed, orion_node=node)
+
 
 if __name__ == '__main__':
     main()

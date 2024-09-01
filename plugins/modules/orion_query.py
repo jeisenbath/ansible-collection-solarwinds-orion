@@ -17,7 +17,7 @@ description:
     - "Will return the query results as a json object, which can be registered and used with other modules."
     - "Optionally can also save results into a csv."
 version_added: "1.3.0"
-author: 
+author:
     - "Josh M. Eisenbath (@jeisenbath)"
     - "Andrew  Bailey (@andyjb8)"
 options:
@@ -73,18 +73,24 @@ results:
             "IP_Address": "127.0.0.1",
             "MachineType": "net-snmp - Linux",
             "NodeID": 12345,
-            "StatusIcon": "Up.gif                                  ",
+            "StatusIcon": "Up.gif",
             "Vendor": "net-snmp"
         }
     ]
 
 '''
 
-import requests
 import csv
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
-
+from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule
+try:
+    import requests
+    HAS_REQUESTS = True
+    requests.packages.urllib3.disable_warnings()
+except ImportError:
+    HAS_REQUESTS = False
+except Exception:
+    raise Exception
 try:
     import orionsdk
     from orionsdk import SwisClient
@@ -93,8 +99,6 @@ except ImportError:
     HAS_ORION = False
 except Exception:
     raise Exception
-
-requests.packages.urllib3.disable_warnings()
 
 
 def write_to_csv(nodes, csv_file_path):
@@ -107,10 +111,14 @@ def write_to_csv(nodes, csv_file_path):
 
 
 def main():
-    argument_spec = orion_argument_spec
-    argument_spec.update(
-        query=dict(required=True, type=str),
-        csv_path=dict(required=False, type=str),
+    argument_spec = dict(
+        hostname=dict(required=True),
+        username=dict(required=True, no_log=True),
+        password=dict(required=True, no_log=True),
+        port=dict(required=False, type='str', default='17774'),
+        verify=dict(required=False, type='bool', default=False),
+        query=dict(required=True, type='str'),
+        csv_path=dict(required=False, type='str'),
     )
     module = AnsibleModule(
         argument_spec,

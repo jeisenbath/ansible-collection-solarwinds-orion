@@ -98,9 +98,16 @@ orion_node:
     }
 '''
 
-import requests
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
+try:
+    import requests
+    HAS_REQUESTS = True
+    requests.packages.urllib3.disable_warnings()
+except ImportError:
+    HAS_REQUESTS = False
+except Exception:
+    raise Exception
 try:
     import orionsdk
     from orionsdk import SwisClient
@@ -110,7 +117,6 @@ except ImportError:
 except Exception:
     raise Exception
 
-requests.packages.urllib3.disable_warnings()
 
 def main():
     argument_spec = orion_argument_spec
@@ -127,7 +133,7 @@ def main():
         module.fail_json(msg='orionsdk required for this module')
 
     orion = OrionModule(module)
-    
+
     node = orion.get_node()
     if not node:
         module.fail_json(skipped=True, msg='Node not found')

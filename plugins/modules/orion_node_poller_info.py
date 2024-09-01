@@ -34,10 +34,10 @@ EXAMPLES = r'''
     name: "{{ node_name }}"
   delegate_to: localhost
   register: poller_info
-  
+
 - name: Loop through the pollers and show PollerType and Enabled
   ansible.builtin.debug:
-    msg: "{{ item.PollerType }}": "{{ item.Enabled }}"
+    msg: "{{ item.PollerType }}: {{ item.Enabled }}"
   loop: "{{ poller_info.pollers }}"
 
 '''
@@ -85,9 +85,16 @@ pollers:
     ]
 '''
 
-import requests
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
+try:
+    import requests
+    HAS_REQUESTS = True
+    requests.packages.urllib3.disable_warnings()
+except ImportError:
+    HAS_REQUESTS = False
+except Exception:
+    raise Exception
 try:
     import orionsdk
     from orionsdk import SwisClient
@@ -96,8 +103,6 @@ except ImportError:
     HAS_ORION = False
 except Exception:
     raise Exception
-
-requests.packages.urllib3.disable_warnings()
 
 
 def main():

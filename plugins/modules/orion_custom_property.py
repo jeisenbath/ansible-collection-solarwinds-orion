@@ -81,9 +81,16 @@ orion_node:
     }
 '''
 
-import requests
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
+try:
+    import requests
+    HAS_REQUESTS = True
+    requests.packages.urllib3.disable_warnings()
+except ImportError:
+    HAS_REQUESTS = False
+except Exception:
+    raise Exception
 try:
     import orionsdk
     from orionsdk import SwisClient
@@ -92,8 +99,6 @@ except ImportError:
     HAS_ORION = False
 except Exception:
     raise Exception
-
-requests.packages.urllib3.disable_warnings()
 
 
 def main():
@@ -133,7 +138,7 @@ def main():
                     orion.add_custom_property(node, module.params['property_name'], module.params['property_value'])
                     module.exit_json(changed=True, orion_node=node)
         except Exception as OrionException:
-            module.fail_json(msg='Failed to add custom properties: {}'.format(OrionException))
+            module.fail_json(msg='Failed to add custom properties: {0}'.format(OrionException))
     elif module.params['state'] == 'absent':
         try:
             prop_name, prop_value = orion.get_node_custom_property_value(node, module.params['property_name'])
@@ -146,7 +151,7 @@ def main():
             else:
                 module.exit_json(changed=False, orion_node=node)
         except Exception as OrionException:
-            module.fail_json(msg='Failed to remove custom property from node: {}'.format(OrionException))
+            module.fail_json(msg='Failed to remove custom property from node: {0}'.format(OrionException))
     # TODO create/update custom properties and their values within solarwinds?
 
     module.exit_json(changed=False)

@@ -7,9 +7,26 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from dateutil.parser import parse
+from ansible.module_utils.six import raise_from
 import re
-from distutils.version import LooseVersion
+try:
+    from ansible.module_utils.compat.version import LooseVersion  # noqa: F401
+except ImportError:
+    try:
+        from distutils.version import LooseVersion  # noqa: F401
+    except ImportError as exc:
+        raise_from(ImportError('To use this plugin or module with ansible-core'
+                               ' < 2.11, you need to use Python < 3.12 with '
+                               'distutils.version present'), exc)
+
+try:
+    from dateutil.parser import parse
+    HAS_DATEUTIL = True
+except ImportError:
+    HAS_DATEUTIL = False
+except Exception:
+    raise Exception
+
 try:
     import orionsdk
     from orionsdk import SwisClient
@@ -25,7 +42,7 @@ orion_argument_spec = dict(
     username=dict(required=True, no_log=True),
     password=dict(required=True, no_log=True),
     port=dict(required=False, type='str', default='17774'),
-    verify=dict(required=False, type=bool, default=False),
+    verify=dict(required=False, type='bool', default=False),
     node_id=dict(required=False),
     ip_address=dict(required=False),
     name=dict(required=False, aliases=['caption']),
@@ -65,12 +82,12 @@ class OrionModule:
         results = self.swis.query(query)
         if results['results']:
             return results['results']
-        
+
     def swis_get_ncm_connection_profiles(self):
         """Find all available connection profiles and return a list."""
         profile_list = self.swis.invoke('Cirrus.Nodes', 'GetAllConnectionProfiles')
         return profile_list
-    
+
     def get_node(self):
         node = {}
         fields = """NodeID, Caption, Unmanaged, UnManageFrom, UnManageUntil, Uri,
@@ -360,6 +377,7 @@ class OrionModule:
         cirrus_node_query = self.swis.query(
             "SELECT NodeID from Cirrus.Nodes WHERE CoreNodeID = '{0}'".format(node['nodeid'])
         )
+
         if cirrus_node_query['results']:
             return cirrus_node_query['results'][0]['NodeID']
     def update_ncm_node_connection_profile(self, profile_dict, new_connection_profile_name, ncm_node_id):
@@ -373,14 +391,14 @@ class OrionModule:
             The name of the desired connection profile
         ncm_node_id : GUID
             The ID of the NCM node whose connection profile is being altered
-        
+
         Returns
         -------
         bool
             A Boolean denoting success (True) or failure (False)
         """
         ncmNode = self.swis.invoke('Cirrus.Nodes', 'GetNode', ncm_node_id)
-        if new_connection_profile_name != '-1': # the -1 denotes no connection profile is set
+        if new_connection_profile_name != '-1':  # the -1 denotes no connection profile is set
             if new_connection_profile_name in profile_dict:
                 if ncmNode['ConnectionProfile'] != profile_dict[new_connection_profile_name]:
                     ncmNode['ConnectionProfile'] = profile_dict[new_connection_profile_name]
@@ -396,7 +414,7 @@ class OrionModule:
                 return False
         self.swis.invoke('Cirrus.Nodes', 'UpdateNode', ncmNode)
         return True
-    
+
     def get_ncm_node_object(self, ncm_node_id):
         ncmNode = self.swis.invoke('Cirrus.Nodes', 'GetNode', ncm_node_id)
         return ncmNode

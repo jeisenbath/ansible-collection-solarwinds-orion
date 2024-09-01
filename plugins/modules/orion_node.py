@@ -127,7 +127,6 @@ options:
             - Authentication method for SNMPv3.
             - Required when SNMP version is 3.
         type: str
-        default: SHA1
         choices:
             - SHA1
             - MD5
@@ -143,13 +142,11 @@ options:
             - SNMPv3 Authentication Password is a key.
             - Confusingly, value of True corresponds to web GUI checkbox being unchecked.
         type: bool
-        default: True
         required: false
     snmpv3_priv_method:
         description:
             - Privacy method for SNMPv3.
         type: str
-        default: AES128
         choices:
             - DES56
             - AES128
@@ -166,7 +163,6 @@ options:
             - SNMPv3 Privacy Password is a key.
             - Confusingly, value of True corresponds to web GUI checkbox being unchecked.
         type: bool
-        default: True
         required: false
     wmi_credential_set:
         description:
@@ -235,10 +231,23 @@ orion_node:
     }
 '''
 
-from datetime import datetime, timedelta
-import requests
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
+try:
+    from datetime import datetime, timedelta
+    HAS_DATETIME = True
+except ImportError:
+    HAS_DATETIME = False
+except Exception:
+    raise Exception
+try:
+    import requests
+    HAS_REQUESTS = True
+    requests.packages.urllib3.disable_warnings()
+except ImportError:
+    HAS_REQUESTS = False
+except Exception:
+    raise Exception
 try:
     import orionsdk
     from orionsdk import SwisClient
@@ -247,8 +256,6 @@ except ImportError:
     HAS_ORION = False
 except Exception:
     raise Exception
-
-requests.packages.urllib3.disable_warnings()
 
 
 def add_credential_set(node, credential_set_name, credential_set_type):
@@ -469,14 +476,14 @@ def main():
         ro_community_string=dict(required=False, no_log=True),
         rw_community_string=dict(required=False, no_log=True),
         snmp_version=dict(required=False, default=None, choices=['2', '3']),
-        snmpv3_credential_set=dict(required=False, default=None, type=str),
-        snmpv3_username=dict(required=False, type=str),
-        snmpv3_auth_method=dict(required=False, type=str, choices=['SHA1', 'MD5']),
-        snmpv3_auth_key=dict(required=False, type=str, no_log=True),
-        snmpv3_auth_key_is_pwd=dict(required=False, type=bool),
-        snmpv3_priv_method=dict(required=False, type=str, choices=['DES56', 'AES128', 'AES192', 'AES256']),
-        snmpv3_priv_key=dict(required=False, type=str, no_log=True),
-        snmpv3_priv_key_is_pwd=dict(required=False, type=bool),
+        snmpv3_credential_set=dict(required=False, default=None, type='str'),
+        snmpv3_username=dict(required=False, type='str'),
+        snmpv3_auth_method=dict(required=False, type='str', choices=['SHA1', 'MD5']),
+        snmpv3_auth_key=dict(required=False, type='str', no_log=True),
+        snmpv3_auth_key_is_pwd=dict(required=False, type='bool'),
+        snmpv3_priv_method=dict(required=False, type='str', choices=['DES56', 'AES128', 'AES192', 'AES256']),
+        snmpv3_priv_key=dict(required=False, type='str', no_log=True),
+        snmpv3_priv_key_is_pwd=dict(required=False, type='bool'),
         snmp_port=dict(required=False, default='161'),
         snmp_allow_64=dict(required=False, default=True, type='bool'),
         wmi_credential_set=dict(required=False, no_log=True),

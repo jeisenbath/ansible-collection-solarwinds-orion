@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2024, Your Name
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -15,7 +14,7 @@ description:
     - Retrieve information about interfaces on a Node in Orion NPM that are currently being monitored.
     - Provides details such as interface name, status, and other relevant attributes.
 version_added: "1.0.0"
-author: "Your Name"
+author: "Andrew Bailey (@Andyjb8)"
 extends_documentation_fragment:
     - solarwinds.orion.orion_auth_options
     - solarwinds.orion.orion_node_options
@@ -84,9 +83,16 @@ interfaces:
         ]
 '''
 
-import requests
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
+try:
+    import requests
+    HAS_REQUESTS = True
+    requests.packages.urllib3.disable_warnings()
+except ImportError:
+    HAS_REQUESTS = False
+except Exception:
+    raise Exception
 try:
     import orionsdk
     from orionsdk import SwisClient
@@ -95,8 +101,6 @@ except ImportError:
     HAS_ORION = False
 except Exception:
     raise Exception
-
-requests.packages.urllib3.disable_warnings()
 
 
 def main():
