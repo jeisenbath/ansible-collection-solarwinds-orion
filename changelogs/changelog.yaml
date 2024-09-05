@@ -187,6 +187,9 @@ releases:
     release_date: '2024-04-18'
   2.1.0:
     changes:
+      bugfixes:
+      - Fixed an issue where ansible-lint would complain about missing parameters
+        when a single yaml doc used multiple modules.
       major_changes:
       - Added orion_node_hardware_health module. This module allows for adding and
         removing hardware health sensors in Solarwinds Orion.
@@ -198,5 +201,6 @@ releases:
         addition to creating orion_node_hardware_health module.
     fragments:
     - 2.1.0.yml
+    - bugfix.yml
     - role_updates.yml
     release_date: '2024-07-12'

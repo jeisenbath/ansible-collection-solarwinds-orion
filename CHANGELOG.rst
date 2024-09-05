@@ -25,6 +25,11 @@ Minor Changes
 - Updated orion_update_node exmaples to show updating to SNMPv3.
 - orion_node role - added tasks for new modules orion_node_ncm and orion_node_hardware_health
 
+Bugfixes
+--------
+
+- Fixed an issue where ansible-lint would complain about missing parameters when a single yaml doc used multiple modules.
+
 v2.0.0
 ======
 

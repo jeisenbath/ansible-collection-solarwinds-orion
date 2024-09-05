@@ -1,4 +1,4 @@
-Role Name
+orion_node
 =========
 
 Adds an node to be monitored in Solarwinds.
@@ -12,32 +12,47 @@ Role Variables
 --------------
 
 defaults/main.yml
-orion_node_solarwinds_server - Defaults to variable {{ solarwinds_server }}
-orion_node_solarwinds_username - Defaults to variable {{ solarwinds_username }}
-orion_node_solarwinds_password - Defaults to variable {{ solarwinds_password }}
-orion_node_caption_name - Default {{ ansible_facts.nodename }}, override if you aren't gathering facts or for custom caption
-orion_node_ip_address - Default {{ ansible_facts.default_ipv4.address }}, override if you aren't gathering facts
-orion_node_polling_method - Default ICMP
-orion_node_snmp_pollers - list, elements are dicts (name, enabled(bool)). Default is only CPU and Memory pollers.
-orion_node_discover_interfaces - Default false, whether to discover and add all interfaces when polling method is SNMP
-orion_node_ncm - Default false, whether to add node to NCM
+```yaml
+orion_node_solarwinds_server: "{{ solarwinds_server }}"
+orion_node_solarwinds_username: "{{ solarwinds_username }}"
+orion_node_solarwinds_password: "{{ solarwinds_password }}"
+orion_node_caption_name: "{{ ansible_facts.nodename }}"
+orion_node_ip_address: "{{ ansible_facts.default_ipv4.address }}"
+orion_node_polling_method: ICMP
+orion_node_snmp_pollers:
+  - name: N.Cpu.SNMP.HrProcessorLoad
+    enabled: true
+  - name: N.Memory.SNMP.NetSnmpReal
+    enabled: true
+orion_node_discover_interfaces: false
+orion_node_ncm: false
+orion_node_snmp_port: 161
+orion_node_snmp_allow_64: true
+```
 
-Optional variables
-orion_node_snmp_version - required when orion_node_polling method is SNMP, set which version of SNMP (choices: 2, 3)
-orion_node_ro_community_string - required when SNMP version is 2
-orion_node_snmpv3_credential_set - required when SNMP version is 3
-orion_node_snmpv3_username - required when SNMP version is 3
-orion_node_snmpv3_auth_key - required when SNMP version is 3
-orion_node_snmpv3_priv_key - required when SNMP version is 3
-orion_node_snmp_port - override default SNMP port
-orion_node_snmp_allow_64 - override default "True" value of device supporting 64 bit counters
+Variables required depending on the values of defaults
+```yaml
+# required when orion_node_polling method is SNMP, set which version of SNMP (choices: 2, 3)
+orion_node_snmp_version:
+# required when SNMP version is 2
+orion_node_ro_community_string:
+# required when SNMP version is 3
+orion_node_snmpv3_credential_set:
+orion_node_snmpv3_username:
+orion_node_snmpv3_auth_key:
+orion_node_snmpv3_priv_key:
 
-orion_node_custom_pollers - list, additional custom UnDP pollers
-orion_node_interfaces - list, interfaces to monitor
-orion_node_volumes - list, volumes to monitor
-orion_node_applications - list, APM templates to add to node
-orion_node_custom_properties - list, elements are dicts (name, value), custom property names and values to set
-orion_node_hardware_health_poller - string, Name of the Hardware Health poller to enable on node
+```
+
+Optional variables, define these if you need to configure
+```yaml
+orion_node_custom_pollers: list, additional custom UnDP pollers
+orion_node_interfaces: list, interfaces to monitor
+orion_node_volumes: list, volumes to monitor
+orion_node_applications: list, APM templates to add to node
+orion_node_custom_properties: list, elements are dicts (name, value), custom property names and values to set
+orion_node_hardware_health_poller: string, Name of the Hardware Health poller to enable on node
+```
 
 
 Example Playbook
