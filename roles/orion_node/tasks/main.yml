@@ -124,4 +124,5 @@
     password: "{{ orion_node_solarwinds_password }}"
     state: present
     name: "{{ orion_node_caption_name }}"
+    profile_name: "{{ orion_node_ncm_profile_name }}"
 ...

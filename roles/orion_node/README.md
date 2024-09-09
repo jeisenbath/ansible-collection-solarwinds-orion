@@ -52,6 +52,7 @@ orion_node_volumes: list, volumes to monitor
 orion_node_applications: list, APM templates to add to node
 orion_node_custom_properties: list, elements are dicts (name, value), custom property names and values to set
 orion_node_hardware_health_poller: string, Name of the Hardware Health poller to enable on node
+orion_node_ncm_profile_name: string, Name of NCM profile if managing node in NCM
 ```
 
 
