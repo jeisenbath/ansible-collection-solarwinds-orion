@@ -241,7 +241,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
                     'username': self.get_option('orion_username'),
                     'password': orion_password,
                     'port': self.get_option('orion_port'),
-                    'verify': self.get_option('orion_verify'),
+                    'verify': self.get_option('verify'),
                 }
             __SWIS__ = SwisClient(**swis_options)
             __SWIS__.query('SELECT uri FROM Orion.Environment')
