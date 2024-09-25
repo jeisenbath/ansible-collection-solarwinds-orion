@@ -74,6 +74,7 @@ orion_node:
     sample: {
         "caption": "localhost",
         "ipaddress": "127.0.0.1",
+        "lastsystemuptimepollutc": "2024-09-25T18:34:20.7630000Z",
         "netobjectid": "N:12345",
         "nodeid": "12345",
         "objectsubtype": "SNMP",
