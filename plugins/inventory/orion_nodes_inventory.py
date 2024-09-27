@@ -56,8 +56,8 @@ DOCUMENTATION = r'''
         type: string
       hostvar_prefix:
         description:
-          - String to prepend to the Orion.Nodes field name when converting to a host variable.
-          - For example I(hostvar_prefix=orion_) generates variables like orion_dns, orion_ip_address, orion_caption
+          - "String to prepend to the Orion.Nodes field name when converting to a host variable."
+          - "For example I(hostvar_prefix=orion_) generates variables like orion_dns, orion_ip_address, orion_caption"
         required: false
         type: string
         default: orion_
