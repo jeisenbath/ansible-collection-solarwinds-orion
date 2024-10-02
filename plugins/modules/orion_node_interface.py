@@ -106,7 +106,7 @@ discovered:
     elements: dict
     sample: [
             {
-                "Name": "lo",
+                "Caption": "lo",
                 "InterfaceID": 0,
                 "Manageable": true,
                 "ifAdminStatus": 1,
@@ -117,7 +117,7 @@ discovered:
                 "ifType": 24
             },
             {
-                "Name": "eth0",
+                "Caption": "eth0",
                 "InterfaceID": 268420,
                 "Manageable": true,
                 "ifAdminStatus": 1,
@@ -135,7 +135,7 @@ interfaces:
     elements: dict
     sample: [
             {
-                "Name": "lo",
+                "Caption": "lo",
                 "InterfaceID": 0,
                 "Manageable": true,
                 "ifAdminStatus": 1,
@@ -197,11 +197,11 @@ def main():
         try:
             if not module.params['interface']:
                 for interface in discovered:
-                    if not orion.get_interface(node, interface['Name']):
+                    if not orion.get_interface(node, interface['Caption']):
                         changed = True
                         interfaces.append(interface)
                         if not module.check_mode:
-                            orion.add_interface(node, interface['Name'], False, discovered)
+                            orion.add_interface(node, interface['Caption'], False, discovered)
             else:
                 get_int = orion.get_interface(node, module.params['interface'])
                 if not get_int:
@@ -217,11 +217,11 @@ def main():
         try:
             if not module.params['interface']:
                 for interface in discovered:
-                    if orion.get_interface(node, interface['Name']):
+                    if orion.get_interface(node, interface['Caption']):
                         changed = True
                         interfaces.append(interface)
                         if not module.check_mode:
-                            orion.remove_interface(node, interface['Name'])
+                            orion.remove_interface(node, interface['Caption'])
             else:
                 get_int = orion.get_interface(node, module.params['interface'])
                 if get_int:
