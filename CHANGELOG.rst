@@ -4,23 +4,29 @@ Solarwinds.Orion Release Notes
 
 .. contents:: Topics
 
-
 v2.1.0
 ======
 
 Release Summary
 ---------------
 
-Minor Updates to orion_node and orion_update_node modules in addition to creating orion_node_hardware_health module.
+Released 2024-10-02
 
 Major Changes
 -------------
 
+- Added module orion_node_interface_info to get interfaces currently monitored for a node.
 - Added orion_node_hardware_health module. This module allows for adding and removing hardware health sensors in Solarwinds Orion.
 
 Minor Changes
 -------------
 
+- Add a poll_now() function to the OrionModule
+- Add a profile_name parameter to orion_node_ncm
+- Add correct check_mode logic to orion_ndoe_ncm
+- Call poll_now() for SNMP nodes in orion_node_info module. This logic will allow using 'until' task logic to validate node is polling.
+- Modified the example playbook for orion_add_node.yml to use the role keyword, and include a task for SNMP poll verification.
+- Update get_node() function to also return LastSystemUptimePollUtc
 - Updated orion_node module to no longer require snmpv3 credential set.
 - Updated orion_update_node exmaples to show updating to SNMPv3.
 - orion_node role - added tasks for new modules orion_node_ncm and orion_node_hardware_health
@@ -116,7 +122,6 @@ Release Summary
 
 | Released 2023-12-1
 
-
 Major Changes
 -------------
 
@@ -129,7 +134,6 @@ Release Summary
 ---------------
 
 | Released 2023-09-26
-
 
 Major Changes
 -------------
@@ -149,7 +153,6 @@ Release Summary
 
 | Released 2023-08-27
 
-
 Minor Changes
 -------------
 
@@ -167,7 +170,6 @@ Release Summary
 ---------------
 
 | Released 2023-08-10
-
 
 Minor Changes
 -------------
@@ -190,7 +192,6 @@ Release Summary
 
 | Released 2023-07-14
 
-
 Minor Changes
 -------------
 
@@ -210,7 +211,6 @@ Release Summary
 ---------------
 
 | Released 2023-03-18
-
 
 New Modules
 -----------
