@@ -6,6 +6,7 @@ plugins:
   callback: {}
   cliconf: {}
   connection: {}
+  filter: {}
   httpapi: {}
   inventory:
     orion_nodes_inventory:
@@ -34,6 +35,11 @@ plugins:
       name: orion_node_custom_poller
       namespace: ''
       version_added: 1.0.0
+    orion_node_hardware_health:
+      description: Manage hardware health polling on a node in Solarwinds Orion
+      name: orion_node_hardware_health
+      namespace: ''
+      version_added: null
     orion_node_info:
       description: Gets info about a Node in Solarwinds Orion NPM
       name: orion_node_info
@@ -83,5 +89,6 @@ plugins:
   netconf: {}
   shell: {}
   strategy: {}
+  test: {}
   vars: {}
-version: 2.0.0
+version: 2.1.0

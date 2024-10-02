@@ -12,3 +12,4 @@ orion_node_snmp_pollers:
   - name: N.Memory.SNMP.NetSnmpReal
     enabled: true
 orion_node_discover_interfaces: false
+orion_node_ncm: false

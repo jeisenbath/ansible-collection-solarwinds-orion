@@ -46,7 +46,7 @@ EXAMPLES = r'''
       Caption: "{{ new_node_caption }}"
   delegate_to: localhost
 
-- name: Update node to SNMP polling
+- name: Update node to SNMPv2 polling
   solarwinds.orion.orion_update_node:
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_user }}"
@@ -56,6 +56,24 @@ EXAMPLES = r'''
       ObjectSubType: SNMP
       SNMPVersion: 2
       Community: "{{ ro_community_string }}"
+  delegate_to: localhost
+
+- name: Update node to SNMPv3 polling. Note you will also need to add SNMP pollers if updating from ICMP
+  solarwinds.orion.orion_update_node:
+    hostname: "{{ solarwinds_server }}"
+    username: "{{ solarwinds_user }}"
+    password: "{{ solarwinds_pass }}"
+    name: "{{ node_name }}"
+    properties:
+      ObjectSubType: SNMP
+      SNMPVersion: 3
+      SNMPV3Username: "{{ snmpv3_username }}"
+      SNMPV3AuthMethod: "{{ snmpv3_auth_method }}"
+      SNMPV3AuthKey: "{{ snmpv3_auth_passphrase }}"
+      SNMPV3AuthKeyIsPwd: True
+      SNMPV3PrivMethod: "{{ snmpv3_priv_method }}"
+      SNMPV3PrivKey: "{{ snmpv3_priv_passphrase] }}"
+      SNMPV3PrivKeyIsPwd: True
   delegate_to: localhost
 
 '''
@@ -68,6 +86,7 @@ orion_node:
     sample: {
         "caption": "localhost",
         "ipaddress": "127.0.0.1",
+        "lastsystemuptimepollutc": "2024-09-25T18:34:20.7630000Z",
         "netobjectid": "N:12345",
         "nodeid": "12345",
         "objectsubtype": "SNMP",
@@ -80,9 +99,16 @@ orion_node:
     }
 '''
 
-import requests
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
+try:
+    import requests
+    HAS_REQUESTS = True
+    requests.packages.urllib3.disable_warnings()
+except ImportError:
+    HAS_REQUESTS = False
+except Exception:
+    raise Exception
 try:
     import orionsdk
     from orionsdk import SwisClient
@@ -92,11 +118,9 @@ except ImportError:
 except Exception:
     raise Exception
 
-requests.packages.urllib3.disable_warnings()
-
 
 def main():
-    argument_spec = orion_argument_spec
+    argument_spec = orion_argument_spec()
     argument_spec.update(
         properties=dict(required=False, default={}, type='dict')
     )
@@ -110,19 +134,23 @@ def main():
         module.fail_json(msg='orionsdk required for this module')
 
     orion = OrionModule(module)
-    
+
     node = orion.get_node()
     if not node:
         module.fail_json(skipped=True, msg='Node not found')
 
+    changed = False
+
     try:
         if module.check_mode:
-            module.exit_json(changed=True, orion_node=node)
+            changed = True
         else:
             orion.swis.update(node['uri'], **module.params['properties'])
-            module.exit_json(changed=True, orion_node=node)
+            changed = True
     except Exception as OrionException:
         module.fail_json(msg='Failed to update {0}'.format(str(OrionException)))
+
+    module.exit_json(changed=changed, orion_node=node)
 
 
 if __name__ == "__main__":
