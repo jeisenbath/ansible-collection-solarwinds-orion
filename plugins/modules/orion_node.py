@@ -87,7 +87,7 @@ options:
         type: str
     rw_community_string:
         description:
-            - SNMP Read-Write Community string
+            - SNMP Read-Write Community string.
         required: false
         type: str
     snmp_version:
@@ -113,7 +113,9 @@ options:
     snmpv3_credential_set:
         description:
             - Credential set name for SNMPv3 credentials.
-            - Required when SNMP version is 3.
+            - Optional when SNMP version is 3.
+        type: str
+        required: false
     snmpv3_username:
         description:
             - Read-Only SNMPv3 username.
@@ -125,7 +127,6 @@ options:
             - Authentication method for SNMPv3.
             - Required when SNMP version is 3.
         type: str
-        default: SHA1
         choices:
             - SHA1
             - MD5
@@ -141,13 +142,11 @@ options:
             - SNMPv3 Authentication Password is a key.
             - Confusingly, value of True corresponds to web GUI checkbox being unchecked.
         type: bool
-        default: True
         required: false
     snmpv3_priv_method:
         description:
             - Privacy method for SNMPv3.
         type: str
-        default: AES128
         choices:
             - DES56
             - AES128
@@ -156,7 +155,7 @@ options:
         required: false
     snmpv3_priv_key:
         description:
-            - Privacy passphrase for SNMPv3
+            - Privacy passphrase for SNMPv3.
         type: str
         required: false
     snmpv3_priv_key_is_pwd:
@@ -164,12 +163,11 @@ options:
             - SNMPv3 Privacy Password is a key.
             - Confusingly, value of True corresponds to web GUI checkbox being unchecked.
         type: bool
-        default: True
         required: false
     wmi_credential_set:
         description:
-            - 'Credential Name already configured in NPM  Found under "Manage Windows Credentials" section of the Orion website (Settings)'
-            - "Note: creation of credentials are not supported at this time"
+            - 'Credential Name already configured in NPM  Found under "Manage Windows Credentials" section of the Orion website (Settings).'
+            - "Note: creation of credentials are not supported at this time."
             - Required if I(polling_method=wmi).
         required: false
         type: str
@@ -221,6 +219,7 @@ orion_node:
     sample: {
         "caption": "localhost",
         "ipaddress": "127.0.0.1",
+        "lastsystemuptimepollutc": "2024-09-25T18:34:20.7630000Z",
         "netobjectid": "N:12345",
         "nodeid": "12345",
         "objectsubtype": "SNMP",
@@ -233,10 +232,23 @@ orion_node:
     }
 '''
 
-from datetime import datetime, timedelta
-import requests
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
+try:
+    from datetime import datetime, timedelta
+    HAS_DATETIME = True
+except ImportError:
+    HAS_DATETIME = False
+except Exception:
+    raise Exception
+try:
+    import requests
+    HAS_REQUESTS = True
+    requests.packages.urllib3.disable_warnings()
+except ImportError:
+    HAS_REQUESTS = False
+except Exception:
+    raise Exception
 try:
     import orionsdk
     from orionsdk import SwisClient
@@ -245,8 +257,6 @@ except ImportError:
     HAS_ORION = False
 except Exception:
     raise Exception
-
-requests.packages.urllib3.disable_warnings()
 
 
 def add_credential_set(node, credential_set_name, credential_set_type):
@@ -292,9 +302,12 @@ def add_node(module, orion):
 
     if module.params['snmp_version'] == '3' and props['ObjectSubType'] == 'SNMP':
         # Even when using credential set, node creation fails without providing all three properties
-        props['SNMPV3Username'] = module.params['snmpv3_username']
-        props['SNMPV3PrivKey'] = module.params['snmpv3_priv_key']
-        props['SNMPV3AuthKey'] = module.params['snmpv3_auth_key']
+        if module.params['snmpv3_username']:
+            props['SNMPV3Username'] = module.params['snmpv3_username']
+        if module.params['snmpv3_priv_key']:
+            props['SNMPV3PrivKey'] = module.params['snmpv3_priv_key']
+        if module.params['snmpv3_auth_key']:
+            props['SNMPV3AuthKey'] = module.params['snmpv3_auth_key']
 
         # Set defaults here instead of at module level, since we only want for snmpv3 nodes
         if module.params['snmpv3_priv_method']:
@@ -325,7 +338,7 @@ def add_node(module, orion):
 
     # If we don't use credential sets, each snmpv3 node will create its own credential set
     # TODO option for read/write sets?
-    if props['ObjectSubType'] == 'SNMP' and props['SNMPVersion'] == '3':
+    if props['ObjectSubType'] == 'SNMP' and props['SNMPVersion'] == '3' and module.params['snmpv3_credential_set']:
         add_credential_set(node, module.params['snmpv3_credential_set'], 'ROSNMPCredentialID')
 
     # If Node is a WMI node, assign credential
@@ -455,7 +468,7 @@ def unmute_node(module, node):
 
 
 def main():
-    argument_spec = orion_argument_spec
+    argument_spec = orion_argument_spec()
     argument_spec.update(
         state=dict(required=True, choices=['present', 'absent', 'managed', 'unmanaged', 'muted', 'unmuted']),
         unmanage_from=dict(required=False, default=None),
@@ -464,14 +477,14 @@ def main():
         ro_community_string=dict(required=False, no_log=True),
         rw_community_string=dict(required=False, no_log=True),
         snmp_version=dict(required=False, default=None, choices=['2', '3']),
-        snmpv3_credential_set=dict(required=False, default=None, type=str),
-        snmpv3_username=dict(required=False, type=str),
-        snmpv3_auth_method=dict(required=False, type=str, choices=['SHA1', 'MD5']),
-        snmpv3_auth_key=dict(required=False, type=str, no_log=True),
-        snmpv3_auth_key_is_pwd=dict(required=False, type=bool),
-        snmpv3_priv_method=dict(required=False, type=str, choices=['DES56', 'AES128', 'AES192', 'AES256']),
-        snmpv3_priv_key=dict(required=False, type=str, no_log=True),
-        snmpv3_priv_key_is_pwd=dict(required=False, type=bool),
+        snmpv3_credential_set=dict(required=False, default=None, type='str'),
+        snmpv3_username=dict(required=False, type='str'),
+        snmpv3_auth_method=dict(required=False, type='str', choices=['SHA1', 'MD5']),
+        snmpv3_auth_key=dict(required=False, type='str', no_log=True),
+        snmpv3_auth_key_is_pwd=dict(required=False, type='bool'),
+        snmpv3_priv_method=dict(required=False, type='str', choices=['DES56', 'AES128', 'AES192', 'AES256']),
+        snmpv3_priv_key=dict(required=False, type='str', no_log=True),
+        snmpv3_priv_key_is_pwd=dict(required=False, type='bool'),
         snmp_port=dict(required=False, default='161'),
         snmp_allow_64=dict(required=False, default=True, type='bool'),
         wmi_credential_set=dict(required=False, no_log=True),
@@ -485,7 +498,7 @@ def main():
         required_if=[
             ('state', 'present', ('name', 'ip_address', 'polling_method')),
             ('snmp_version', '2', ['ro_community_string']),
-            ('snmp_version', '3', ['snmpv3_credential_set', 'snmpv3_username', 'snmpv3_auth_key', 'snmpv3_priv_key']),
+            ('snmp_version', '3', ['snmpv3_username', 'snmpv3_auth_key', 'snmpv3_priv_key']),
             ('polling_method', 'SNMP', ['snmp_version']),
             ('polling_method', 'WMI', ['wmi_credential_set']),
         ],
