@@ -84,14 +84,6 @@ except ImportError:
     HAS_REQUESTS = False
 except Exception:
     raise Exception
-try:
-    import orionsdk
-    from orionsdk import SwisClient
-    HAS_ORION = True
-except ImportError:
-    HAS_ORION = False
-except Exception:
-    raise Exception
 
 
 def index_connection_profiles(orion_module):
@@ -120,8 +112,6 @@ def main():
         supports_check_mode=True,
         required_one_of=[('name', 'node_id', 'ip_address')],
     )
-    if not HAS_ORION:
-        module.fail_json(msg='orionsdk required for this module')
 
     # create an OrionModule object using our custom Ansible module
     orion = OrionModule(module)

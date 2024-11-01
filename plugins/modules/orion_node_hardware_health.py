@@ -106,11 +106,7 @@ except ImportError:
     HAS_REQUESTS = False
 except Exception:
     raise Exception
-try:
-    from orionsdk import SwisClient
-    HAS_ORIONSDK = True
-except ImportError:
-    HAS_ORIONSDK = False
+
 
 # Mapping of polling method names to their corresponding IDs
 POLLING_METHOD_MAP = {
@@ -150,9 +146,6 @@ def main():
             ('state', 'present', ['polling_method'])
         ],
     )
-
-    if not HAS_ORIONSDK:
-        module.fail_json(msg="The orionsdk module is required")
 
     orion = OrionModule(module)
     node = orion.get_node()

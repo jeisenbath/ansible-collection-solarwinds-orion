@@ -92,14 +92,6 @@ except ImportError:
     HAS_REQUESTS = False
 except Exception:
     raise Exception
-try:
-    import orionsdk
-    from orionsdk import SwisClient
-    HAS_ORION = True
-except ImportError:
-    HAS_ORION = False
-except Exception:
-    raise Exception
 
 
 def main():
@@ -117,9 +109,6 @@ def main():
             ('state', 'present', ['property_value'])
         ]
     )
-
-    if not HAS_ORION:
-        module.fail_json(msg='orionsdk required for this module')
 
     orion = OrionModule(module)
 

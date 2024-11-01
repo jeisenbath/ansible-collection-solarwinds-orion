@@ -249,14 +249,6 @@ except ImportError:
     HAS_REQUESTS = False
 except Exception:
     raise Exception
-try:
-    import orionsdk
-    from orionsdk import SwisClient
-    HAS_ORION = True
-except ImportError:
-    HAS_ORION = False
-except Exception:
-    raise Exception
 
 
 def add_credential_set(node, credential_set_name, credential_set_type):
@@ -503,9 +495,6 @@ def main():
             ('polling_method', 'WMI', ['wmi_credential_set']),
         ],
     )
-
-    if not HAS_ORION:
-        module.fail_json(msg='orionsdk required for this module')
 
     orion = OrionModule(module)
 
