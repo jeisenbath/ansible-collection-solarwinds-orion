@@ -91,14 +91,6 @@ except ImportError:
     HAS_REQUESTS = False
 except Exception:
     raise Exception
-try:
-    import orionsdk
-    from orionsdk import SwisClient
-    HAS_ORION = True
-except ImportError:
-    HAS_ORION = False
-except Exception:
-    raise Exception
 
 
 def write_to_csv(nodes, csv_file_path):
