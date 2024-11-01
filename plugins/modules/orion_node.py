@@ -496,9 +496,6 @@ def main():
         ],
     )
 
-    if not HAS_ORION:
-        module.fail_json(msg='orionsdk required for this module')
-
     orion = OrionModule(module)
 
     global __SWIS__

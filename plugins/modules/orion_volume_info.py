@@ -115,8 +115,6 @@ def main():
         supports_check_mode=True,
         required_one_of=[('name', 'node_id', 'ip_address')],
     )
-    if not HAS_ORION:
-        module.fail_json(msg='orionsdk required for this module')
 
     orion = OrionModule(module)
 

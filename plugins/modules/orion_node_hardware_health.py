@@ -147,9 +147,6 @@ def main():
         ],
     )
 
-    if not HAS_ORIONSDK:
-        module.fail_json(msg="The orionsdk module is required")
-
     orion = OrionModule(module)
     node = orion.get_node()
     if not node:

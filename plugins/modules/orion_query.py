@@ -117,9 +117,6 @@ def main():
         supports_check_mode=True,
     )
 
-    if not HAS_ORION:
-        module.fail_json(msg='orionsdk required for this module')
-
     orion = OrionModule(module)
 
     results = orion.swis_query(module.params['query'])
