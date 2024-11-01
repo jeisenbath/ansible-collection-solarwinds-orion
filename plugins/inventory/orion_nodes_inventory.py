@@ -168,27 +168,24 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
             raise AnsibleParserError('Failed to consume options:    {0}'.format(to_native(e)))
 
         cache_key = self.get_cache_key(path)
-        update_cache = False
 
         if cache:
             try:
                 self.display.vvv("Getting cached data...")
                 cacheable_results = self._cache[cache_key]
                 self.display.vvv("Got cached data...")
+                self.display.vvv("Populating from cache...")
+                self._populate_from_cache(cacheable_results)
             except KeyError:
                 self.display.vvv("Cache needs updating...")
-                update_cache = True
-
-        if cache and not update_cache:
-            self.display.vvv("Populating from cache...")
-            self._populate_from_cache(cacheable_results)
+                self.display.vvv("Populating from source...")
+                cacheable_results = self._populate_from_source()
+                self.display.vvv("Updating cache data...")
+                self._cache[cache_key] = cacheable_results
         else:
             self.display.vvv("Populating from source...")
             cacheable_results = self._populate_from_source()
 
-        if update_cache or (not cache and self.get_option('cache')):
-            self.display.vvv("Updating cache data...")
-            self._cache[cache_key] = cacheable_results
 
     def _populate_from_cache(self, cache_data):
         """
