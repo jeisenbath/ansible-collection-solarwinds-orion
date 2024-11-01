@@ -1,0 +1,6 @@
+---
+solarwinds_server: your_server_ip
+solarwinds_username: changeme
+solarwinds_password: changeme
+node_name: node_to_test
+node_ip_address: ip_address_of_node
