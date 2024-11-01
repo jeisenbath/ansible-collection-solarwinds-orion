@@ -186,7 +186,6 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
             self.display.vvv("Populating from source...")
             cacheable_results = self._populate_from_source()
 
-
     def _populate_from_cache(self, cache_data):
         """
         Populate cache using source data
