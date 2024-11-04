@@ -1,12 +1,12 @@
 ---
 - name: Create node (check mode)
   orion_node:
-    hostname: "{{ solarwinds_server }}"
-    username: "{{ solarwinds_username }}"
-    password: "{{ solarwinds_password }}"
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
     state: present
-    name: "{{ node_name }}"
-    ip_address: "{{ node_ip_address }}"
+    name: "{{ orion_test_node_name }}"
+    ip_address: "{{ orion_test_node_ip_address }}"
     polling_method: ICMP
   delegate_to: localhost
   check_mode: true
@@ -14,24 +14,24 @@
 
 - name: Create node
   orion_node:
-    hostname: "{{ solarwinds_server }}"
-    username: "{{ solarwinds_username }}"
-    password: "{{ solarwinds_password }}"
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
     state: present
-    name: "{{ node_name }}"
-    ip_address: "{{ node_ip_address }}"
+    name: "{{ orion_test_node_name }}"
+    ip_address: "{{ orion_test_node_ip_address }}"
     polling_method: ICMP
   delegate_to: localhost
   register: icmp_add_02
 
 - name: Create node (check) (idempotence)
   orion_node:
-    hostname: "{{ solarwinds_server }}"
-    username: "{{ solarwinds_username }}"
-    password: "{{ solarwinds_password }}"
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
     state: present
-    name: "{{ node_name }}"
-    ip_address: "{{ node_ip_address }}"
+    name: "{{ orion_test_node_name }}"
+    ip_address: "{{ orion_test_node_ip_address }}"
     polling_method: ICMP
   delegate_to: localhost
   check_mode: true
@@ -39,12 +39,12 @@
 
 - name: Create node (idempotence)
   orion_node:
-    hostname: "{{ solarwinds_server }}"
-    username: "{{ solarwinds_username }}"
-    password: "{{ solarwinds_password }}"
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
     state: present
-    name: "{{ node_name }}"
-    ip_address: "{{ node_ip_address }}"
+    name: "{{ orion_test_node_name }}"
+    ip_address: "{{ orion_test_node_ip_address }}"
     polling_method: ICMP
   delegate_to: localhost
   register: icmp_add_04
@@ -54,51 +54,51 @@
     that:
       - icmp_add_01.changed
       - icmp_add_02.changed
-      - icmp_add_02.orion_node.caption == node_name
-      - icmp_add_02.orion_node.ipaddress == node_ip_address
+      - icmp_add_02.orion_node.caption == orion_test_node_name
+      - icmp_add_02.orion_node.ipaddress == orion_test_node_ip_address
       - icmp_add_02.orion_node.objectsubtype == "ICMP"
       - not icmp_add_03.changed
       - not icmp_add_04.changed
 
 - name: Delete node (check)
   orion_node:
-    hostname: "{{ solarwinds_server }}"
-    username: "{{ solarwinds_username }}"
-    password: "{{ solarwinds_password }}"
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
     state: absent
-    name: "{{ node_name }}"
+    name: "{{ orion_test_node_name }}"
   delegate_to: localhost
   check_mode: true
   register: icmp_delete_01
 
 - name: Delete node
   orion_node:
-    hostname: "{{ solarwinds_server }}"
-    username: "{{ solarwinds_username }}"
-    password: "{{ solarwinds_password }}"
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
     state: absent
-    name: "{{ node_name }}"
+    name: "{{ orion_test_node_name }}"
   delegate_to: localhost
   register: icmp_delete_02
 
 - name: Delete node (check) (idempotence)
   orion_node:
-    hostname: "{{ solarwinds_server }}"
-    username: "{{ solarwinds_username }}"
-    password: "{{ solarwinds_password }}"
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
     state: absent
-    name: "{{ node_name }}"
+    name: "{{ orion_test_node_name }}"
   delegate_to: localhost
   check_mode: true
   register: icmp_delete_03
 
 - name: Delete node (idempotence)
   orion_node:
-    hostname: "{{ solarwinds_server }}"
-    username: "{{ solarwinds_username }}"
-    password: "{{ solarwinds_password }}"
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
     state: absent
-    name: "{{ node_name }}"
+    name: "{{ orion_test_node_name }}"
   delegate_to: localhost
   register: icmp_delete_04
 

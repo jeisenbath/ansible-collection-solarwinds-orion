@@ -1,6 +1,6 @@
 ---
-solarwinds_server: your_server_ip
-solarwinds_username: changeme
-solarwinds_password: changeme
-node_name: node_to_test
-node_ip_address: ip_address_of_node
+orion_test_solarwinds_server: "{{ solarwinds_server }}"
+orion_test_solarwinds_username: "{{ solarwinds_username }}"
+orion_test_solarwinds_password: "{{ solarwinds_password }}"
+orion_test_node_name: "{{ node_name }}"
+orion_test_node_ip_address: "{{ node_ip_address }}"
