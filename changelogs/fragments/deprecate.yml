@@ -1,0 +1,4 @@
+deprecated_features:
+  - Collection has been moved to jeseinbath.solarwinds namespace in order to publish to Ansible Galaxy.
+  - Bugfixes will be ported to this collection when applicable.
+  - This repository will be archived at a date no sooner than 2025-06-01
