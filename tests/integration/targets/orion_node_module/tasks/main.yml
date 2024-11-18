@@ -4,4 +4,5 @@
   ansible.builtin.include_tasks: "{{ item }}"
   loop:
     - icmp_node.yml
+    - snmp_node.yml
 ...
