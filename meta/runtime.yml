@@ -1,33 +1,33 @@
 requires_ansible: ">=2.9"
-plugin_routing:
-  modules:
-    orion_custom_property:
-      redirect: jeisenbath.solarwinds.orion_custom_property
-    orion_node_application:
-      redirect: jeisenbath.solarwinds.orion_node_application
-    orion_node_custom_poller:
-      redirect: jeisenbath.solarwinds.orion_node_custom_poller
-    orion_node_hardware_health:
-      redirect: jeisenbath.solarwinds.orion_node_hardware_health
-    orion_node_info:
-      redirect: jeisenbath.solarwinds.orion_node_info
-    orion_node_interface_info:
-      redirect: jeisenbath.solarwinds.orion_node_interface_info
-    orion_node_interface:
-      redirect: jeisenbath.solarwinds.orion_node_interface
-    orion_node_ncm:
-      redirect: jeisenbath.solarwinds.orion_node_ncm
-    orion_node_poller_info:
-      redirect: jeisenbath.solarwinds.orion_node_poller_info
-    orion_node_poller:
-      redirect: jeisenbath.solarwinds.orion_node_poller
-    orion_node:
-      redirect: jeisenbath.solarwinds.orion_node
-    orion_query:
-      redirect: jeisenbath.solarwinds.orion_query
-    orion_update_node:
-      redirect: jeisenbath.solarwinds.orion_update_node
-    orion_volume_info:
-      redirect: jeisenbath.solarwinds.orion_volume_info
-    orion_volume:
-      redirect: jeisenbath.solarwinds.orion_volume
+# plugin_routing:
+#   modules:
+#     orion_custom_property:
+#       redirect: jeisenbath.solarwinds.orion_custom_property
+#     orion_node_application:
+#       redirect: jeisenbath.solarwinds.orion_node_application
+#     orion_node_custom_poller:
+#       redirect: jeisenbath.solarwinds.orion_node_custom_poller
+#     orion_node_hardware_health:
+#       redirect: jeisenbath.solarwinds.orion_node_hardware_health
+#     orion_node_info:
+#       redirect: jeisenbath.solarwinds.orion_node_info
+#     orion_node_interface_info:
+#       redirect: jeisenbath.solarwinds.orion_node_interface_info
+#     orion_node_interface:
+#       redirect: jeisenbath.solarwinds.orion_node_interface
+#     orion_node_ncm:
+#       redirect: jeisenbath.solarwinds.orion_node_ncm
+#     orion_node_poller_info:
+#       redirect: jeisenbath.solarwinds.orion_node_poller_info
+#     orion_node_poller:
+#       redirect: jeisenbath.solarwinds.orion_node_poller
+#     orion_node:
+#       redirect: jeisenbath.solarwinds.orion_node
+#     orion_query:
+#       redirect: jeisenbath.solarwinds.orion_query
+#     orion_update_node:
+#       redirect: jeisenbath.solarwinds.orion_update_node
+#     orion_volume_info:
+#       redirect: jeisenbath.solarwinds.orion_volume_info
+#     orion_volume:
+#       redirect: jeisenbath.solarwinds.orion_volume
