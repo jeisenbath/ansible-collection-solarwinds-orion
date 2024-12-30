@@ -25,7 +25,7 @@
       - not info_02.changed
       - info_02.orion_node is defined
       - info_02.orion_node.caption == orion_test_node_name
-      - info_02.orion_node.ipaddress == orin_test_node_ip_address
+      - info_02.orion_node.ipaddress == orion_test_node_ip_address
       - info_02.orion_node.lastsystemuptimepollutc is defined
       - info_02.orion_node.netobjectid is defined
       - info_02.orion_node.nodeid is defined

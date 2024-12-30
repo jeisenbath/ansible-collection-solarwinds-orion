@@ -1,5 +1,5 @@
 ---
-- name: Create node (check mode)
+- name: (ICMP) Create node (check mode)
   orion_node:
     hostname: "{{ orion_test_solarwinds_server }}"
     username: "{{ orion_test_solarwinds_username }}"
@@ -12,7 +12,7 @@
   check_mode: true
   register: icmp_add_01
 
-- name: Create node
+- name: (ICMP) Create node
   orion_node:
     hostname: "{{ orion_test_solarwinds_server }}"
     username: "{{ orion_test_solarwinds_username }}"
@@ -24,7 +24,7 @@
   delegate_to: localhost
   register: icmp_add_02
 
-- name: Create node (check) (idempotence)
+- name: (ICMP) Create node (check) (idempotence)
   orion_node:
     hostname: "{{ orion_test_solarwinds_server }}"
     username: "{{ orion_test_solarwinds_username }}"
@@ -37,7 +37,7 @@
   check_mode: true
   register: icmp_add_03
 
-- name: Create node (idempotence)
+- name: (ICMP) Create node (idempotence)
   orion_node:
     hostname: "{{ orion_test_solarwinds_server }}"
     username: "{{ orion_test_solarwinds_username }}"
@@ -49,7 +49,7 @@
   delegate_to: localhost
   register: icmp_add_04
 
-- name: Create node asserts
+- name: (ICMP) Create node asserts
   ansible.builtin.assert:
     that:
       - icmp_add_01.changed
@@ -60,7 +60,7 @@
       - not icmp_add_03.changed
       - not icmp_add_04.changed
 
-- name: Delete node (check)
+- name: (ICMP) Delete node (check)
   orion_node:
     hostname: "{{ orion_test_solarwinds_server }}"
     username: "{{ orion_test_solarwinds_username }}"
@@ -71,7 +71,7 @@
   check_mode: true
   register: icmp_delete_01
 
-- name: Delete node
+- name: (ICMP) Delete node
   orion_node:
     hostname: "{{ orion_test_solarwinds_server }}"
     username: "{{ orion_test_solarwinds_username }}"
@@ -81,7 +81,7 @@
   delegate_to: localhost
   register: icmp_delete_02
 
-- name: Delete node (check) (idempotence)
+- name: (ICMP) Delete node (check) (idempotence)
   orion_node:
     hostname: "{{ orion_test_solarwinds_server }}"
     username: "{{ orion_test_solarwinds_username }}"
@@ -92,7 +92,7 @@
   check_mode: true
   register: icmp_delete_03
 
-- name: Delete node (idempotence)
+- name: (ICMP) Delete node (idempotence)
   orion_node:
     hostname: "{{ orion_test_solarwinds_server }}"
     username: "{{ orion_test_solarwinds_username }}"
@@ -102,7 +102,7 @@
   delegate_to: localhost
   register: icmp_delete_04
 
-- name: Delete node asserts
+- name: (ICMP) Delete node asserts
   ansible.builtin.assert:
     that:
       - icmp_delete_01.changed

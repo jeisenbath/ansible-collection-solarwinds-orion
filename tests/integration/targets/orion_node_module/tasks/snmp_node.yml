@@ -1,5 +1,5 @@
 ---
-- name: Create node (check mode)
+- name: (SNMP v2) Create node (check mode)
   orion_node:
     hostname: "{{ orion_test_solarwinds_server }}"
     username: "{{ orion_test_solarwinds_username }}"
@@ -8,12 +8,13 @@
     name: "{{ orion_test_node_name }}"
     ip_address: "{{ orion_test_node_ip_address }}"
     polling_method: SNMP
+    snmp_version: 2
     ro_community_string: "{{ orion_test_node_ro_community_string }}"
   delegate_to: localhost
   check_mode: true
   register: snmp_add_01
 
-- name: Create node
+- name: (SNMP v2) Create node
   orion_node:
     hostname: "{{ orion_test_solarwinds_server }}"
     username: "{{ orion_test_solarwinds_username }}"
@@ -22,11 +23,12 @@
     name: "{{ orion_test_node_name }}"
     ip_address: "{{ orion_test_node_ip_address }}"
     polling_method: SNMP
+    snmp_version: 2
     ro_community_string: "{{ orion_test_node_ro_community_string }}"
   delegate_to: localhost
   register: snmp_add_02
 
-- name: Create node (check) (idempotence)
+- name: (SNMP v2) Create node (check) (idempotence)
   orion_node:
     hostname: "{{ orion_test_solarwinds_server }}"
     username: "{{ orion_test_solarwinds_username }}"
@@ -35,12 +37,13 @@
     name: "{{ orion_test_node_name }}"
     ip_address: "{{ orion_test_node_ip_address }}"
     polling_method: SNMP
+    snmp_version: 2
     ro_community_string: "{{ orion_test_node_ro_community_string }}"
   delegate_to: localhost
   check_mode: true
   register: snmp_add_03
 
-- name: Create node (idempotence)
+- name: (SNMP v2) Create node (idempotence)
   orion_node:
     hostname: "{{ orion_test_solarwinds_server }}"
     username: "{{ orion_test_solarwinds_username }}"
@@ -49,11 +52,12 @@
     name: "{{ orion_test_node_name }}"
     ip_address: "{{ orion_test_node_ip_address }}"
     polling_method: SNMP
+    snmp_version: 2
     ro_community_string: "{{ orion_test_node_ro_community_string }}"
   delegate_to: localhost
   register: snmp_add_04
 
-- name: Create node asserts
+- name: (SNMP v2) Create node asserts
   ansible.builtin.assert:
     that:
       - snmp_add_01.changed
@@ -64,7 +68,7 @@
       - not snmp_add_03.changed
       - not snmp_add_04.changed
 
-- name: Delete node (check)
+- name: (SNMP v2) Delete node (check)
   orion_node:
     hostname: "{{ orion_test_solarwinds_server }}"
     username: "{{ orion_test_solarwinds_username }}"
@@ -75,7 +79,7 @@
   check_mode: true
   register: snmp_delete_01
 
-- name: Delete node
+- name: (SNMP v2) Delete node
   orion_node:
     hostname: "{{ orion_test_solarwinds_server }}"
     username: "{{ orion_test_solarwinds_username }}"
@@ -85,7 +89,7 @@
   delegate_to: localhost
   register: snmp_delete_02
 
-- name: Delete node (check) (idempotence)
+- name: (SNMP v2) Delete node (check) (idempotence)
   orion_node:
     hostname: "{{ orion_test_solarwinds_server }}"
     username: "{{ orion_test_solarwinds_username }}"
@@ -96,7 +100,7 @@
   check_mode: true
   register: snmp_delete_03
 
-- name: Delete node (idempotence)
+- name: (SNMP v2) Delete node (idempotence)
   orion_node:
     hostname: "{{ orion_test_solarwinds_server }}"
     username: "{{ orion_test_solarwinds_username }}"
@@ -106,7 +110,7 @@
   delegate_to: localhost
   register: snmp_delete_04
 
-- name: Delete node asserts
+- name: (SNMP v2) Delete node asserts
   ansible.builtin.assert:
     that:
       - snmp_delete_01.changed
