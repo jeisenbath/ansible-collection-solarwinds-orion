@@ -1,5 +1,5 @@
 ---
-# Integration tests for orion_node_application module
+# Integration tests for orion_node_custom_poller module
 - name: Create test node
   orion_node:
     hostname: "{{ orion_test_solarwinds_server }}"
@@ -8,13 +8,15 @@
     state: present
     name: "{{ orion_test_node_name }}"
     ip_address: "{{ orion_test_node_ip_address }}"
-    polling_method: ICMP
+    polling_method: SNMP
+    snmp_version: 2
+    ro_community_string: "{{ orion_test_node_ro_community_string }}"
   delegate_to: localhost
 
 - name: Include tests
   ansible.builtin.include_tasks: "{{ item }}"
   loop:
-    - node_application.yml
+    - custom_poller.yml
 
 - name: Remove test node
   orion_node:
