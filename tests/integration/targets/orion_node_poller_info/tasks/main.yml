@@ -1,5 +1,5 @@
 ---
-# Integration tests for orion_node_interface_info module
+# Integration tests for orion_node_poller_info module
 - name: Create test node
   orion_node:
     hostname: "{{ orion_test_solarwinds_server }}"

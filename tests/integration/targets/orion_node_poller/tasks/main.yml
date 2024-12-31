@@ -1,5 +1,5 @@
 ---
-# Integration tests for orion_node_interface module
+# Integration tests for orion_node_poller module
 - name: Create test node
   orion_node:
     hostname: "{{ orion_test_solarwinds_server }}"
@@ -16,8 +16,7 @@
 - name: Include tests
   ansible.builtin.include_tasks: "{{ item }}"
   loop:
-    - discover.yml
-    - defined.yml
+    - poller.yml
 
 - name: Remove test node
   orion_node:

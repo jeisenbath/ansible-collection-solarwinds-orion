@@ -1,0 +1,118 @@
+---
+- name: Add poller to node (check)
+  orion_node_poller: &add_poller
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    poller: N.Topology_Layer3.SNMP.ipNetToMedia
+    enabled: 'True'
+    state: present
+  delegate_to: localhost
+  check_mode: true
+  register: add_poller_01
+
+- name: Add poller to node
+  orion_node_poller:
+    <<: *add_poller
+  delegate_to: localhost
+  register: add_poller_02
+
+- name: Add poller to node (check) (idempotence)
+  orion_node_poller:
+    <<: *add_poller
+  delegate_to: localhost
+  check_mode: true
+  register: add_poller_03
+
+- name: Add poller to node (idempotence)
+  orion_node_poller:
+    <<: *add_poller
+  delegate_to: localhost
+  register: add_poller_04
+
+- name: Disable poller on node (check)
+  orion_node_poller: &disable_poller
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    poller: N.Topology_Layer3.SNMP.ipNetToMedia
+    enabled: 'False'
+    state: present
+  delegate_to: localhost
+  check_mode: true
+  register: disable_poller_01
+
+- name: Disable poller on node
+  orion_node_poller:
+    <<: *disable_poller
+  delegate_to: localhost
+  register: disable_poller_02
+
+- name: Disable poller on node (check) (idempotence)
+  orion_node_poller:
+    <<: *disable_poller
+  delegate_to: localhost
+  check_mode: true
+  register: disable_poller_03
+
+- name: Disable poller on node (idempotence)
+  orion_node_poller:
+    <<: *disable_poller
+  delegate_to: localhost
+  register: disable_poller_04
+
+- name: Add poller asserts
+  ansible.builtin.assert:
+    that:
+      - add_poller_01.changed
+      - add_poller_02.changed
+      - not add_poller_03.changed
+      - not add_poller_04.changed
+      - disable_poller_01.changed
+      - disable_poller_02.changed
+      - not disable_poller_03.changed
+      - not disable_poller_04.changed
+      - add_poller_02.orion_node.caption == orion_test_node_name
+      - add_poller_02.orion_node.ipaddress == orion_test_node_ip_address
+
+- name: Remove poller from node (check)
+  orion_node_poller: &remove_poller
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    poller: N.Topology_Layer3.SNMP.ipNetToMedia
+    state: absent
+  delegate_to: localhost
+  check_mode: true
+  register: remove_poller_01
+
+- name: Remove poller from node
+  orion_node_poller:
+    <<: *remove_poller
+  delegate_to: localhost
+  register: remove_poller_02
+
+- name: Remove poller from node (check) (idempotence)
+  orion_node_poller:
+    <<: *remove_poller
+  delegate_to: localhost
+  check_mode: true
+  register: remove_poller_03
+
+- name: Remove poller from node (idempotence)
+  orion_node_poller:
+    <<: *remove_poller
+  delegate_to: localhost
+  register: remove_poller_04
+
+- name: Remove poller from node asserts
+  ansible.builtin.assert:
+    that:
+      - remove_poller_01.changed
+      - remove_poller_02.changed
+      - not remove_poller_03.changed
+      - not remove_poller_04.changed
+...
