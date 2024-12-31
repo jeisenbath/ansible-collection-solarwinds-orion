@@ -1,0 +1,117 @@
+---
+- name: Set custom property on node (check)
+  orion_custom_property: &add_property
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    state: present
+    property_name: "{{ orion_test_custom_property_name }}"
+    property_value: "{{ orion_test_custom_property_value }}"
+  delegate_to: localhost
+  check_mode: true
+  register: add_property_01
+
+- name: Set custom property on node
+  orion_custom_property:
+    <<: *add_property
+  delegate_to: localhost
+  register: add_property_02
+
+- name: Set custom property on node (check) (idempotence)
+  orion_custom_property:
+    <<: *add_property
+  delegate_to: localhost
+  check_mode: true
+  register: add_property_03
+
+- name: Set custom property on node (idempotence)
+  orion_custom_property:
+    <<: *add_property
+  delegate_to: localhost
+  register: add_property_04
+
+- name: Update property value (check)
+  orion_custom_property: &update_property
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    state: present
+    property_name: "{{ orion_test_custom_property_name }}"
+    property_value: "{{ orion_test_custom_property_value_update }}"
+  delegate_to: localhost
+  check_mode: true
+  register: update_property_01
+
+- name: Update property value
+  orion_custom_property:
+    <<: *update_property
+  delegate_to: localhost
+  register: update_property_02
+
+- name: Update property value (check) (idempotence)
+  orion_custom_property:
+    <<: *update_property
+  delegate_to: localhost
+  check_mode: true
+  register: update_property_03
+
+- name: Update property value (idempotence)
+  orion_custom_property:
+    <<: *update_property
+  delegate_to: localhost
+  register: update_property_04
+
+- name: Create custom property asserts
+  ansible.builtin.assert:
+    that:
+      - add_property_01.changed
+      - add_property_02.changed
+      - not add_property_03.changed
+      - not add_property_04.changed
+      - update_property_01.changed
+      - update_property_02.changed
+      - not update_property_03.changed
+      - not update_property_04.changed
+      - add_property_02.orion_node is defined
+
+- name: Unset custom property (check)
+  orion_custom_property: &remove_property
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    state: absent
+    property_name: "{{ orion_test_custom_property_name }}"
+  delegate_to: localhost
+  check_mode: true
+  register: remove_property_01
+
+- name: Unset custom property
+  orion_custom_property:
+    <<: *remove_property
+  delegate_to: localhost
+  register: remove_property_02
+
+- name: Unset custom property (check) (idempotence)
+  orion_custom_property:
+    <<: *remove_property
+  delegate_to: localhost
+  check_mode: true
+  register: remove_property_03
+
+- name: Unset custom property (idempotence)
+  orion_custom_property:
+    <<: *remove_property
+  delegate_to: localhost
+  register: remove_property_04
+
+- name: Unset custom property asserts
+  ansible.builtin.assert:
+    that:
+      - remove_property_01.changed
+      - remove_property_02.changed
+      - not remove_property_03.changed
+      - not remove_property_04.changed
+...
