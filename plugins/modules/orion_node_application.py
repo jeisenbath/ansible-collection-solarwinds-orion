@@ -61,7 +61,7 @@ EXAMPLES = r'''
     password: "{{ solarwinds_pass }}"
     name: "{{ node_name }}"
     state: present
-    application_name: "{{ APM_application_name }}"
+    application_template_name: "{{ APM_application_name }}"
   delegate_to: localhost
 
 '''
