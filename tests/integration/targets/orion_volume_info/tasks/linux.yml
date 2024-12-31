@@ -1,0 +1,72 @@
+---
+- name: Create test node
+  orion_node:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: present
+    name: "{{ orion_test_node_name }}"
+    ip_address: "{{ orion_test_node_ip_address }}"
+    polling_method: SNMP
+    snmp_version: 2
+    ro_community_string: "{{ orion_test_node_ro_community_string }}"
+  delegate_to: localhost
+
+- name: Create volume on test node
+  orion_volume:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    volume:
+      name: '/'
+    state: present
+  delegate_to: localhost
+
+- name: Get volume info (check)
+  orion_volume_info: &volume_info
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    volume:
+      name: '/'
+  delegate_to: localhost
+  check_mode: true
+  register: info_01
+
+- name: Get volume info
+  orion_volume_info:
+    <<: *volume_info
+  delegate_to: localhost
+  register: info_02
+
+- name: Info asserts
+  ansible.builtin.assert:
+    that:
+      - not info_01.changed
+      - not info_02.changed
+      - info_02.orion_node is defined
+      - info_02.orion_node.caption == orion_test_node_name
+      - info_02.orion_node.ipaddress == orion_test_node_ip_address
+      - info_02.orion_volume.caption == '/'
+      - info_02.orion_volume.displayname is defined
+      - info_02.orion_volume.volumeindex is defined
+      - info_02.orion_volume.status is defined
+      - info_02.orion_volume.type is defined
+      - info_02.orion_volume.pollinterval is defined
+      - info_02.orion_volume.statcollection is defined
+      - info_02.orion_volume.rediscoveryinterval is defined
+      - info_02.orion_volume.volumedescription is defined
+      - info_02.orion_volume.icon is defined
+      - info_02.orion_volume.uri is defined
+
+- name: Remove test node
+  orion_node:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: absent
+    name: "{{ orion_test_node_name }}"
+  delegate_to: localhost
+...
