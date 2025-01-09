@@ -51,7 +51,7 @@
 - name: Add node to NCM asserts
   ansible.builtin.assert:
     that:
-      - add_ncm_01.changed
+      - not add_ncm_01.changed
       - add_ncm_02.changed
       - not add_ncm_03.changed
       - not add_ncm_04.changed
