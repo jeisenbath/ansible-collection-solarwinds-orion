@@ -1,6 +1,6 @@
 galaxy_info:
   role_name: orion_node
-  namespace: solarwinds
+  namespace: jeisenbath.solarwinds
   author: Josh Eisenbath (@jeisenbath)
   description: Add a node to Solarwinds Orion
   license: GPL-3.0-or-later

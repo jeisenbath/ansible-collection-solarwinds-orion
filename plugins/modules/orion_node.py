@@ -179,7 +179,7 @@ options:
         required: false
         type: str
 extends_documentation_fragment:
-    - solarwinds.orion.orion_auth_options
+    - jeisenbath.solarwinds.orion_auth_options
 requirements:
     - orionsdk
     - python-dateutil
@@ -189,7 +189,7 @@ requirements:
 EXAMPLES = '''
 ---
 - name: Add an SNMP node to Orion
-  solarwinds.orion.orion_node:
+  jeisenbath.solarwinds.orion_node:
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_username }}"
     password: "{{ solarwinds_password }}"
@@ -201,7 +201,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Mute node in Solarwinds for 30 minutes
-  solarwinds.orion.orion_node:
+  jeisenbath.solarwinds.orion_node:
     hostname: "{{ solarwinds_host }}"
     username: "{{ solarwinds_username }}"
     password: "{{ solarwinds_password }}"
@@ -233,7 +233,7 @@ orion_node:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
+from ansible_collections.jeisenbath.solarwinds.plugins.module_utils.orion import OrionModule, orion_argument_spec
 try:
     from datetime import datetime, timedelta
     HAS_DATETIME = True

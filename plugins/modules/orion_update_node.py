@@ -14,7 +14,7 @@ short_description: Updates Node in Solarwinds Orion NPM
 description:
     - Updates properties of a node, such as caption or IP Address.
     - Updating a node's caption, or polling method, can be used to retain historical data about the node.
-    - For cases where that data isn't needed, it is recommended to use M(solarwinds.orion.orion_node) to re-add it.
+    - For cases where that data isn't needed, it is recommended to use M(jeisenbath.solarwinds.orion_node) to re-add it.
     - Never use this to update a node_id.
 version_added: "1.0.0"
 author: "Josh M. Eisenbath (@jeisenbath)"
@@ -26,8 +26,8 @@ options:
         default: {}
         type: dict
 extends_documentation_fragment:
-    - solarwinds.orion.orion_auth_options
-    - solarwinds.orion.orion_node_options
+    - jeisenbath.solarwinds.orion_auth_options
+    - jeisenbath.solarwinds.orion_node_options
 requirements:
     - orionsdk
     - requests
@@ -37,7 +37,7 @@ EXAMPLES = r'''
 ---
 
 - name: Update node caption
-  solarwinds.orion.orion_update_node:
+  jeisenbath.solarwinds.orion_update_node:
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_user }}"
     password: "{{ solarwinds_pass }}"
@@ -47,7 +47,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Update node to SNMPv2 polling
-  solarwinds.orion.orion_update_node:
+  jeisenbath.solarwinds.orion_update_node:
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_user }}"
     password: "{{ solarwinds_pass }}"
@@ -59,7 +59,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Update node to SNMPv3 polling. Note you will also need to add SNMP pollers if updating from ICMP
-  solarwinds.orion.orion_update_node:
+  jeisenbath.solarwinds.orion_update_node:
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_user }}"
     password: "{{ solarwinds_pass }}"
@@ -100,7 +100,7 @@ orion_node:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
+from ansible_collections.jeisenbath.solarwinds.plugins.module_utils.orion import OrionModule, orion_argument_spec
 try:
     import requests
     HAS_REQUESTS = True

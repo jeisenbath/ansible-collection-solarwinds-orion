@@ -1,11 +1,11 @@
 ---
-namespace: solarwinds
-name: orion
-version: 2.1.1
+namespace: jeisenbath
+name: solarwinds
+version: 3.0.0
 readme: README.md
 authors:
   - Josh Eisenbath (@jeisenbath)
-description: Modules for Solarwinds Orion
+description: Modules and plugins for managing nodes with Solarwinds Orion
 repository: https://github.com/jeisenbath/ansible-collection-solarwinds-orion
 homepage: https://github.com/jeisenbath/ansible-collection-solarwinds-orion
 issues: https://github.com/jeisenbath/ansible-collection-solarwinds-orion

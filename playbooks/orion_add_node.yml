@@ -5,7 +5,7 @@
 
   # Be sure to check out the role README for a full list of variables
   roles:
-    - role: solarwinds.orion.orion_node
+    - role: jeisenbath.solarwinds.orion_node
       solarwinds_server: 127.0.0.1
       solarwinds_username: admin
       solarwinds_password: changeme2345
@@ -47,7 +47,7 @@
 
   tasks:
     - name: Validate SNMP is polling after node add
-      solarwinds.orion.orion_node_info:
+      jeisenbath.solarwinds.orion_node_info:
         hostname: "{{ solarwinds_server }}"
         username: "{{ solarwinds_user }}"
         password: "{{ solarwinds_pass }}"

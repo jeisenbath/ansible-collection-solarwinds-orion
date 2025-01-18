@@ -87,7 +87,7 @@ EXAMPLES = r'''
 # So we will pull that value and create a host variable,
 # then use the keyed_groups function to turn that value into a group.
 ---
-plugin: solarwinds.orion.orion_nodes_inventory
+plugin: jeisenbath.solarwinds.orion_nodes_inventory
 cache: true
 strict: false
 orion_hostname: orion.hostname.com
@@ -144,7 +144,7 @@ from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, Constructa
 
 
 class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
-    NAME = 'solarwinds.orion.orion_nodes_inventory'
+    NAME = 'jeisenbath.solarwinds.orion_nodes_inventory'
 
     def __init__(self):
         super(InventoryModule, self).__init__()
