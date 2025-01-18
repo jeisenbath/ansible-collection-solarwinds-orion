@@ -1,0 +1,230 @@
+---
+- name: (ICMP) Create node (check mode)
+  orion_node: &add_icmp_node
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: present
+    name: "{{ orion_test_node_name }}"
+    ip_address: "{{ orion_test_node_ip_address }}"
+    polling_method: ICMP
+  delegate_to: localhost
+  check_mode: true
+  register: icmp_add_01
+
+- name: (ICMP) Create node
+  orion_node:
+    <<: *add_icmp_node
+  delegate_to: localhost
+  register: icmp_add_02
+
+- name: (ICMP) Create node (check) (idempotence)
+  orion_node:
+    <<: *add_icmp_node
+  delegate_to: localhost
+  check_mode: true
+  register: icmp_add_03
+
+- name: (ICMP) Create node (idempotence)
+  orion_node:
+    <<: *add_icmp_node
+  delegate_to: localhost
+  register: icmp_add_04
+
+- name: (ICMP) Create node asserts
+  ansible.builtin.assert:
+    that:
+      - icmp_add_01.changed
+      - icmp_add_02.changed
+      - icmp_add_02.orion_node.caption == orion_test_node_name
+      - icmp_add_02.orion_node.ipaddress == orion_test_node_ip_address
+      - icmp_add_02.orion_node.objectsubtype == "ICMP"
+      - not icmp_add_03.changed
+      - not icmp_add_04.changed
+
+- name: (ICMP) Unmanage node (check)
+  orion_node: &unmanage_icmp_node
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: unmanaged
+    name: "{{ orion_test_node_name }}"
+  delegate_to: localhost
+  check_mode: true
+  register: icmp_unmanage_01
+
+- name: (ICMP) Unmanage node
+  orion_node:
+    <<: *unmanage_icmp_node
+  delegate_to: localhost
+  register: icmp_unmanage_02
+
+- name: (ICMP) Unmanage node (idempotence) (check)
+  orion_node:
+    <<: *unmanage_icmp_node
+  delegate_to: localhost
+  register: icmp_unmanage_03
+
+- name: (ICMP) Unmanage node (idempotence)
+  orion_node:
+    <<: *unmanage_icmp_node
+  delegate_to: localhost
+  register: icmp_unmanage_04
+
+- name: (ICMP) Unmanage node asserts
+  ansible.builtin.assert:
+    that:
+      - icmp_unmanage_01.changed
+      - icmp_unmanage_02.changed
+      - not icmp_unmanage_03.changed
+      - not icmp_unmanage_04.changed
+
+- name: (ICMP) Manage node (check)
+  orion_node: &manage_icmp_node
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: managed
+    name: "{{ orion_test_node_name }}"
+  delegate_to: localhost
+  check_mode: true
+  register: icmp_manage_01
+
+- name: (ICMP) Manage node
+  orion_node:
+    <<: *manage_icmp_node
+  delegate_to: localhost
+  register: icmp_manage_02
+
+- name: (ICMP) Manage node (idempotence) (check)
+  orion_node:
+    <<: *manage_icmp_node
+  delegate_to: localhost
+  register: icmp_manage_03
+
+- name: (ICMP) Manage node (idempotence)
+  orion_node:
+    <<: *manage_icmp_node
+  delegate_to: localhost
+  register: icmp_manage_04
+
+- name: (ICMP) Manage node asserts
+  ansible.builtin.assert:
+    that:
+      - icmp_manage_01.changed
+      - icmp_manage_02.changed
+      - not icmp_manage_03.changed
+      - not icmp_manage_04.changed
+
+- name: (ICMP) Mute node (check)
+  orion_node: &mute_icmp_node
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: muted
+    name: "{{ orion_test_node_name }}"
+  delegate_to: localhost
+  check_mode: true
+  register: icmp_mute_01
+
+- name: (ICMP) Mute node
+  orion_node:
+    <<: *mute_icmp_node
+  delegate_to: localhost
+  register: icmp_mute_02
+
+- name: (ICMP) Mute node (idempotence) (check)
+  orion_node:
+    <<: *mute_icmp_node
+  delegate_to: localhost
+  register: icmp_mute_03
+
+- name: (ICMP) Mute node (idempotence)
+  orion_node:
+    <<: *mute_icmp_node
+  delegate_to: localhost
+  register: icmp_mute_04
+
+- name: (ICMP) Mute node asserts
+  ansible.builtin.assert:
+    that:
+      - icmp_mute_01.changed
+      - icmp_mute_02.changed
+      - not icmp_mute_03.changed
+      - not icmp_mute_04.changed
+
+- name: (ICMP) Unmute node (check)
+  orion_node: &unmute_icmp_node
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: unmuted
+    name: "{{ orion_test_node_name }}"
+  delegate_to: localhost
+  check_mode: true
+  register: icmp_unmute_01
+
+- name: (ICMP) Unmute node
+  orion_node:
+    <<: *unmute_icmp_node
+  delegate_to: localhost
+  register: icmp_unmute_02
+
+- name: (ICMP) Unmute node (idempotence) (check)
+  orion_node:
+    <<: *unmute_icmp_node
+  delegate_to: localhost
+  register: icmp_unmute_03
+
+- name: (ICMP) Unmute node (idempotence)
+  orion_node:
+    <<: *unmute_icmp_node
+  delegate_to: localhost
+  register: icmp_unmute_04
+
+- name: (ICMP) Unmute node asserts
+  ansible.builtin.assert:
+    that:
+      - icmp_unmute_01.changed
+      - icmp_unmute_02.changed
+      - not icmp_unmute_03.changed
+      - not icmp_unmute_04.changed
+
+- name: (ICMP) Delete node (check)
+  orion_node: &remove_icmp_node
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: absent
+    name: "{{ orion_test_node_name }}"
+  delegate_to: localhost
+  check_mode: true
+  register: icmp_delete_01
+
+- name: (ICMP) Delete node
+  orion_node:
+    <<: *remove_icmp_node
+  delegate_to: localhost
+  register: icmp_delete_02
+
+- name: (ICMP) Delete node (check) (idempotence)
+  orion_node:
+    <<: *remove_icmp_node
+  delegate_to: localhost
+  check_mode: true
+  register: icmp_delete_03
+
+- name: (ICMP) Delete node (idempotence)
+  orion_node:
+    <<: *remove_icmp_node
+  delegate_to: localhost
+  register: icmp_delete_04
+
+- name: (ICMP) Delete node asserts
+  ansible.builtin.assert:
+    that:
+      - icmp_delete_01.changed
+      - icmp_delete_02.changed
+      - not icmp_delete_03.changed
+      - not icmp_delete_04.changed
+...

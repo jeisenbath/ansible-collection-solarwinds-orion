@@ -1,0 +1,42 @@
+---
+- name: Get info (check mode)
+  orion_node_poller_info:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+  delegate_to: localhost
+  check_mode: true
+  register: info_01
+
+- name: Get info
+  orion_node_poller_info:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+  delegate_to: localhost
+  register: info_02
+
+- name: Info asserts
+  ansible.builtin.assert:
+    that:
+      - not info_01.changed
+      - not info_02.changed
+      - info_02.orion_node is defined
+      - info_02.orion_node.caption == orion_test_node_name
+      - info_02.orion_node.ipaddress == orion_test_node_ip_address
+      - info_02.orion_node.lastsystemuptimepollutc is defined
+      - info_02.orion_node.netobjectid is defined
+      - info_02.orion_node.nodeid is defined
+      - info_02.orion_node.objectsubtype is defined
+      - info_02.orion_node.status is defined
+      - info_02.orion_node.statusdescription is defined
+      - info_02.orion_node.unmanaged is defined
+      - info_02.orion_node.unmanagefrom is defined
+      - info_02.orion_node.unmanageuntil is defined
+      - info_02.orion_node.uri is defined
+      - info_02.pollers is defined
+      - info_02.pollers[0].Enabled is defined
+      - info_02.pollers[0].PollerType is defined
+...

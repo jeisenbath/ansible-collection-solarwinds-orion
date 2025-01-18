@@ -8,6 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 from ansible.module_utils.six import raise_from
+from ansible.module_utils.basic import env_fallback
 import re
 try:
     from ansible.module_utils.compat.version import LooseVersion  # noqa: F401
@@ -39,9 +40,9 @@ except Exception:
 
 def orion_argument_spec():
     return dict(
-        hostname=dict(required=True),
-        username=dict(required=True, no_log=True),
-        password=dict(required=True, no_log=True),
+        hostname=dict(fallback=(env_fallback, ['SOLARWINDS_SERVER']), required=False),
+        username=dict(fallback=(env_fallback, ['SOLARWINDS_USERNAME']), required=False, no_log=True),
+        password=dict(fallback=(env_fallback, ['SOLARWINDS_PASSWORD']), required=False, no_log=True),
         port=dict(required=False, type='str', default='17774'),
         verify=dict(required=False, type='bool', default=False),
         node_id=dict(required=False),

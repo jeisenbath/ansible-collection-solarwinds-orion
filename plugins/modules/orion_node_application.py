@@ -61,7 +61,7 @@ EXAMPLES = r'''
     password: "{{ solarwinds_pass }}"
     name: "{{ node_name }}"
     state: present
-    application_name: "{{ APM_application_name }}"
+    application_template_name: "{{ APM_application_name }}"
   delegate_to: localhost
 
 '''
@@ -119,6 +119,7 @@ def main():
     if not node:
         module.fail_json(skipped=True, msg='Node not found')
 
+    changed = False
     if module.params['state'] == 'present':
         try:
             application_template_id = orion.get_application_template_id(module.params['application_template_name'])
@@ -131,14 +132,10 @@ def main():
                     module.fail_json(msg='Failed to query credential name: {0}'.format(OrionException))
 
             application_id = orion.get_application_id(node, module.params['application_template_name'])
-            if application_id:
-                module.exit_json(changed=False, orion_node=node)
-            else:
-                if module.check_mode:
-                    module.exit_json(changed=True, orion_node=node)
-                else:
+            if not application_id:
+                if not module.check_mode:
                     orion.add_application_template_to_node(node, application_template_id, credential_id, module.params['skip_duplicates'])
-                    module.exit_json(changed=True, orion_node=node)
+                changed = True
         except Exception as OrionException:
             module.fail_json(msg='Failed to add application to node: {0}'.format(OrionException))
 
@@ -147,17 +144,13 @@ def main():
             application_id = orion.get_application_id(node, module.params['application_template_name'])
 
             if application_id:
-                if module.check_mode:
-                    module.exit_json(changed=True, orion_node=node)
-                else:
+                if not module.check_mode:
                     orion.remove_application_template_from_node(application_id)
-                    module.exit_json(changed=True, orion_node=node)
-            else:
-                module.exit_json(changed=False, orion_node=node)
+                changed = True
         except Exception as OrionException:
             module.fail_json(msg='Failed to remove application from node: {0}'.format(OrionException))
 
-    module.exit_json(changed=False)
+    module.exit_json(changed=changed, orion_node=node)
 
 
 if __name__ == "__main__":

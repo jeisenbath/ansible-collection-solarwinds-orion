@@ -1,0 +1,99 @@
+---
+- name: Add node to NCM (check)
+  orion_node_ncm: &add_ncm
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    profile_name: "{{ orion_test_node_ncm_profile }}"
+    state: present
+  delegate_to: localhost
+  check_mode: true
+  register: add_ncm_01
+
+- name: Add node to NCM
+  orion_node_ncm:
+    <<: *add_ncm
+  delegate_to: localhost
+  register: add_ncm_02
+
+- name: Add node to NCM (check) (idempotence)
+  orion_node_ncm:
+    <<: *add_ncm
+  delegate_to: localhost
+  check_mode: true
+  register: add_ncm_03
+
+- name: Add node to NCM (idempotence)
+  orion_node_ncm:
+    <<: *add_ncm
+  delegate_to: localhost
+  register: add_ncm_04
+
+- name: Update NCM profile (check)
+  orion_node_ncm: &update_ncm
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    profile_name: "{{ orion_test_node_ncm_profile_update }}"
+    state: present
+  delegate_to: localhost
+  check_mode: true
+  register: update_ncm_01
+
+- name: Update NCM profile
+  orion_node_ncm:
+    <<: *update_ncm
+  delegate_to: localhost
+  register: update_ncm_02
+
+- name: Add node to NCM asserts
+  ansible.builtin.assert:
+    that:
+      - add_ncm_01.changed
+      - add_ncm_02.changed
+      - not add_ncm_03.changed
+      - not add_ncm_04.changed
+      - add_ncm_02.orion_node is defined
+      - update_ncm_01.changed
+      - update_ncm_01.changed
+
+- name: Remove node from NCM (check)
+  orion_node_ncm: &remove_ncm
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    state: absent
+  delegate_to: localhost
+  check_mode: true
+  register: remove_ncm_01
+
+- name: Remove node from NCM
+  orion_node_ncm:
+    <<: *remove_ncm
+  delegate_to: localhost
+  register: remove_ncm_02
+
+- name: Remove node from NCM (check) (idempotence)
+  orion_node_ncm:
+    <<: *remove_ncm
+  delegate_to: localhost
+  check_mode: true
+  register: remove_ncm_03
+
+- name: Remove node from NCM (idempotence)
+  orion_node_ncm:
+    <<: *remove_ncm
+  delegate_to: localhost
+  register: remove_ncm_04
+
+- name: Remove node from NCM asserts
+  ansible.builtin.assert:
+    that:
+      - remove_ncm_01.changed
+      - remove_ncm_02.changed
+      - not remove_ncm_03.changed
+      - not remove_ncm_04.changed
+...

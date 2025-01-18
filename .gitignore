@@ -1,2 +1,7 @@
 ansible/
 args.json
+tests/output
+tests/integration/integration_config.yml
+tests/integration/inventory
+plugins/doc_fragments/__pycache__/
+.vscode/

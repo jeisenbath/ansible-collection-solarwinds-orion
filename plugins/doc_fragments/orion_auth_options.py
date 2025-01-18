@@ -15,18 +15,21 @@ options:
     hostname:
         description:
             - Name of Orion host running SWIS service.
-        required: true
+            - If not defined in the task, the value of E(SOLARWINDS_SERVER) will be used instead.
+        required: false
         type: str
     username:
         description:
             - Orion Username.
             - Active Directory users must use DOMAIN\\username format.
-        required: true
+            - If not defined in the task, the value of E(SOLARWINDS_USERNAME) will be used instead.
+        required: false
         type: str
     password:
         description:
             - Password for Orion user.
-        required: true
+            - If not defined in the task, the value of E(SOLARWINDS_PASSWORD) will be used instead.
+        required: false
         type: str
     port:
         description:

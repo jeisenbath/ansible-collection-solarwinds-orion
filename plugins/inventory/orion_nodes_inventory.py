@@ -24,14 +24,20 @@ DOCUMENTATION = r'''
         description: Hostname of the Solarwinds Orion server.
         required: true
         type: string
+        env:
+          - name: SOLARWINDS_SERVER
       orion_username:
         description: Username to Authenticate with Orion Server.
         required: true
         type: string
+        env:
+          - name: SOLARWINDS_USERNAME
       orion_password:
         description: Password to Authenticate with Orion Server. Accepts ansible-vault encrypted string.
         required: true
         type: string
+        env:
+          - name: SOLARWINDS_PASSWORD
       orion_port:
         description: Port to connect to the Solarwinds Information Service API. Only supported if orionsdk >= 0.4.0
         required: false

@@ -1,0 +1,90 @@
+---
+- name: Add single defined interface (check)
+  orion_node_interface: &solarwinds_interface_add
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: present
+    name: "{{ orion_test_node_name }}"
+    interface: lo
+  delegate_to: localhost
+  check_mode: true
+  register: defined_if_add_01
+
+- name: Add single defined interface
+  orion_node_interface:
+    <<: *solarwinds_interface_add
+  delegate_to: localhost
+  register: defined_if_add_02
+
+- name: Add single defined interface (check) (idempotence)
+  orion_node_interface:
+    <<: *solarwinds_interface_add
+  delegate_to: localhost
+  check_mode: true
+  register: defined_if_add_03
+
+- name: Add single defined interface (idempotence)
+  orion_node_interface:
+    <<: *solarwinds_interface_add
+  delegate_to: localhost
+  register: defined_if_add_04
+
+- name: Add single defined interface asserts
+  ansible.builtin.assert:
+    that:
+      - defined_if_add_01.changed
+      - defined_if_add_02.changed
+      - not defined_if_add_03.changed
+      - not defined_if_add_04.changed
+      - defined_if_add_02.discovered is defined
+      - defined_if_add_02.interfaces is defined
+      - defined_if_add_02.interfaces[0].Caption is defined
+      - defined_if_add_02.interfaces[0].InterfaceID is defined
+      - defined_if_add_02.interfaces[0].Manageable is defined
+      - defined_if_add_02.interfaces[0].ifAdminStatus is defined
+      - defined_if_add_02.interfaces[0].ifIndex is defined
+      - defined_if_add_02.interfaces[0].ifOperStatus is defined
+      - defined_if_add_02.interfaces[0].ifSpeed is defined
+      - defined_if_add_02.interfaces[0].ifSubType is defined
+      - defined_if_add_02.interfaces[0].ifType is defined
+
+- name: Remove single defined interface (check)
+  orion_node_interface: &solarwinds_interface_remove
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    interface: lo
+    state: absent
+  delegate_to: localhost
+  check_mode: true
+  register: defined_if_remove_01
+
+- name: Remove single defined interface
+  orion_node_interface:
+    <<: *solarwinds_interface_remove
+  delegate_to: localhost
+  register: defined_if_remove_02
+
+- name: Remove single defined interface (check) (idempotence)
+  orion_node_interface:
+    <<: *solarwinds_interface_remove
+  delegate_to: localhost
+  check_mode: true
+  register: defined_if_remove_03
+
+- name: Remove single defined interface (idempotence)
+  orion_node_interface:
+    <<: *solarwinds_interface_remove
+  delegate_to: localhost
+  register: defined_if_remove_04
+
+- name: Remove single defined interface asserts
+  ansible.builtin.assert:
+    that:
+      - defined_if_remove_01.changed
+      - defined_if_remove_02.changed
+      - not defined_if_remove_03.changed
+      - not defined_if_remove_04.changed
+...

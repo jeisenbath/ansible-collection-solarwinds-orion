@@ -1,0 +1,7 @@
+---
+# Integration tests for orion_volume_info module
+- name: Include tests
+  ansible.builtin.include_tasks: "{{ item }}"
+  loop:
+    - linux.yml
+...

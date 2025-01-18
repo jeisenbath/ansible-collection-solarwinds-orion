@@ -374,18 +374,13 @@ def add_node(module, orion):
 def remove_node(module, node):
     try:
         __SWIS__.delete(node['uri'])
-        module.exit_json(changed=True, orion_node=node)
     except Exception as OrionException:
         module.fail_json(msg='Error removing node: {0}'.format(str(OrionException)))
 
 
 def remanage_node(module, node):
-    if not node['unmanaged']:
-        module.exit_json(changed=False, orion_node=node)
-
     try:
         __SWIS__.invoke('Orion.Nodes', 'Remanage', node['netobjectid'])
-        module.exit_json(changed=True, orion_node=node)
     except Exception as OrionException:
         module.fail_json(msg='Error remanaging node: {0}'.format(str(OrionException)))
 
@@ -393,17 +388,12 @@ def remanage_node(module, node):
 def unmanage_node(module, node):
     now = datetime.now()
     tomorrow = now + timedelta(days=1)
-
     unmanage_from = module.params['unmanage_from']
     unmanage_until = module.params['unmanage_until']
-
     if not unmanage_from:
         unmanage_from = now.isoformat()
     if not unmanage_until:
         unmanage_until = tomorrow.isoformat()
-
-    elif node['unmanaged']:
-        module.exit_json(changed=False, orion_node=node)
 
     try:
         __SWIS__.invoke(
@@ -414,7 +404,6 @@ def unmanage_node(module, node):
             unmanage_until,
             False  # use Absolute Time
         )
-        module.exit_json(changed=True, orion_node=node)
     except Exception as OrionException:
         module.fail_json(msg='Error unmanaging node: {0}'.format(str(OrionException)))
 
@@ -422,39 +411,22 @@ def unmanage_node(module, node):
 def mute_node(module, node):
     now = datetime.now()
     tomorrow = now + timedelta(days=1)
-
     unmanage_from = module.params['unmanage_from']
     unmanage_until = module.params['unmanage_until']
-
     if not unmanage_from:
         unmanage_from = now.isoformat()
     if not unmanage_until:
         unmanage_until = tomorrow.isoformat()
 
     try:
-        suppressed_state = __SWIS__.invoke('Orion.AlertSuppression', 'GetAlertSuppressionState', [node['uri']])[0]
-
-        # SuppressionMode 1 is suppressed, 0 unsuppressed
-        if suppressed_state['SuppressionMode'] == 0:
-            __SWIS__.invoke('Orion.AlertSuppression', 'SuppressAlerts', [node['uri']], unmanage_from, unmanage_until)
-            module.exit_json(changed=True, orion_node=node)
-        # todo if unmanage_until param > current unmanage until, update time
-        else:
-            module.exit_json(changed=False, orion_node=node)
+        __SWIS__.invoke('Orion.AlertSuppression', 'SuppressAlerts', [node['uri']], unmanage_from, unmanage_until)
     except Exception as OrionException:
         module.fail_json(msg='Error muting node: {0}'.format(str(OrionException)))
 
 
 def unmute_node(module, node):
-    suppressed_state = __SWIS__.invoke('Orion.AlertSuppression', 'GetAlertSuppressionState', [node['uri']])[0]
-
     try:
-        # SuppressionMode 1 is suppressed, 0 unsuppressed
-        if suppressed_state['SuppressionMode'] == 0:
-            module.exit_json(changed=False, orion_node=node)
-        else:
-            __SWIS__.invoke('Orion.AlertSuppression', 'ResumeAlerts', [node['uri']])
-            module.exit_json(changed=True, orion_node=node)
+        __SWIS__.invoke('Orion.AlertSuppression', 'ResumeAlerts', [node['uri']])
     except Exception as OrionException:
         module.fail_json(msg='Error muting node: {0}'.format(str(OrionException)))
 
@@ -503,47 +475,44 @@ def main():
 
     node = orion.get_node()
 
+    changed = False
     if module.params['state'] == 'present':
-        if node:
-            module.exit_json(changed=False, orion_node=node)
-
-        if module.check_mode:
-            module.exit_json(changed=True, orion_node=node)
-        else:
-            new_node = add_node(module, orion)
-            module.exit_json(changed=True, orion_node=new_node)
-    elif module.params['state'] == 'absent':
         if not node:
-            module.exit_json(changed=False)
-
-        if module.check_mode:
-            module.exit_json(changed=True, orion_node=node)
-        else:
-            remove_node(module, node)
+            if not module.check_mode:
+                node = add_node(module, orion)
+            changed = True
+    elif module.params['state'] == 'absent':
+        if node:
+            if not module.check_mode:
+                remove_node(module, node)
+            changed = True
     else:
         if not node:
             module.exit_json(skipped=True, msg='Node not found')
-
+        # SuppressionMode 1 is suppressed, 0 unsuppressed
+        suppressed_state = __SWIS__.invoke('Orion.AlertSuppression', 'GetAlertSuppressionState', [node['uri']])[0]
         if module.params['state'] == 'managed':
-            if module.check_mode:
-                module.exit_json(changed=True, orion_node=node)
-            else:
-                remanage_node(module, node)
+            if node['unmanaged']:
+                if not module.check_mode:
+                    remanage_node(module, node)
+                changed = True
         elif module.params['state'] == 'unmanaged':
-            if module.check_mode:
-                module.exit_json(changed=True, orion_node=node)
-            else:
-                unmanage_node(module, node)
+            if not node['unmanaged']:
+                if not module.check_mode:
+                    unmanage_node(module, node)
+                changed = True
         elif module.params['state'] == 'muted':
-            if module.check_mode:
-                module.exit_json(changed=True, orion_node=node)
-            else:
-                mute_node(module, node)
+            if suppressed_state['SuppressionMode'] == 0:
+                if not module.check_mode:
+                    mute_node(module, node)
+                changed = True
         elif module.params['state'] == 'unmuted':
-            if module.check_mode:
-                module.exit_json(changed=True, orion_node=node)
-            else:
-                unmute_node(module, node)
+            if suppressed_state['SuppressionMode'] == 1:
+                if not module.check_mode:
+                    unmute_node(module, node)
+                changed = True
+
+    module.exit_json(changed=changed, orion_node=node)
 
 
 if __name__ == "__main__":

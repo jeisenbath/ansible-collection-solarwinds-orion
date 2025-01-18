@@ -1,0 +1,88 @@
+---
+- name: Add discovered interfaces (check)
+  orion_node_interface: &solarwinds_interface_add
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: present
+    name: "{{ orion_test_node_name }}"
+  delegate_to: localhost
+  check_mode: true
+  register: discover_if_add_01
+
+- name: Add discovered interfaces
+  orion_node_interface:
+    <<: *solarwinds_interface_add
+  delegate_to: localhost
+  register: discover_if_add_02
+
+- name: Add discovered interfaces (check) (idempotence)
+  orion_node_interface:
+    <<: *solarwinds_interface_add
+  delegate_to: localhost
+  check_mode: true
+  register: discover_if_add_03
+
+- name: Add discovered interfaces (idempotence)
+  orion_node_interface:
+    <<: *solarwinds_interface_add
+  delegate_to: localhost
+  register: discover_if_add_04
+
+- name: Add discovered interfaces asserts
+  ansible.builtin.assert:
+    that:
+      - discover_if_add_01.changed
+      - discover_if_add_02.changed
+      - not discover_if_add_03.changed
+      - not discover_if_add_04.changed
+      - discover_if_add_02.discovered is defined
+      - discover_if_add_02.interfaces is defined
+      - discover_if_add_02.interfaces[0].Caption is defined
+      - discover_if_add_02.interfaces[0].InterfaceID is defined
+      - discover_if_add_02.interfaces[0].Manageable is defined
+      - discover_if_add_02.interfaces[0].ifAdminStatus is defined
+      - discover_if_add_02.interfaces[0].ifIndex is defined
+      - discover_if_add_02.interfaces[0].ifOperStatus is defined
+      - discover_if_add_02.interfaces[0].ifSpeed is defined
+      - discover_if_add_02.interfaces[0].ifSubType is defined
+      - discover_if_add_02.interfaces[0].ifType is defined
+
+- name: Remove all interfaces (check)
+  orion_node_interface: &solarwinds_interface_remove
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: absent
+    name: "{{ orion_test_node_name }}"
+  delegate_to: localhost
+  check_mode: true
+  register: discover_if_remove_01
+
+- name: Remove all interfaces
+  orion_node_interface:
+    <<: *solarwinds_interface_remove
+  delegate_to: localhost
+  register: discover_if_remove_02
+
+- name: Remove all interfaces (check) (idempotence)
+  orion_node_interface:
+    <<: *solarwinds_interface_remove
+  delegate_to: localhost
+  check_mode: true
+  register: discover_if_remove_03
+
+- name: Remove all interfaces (idempotence)
+  orion_node_interface:
+    <<: *solarwinds_interface_remove
+  delegate_to: localhost
+  register: discover_if_remove_04
+
+- name: Remove discovered interfaces asserts
+  ansible.builtin.assert:
+    that:
+      - discover_if_remove_01.changed
+      - discover_if_remove_02.changed
+      - not discover_if_remove_03.changed
+      - not discover_if_remove_04.changed
+...

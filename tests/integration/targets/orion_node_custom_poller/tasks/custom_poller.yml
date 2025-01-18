@@ -1,0 +1,80 @@
+---
+- name: Add poller to node (check)
+  orion_node_custom_poller: &add_poller
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    custom_poller: "{{ orion_test_node_custom_poller }}"
+    state: present
+  delegate_to: localhost
+  check_mode: true
+  register: add_poller_01
+
+- name: Add poller to node
+  orion_node_custom_poller:
+    <<: *add_poller
+  delegate_to: localhost
+  register: add_poller_02
+
+- name: Add poller to node (check) (idempotence)
+  orion_node_custom_poller:
+    <<: *add_poller
+  delegate_to: localhost
+  check_mode: true
+  register: add_poller_03
+
+- name: Add poller to node (idempotence)
+  orion_node_custom_poller:
+    <<: *add_poller
+  delegate_to: localhost
+  register: add_poller_04
+
+- name: Add poller asserts
+  ansible.builtin.assert:
+    that:
+      - add_poller_01.changed
+      - add_poller_02.changed
+      - not add_poller_03.changed
+      - not add_poller_04.changed
+      - add_poller_02.orion_node is defined
+
+- name: Remove poller from node (check)
+  orion_node_custom_poller: &remove_poller
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    custom_poller: "{{ orion_test_node_custom_poller }}"
+    state: absent
+  delegate_to: localhost
+  check_mode: true
+  register: remove_poller_01
+
+- name: Remove poller from node
+  orion_node_custom_poller:
+    <<: *remove_poller
+  delegate_to: localhost
+  register: remove_poller_02
+
+- name: Remove poller from node (check) (idempotence)
+  orion_node_custom_poller:
+    <<: *remove_poller
+  delegate_to: localhost
+  check_mode: true
+  register: remove_poller_03
+
+- name: Remove poller from node (idempotence)
+  orion_node_custom_poller:
+    <<: *remove_poller
+  delegate_to: localhost
+  register: remove_poller_04
+
+- name: Remove poller from node asserts
+  ansible.builtin.assert:
+    that:
+      - remove_poller_01.changed
+      - remove_poller_02.changed
+      - not remove_poller_03.changed
+      - not remove_poller_04.changed
+...

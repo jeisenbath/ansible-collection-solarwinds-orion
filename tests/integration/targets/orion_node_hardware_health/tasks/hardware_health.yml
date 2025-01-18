@@ -1,0 +1,80 @@
+---
+- name: Add hardware health poller to node (check)
+  orion_node_hardware_health: &add_hh
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    polling_method: "{{ orion_test_node_hardware_health_polling_method }}"
+    state: present
+  delegate_to: localhost
+  check_mode: true
+  register: add_hh_01
+
+- name: Add hardware health poller to node
+  orion_node_hardware_health:
+    <<: *add_hh
+  delegate_to: localhost
+  register: add_hh_02
+
+- name: Add hardware health poller to node (check) (idempotence)
+  orion_node_hardware_health:
+    <<: *add_hh
+  delegate_to: localhost
+  check_mode: true
+  register: add_hh_03
+
+- name: Add hardware health poller to node (idempotence)
+  orion_node_hardware_health:
+    <<: *add_hh
+  delegate_to: localhost
+  register: add_hh_04
+
+- name: Add poller asserts
+  ansible.builtin.assert:
+    that:
+      - add_hh_01.changed
+      - add_hh_02.changed
+      - not add_hh_03.changed
+      - not add_hh_04.changed
+      - add_hh_02.orion_node is defined
+
+- name: Remove hardware health poller from node (check)
+  orion_node_hardware_health: &remove_hh
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    polling_method: "{{ orion_test_node_hardware_health_polling_method }}"
+    state: absent
+  delegate_to: localhost
+  check_mode: true
+  register: remove_hh_01
+
+- name: Remove hardware health poller from node
+  orion_node_hardware_health:
+    <<: *remove_hh
+  delegate_to: localhost
+  register: remove_hh_02
+
+- name: Remove hardware health poller from node (check) (idempotence)
+  orion_node_hardware_health:
+    <<: *remove_hh
+  delegate_to: localhost
+  check_mode: true
+  register: remove_hh_03
+
+- name: Remove hardware health poller from node (idempotence)
+  orion_node_hardware_health:
+    <<: *remove_hh
+  delegate_to: localhost
+  register: remove_hh_04
+
+- name: Remove poller from node asserts
+  ansible.builtin.assert:
+    that:
+      - remove_hh_01.changed
+      - remove_hh_02.changed
+      - not remove_hh_03.changed
+      - not remove_hh_04.changed
+...

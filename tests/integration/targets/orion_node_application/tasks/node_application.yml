@@ -1,0 +1,80 @@
+---
+- name: Add APM template to node (check)
+  orion_node_application: &add_application
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    application_template_name: "{{ orion_test_node_application }}"
+    state: present
+  delegate_to: localhost
+  check_mode: true
+  register: add_app_01
+
+- name: Add APM template to node
+  orion_node_application:
+    <<: *add_application
+  delegate_to: localhost
+  register: add_app_02
+
+- name: Add APM template to node (check) (idempotence)
+  orion_node_application:
+    <<: *add_application
+  delegate_to: localhost
+  check_mode: true
+  register: add_app_03
+
+- name: Add APM template to node (idempotence)
+  orion_node_application:
+    <<: *add_application
+  delegate_to: localhost
+  register: add_app_04
+
+- name: Add APM template asserts
+  ansible.builtin.assert:
+    that:
+      - add_app_01.changed
+      - add_app_02.changed
+      - not add_app_03.changed
+      - not add_app_04.changed
+      - add_app_02.orion_node is defined
+
+- name: Remove APM template from node (check)
+  orion_node_application: &remove_application
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    application_template_name: "{{ orion_test_node_application }}"
+    state: absent
+  delegate_to: localhost
+  check_mode: true
+  register: remove_app_01
+
+- name: Remove APM template from node
+  orion_node_application:
+    <<: *remove_application
+  delegate_to: localhost
+  register: remove_app_02
+
+- name: Remove APM template from node
+  orion_node_application:
+    <<: *remove_application
+  delegate_to: localhost
+  check_mode: true
+  register: remove_app_03
+
+- name: Remove APM template from node
+  orion_node_application:
+    <<: *remove_application
+  delegate_to: localhost
+  register: remove_app_04
+
+- name: Remove APM template asserts
+  ansible.builtin.assert:
+    that:
+      - remove_app_01.changed
+      - remove_app_02.changed
+      - not remove_app_03.changed
+      - not remove_app_04.changed
+...
