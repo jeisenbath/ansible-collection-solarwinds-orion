@@ -6,7 +6,7 @@ Adds an node to be monitored in Solarwinds.
 Requirements
 ------------
 
-solarwinds.orion collection
+jeisenbath.solarwinds collection
 
 Role Variables
 --------------
@@ -69,7 +69,7 @@ Example Playbook
         solarwinds_username: admin
         solarwinds_password: changeme2345
       roles:
-        - role: solarwinds.orion.orion_node
+        - role: jeisenbath.solarwinds.orion_node
           orion_node_polling_method: SNMP
           orion_node_snmp_version: 2
           orion_node_ro_community_string: community

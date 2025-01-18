@@ -10,29 +10,29 @@ Collection for managing Nodes in Solarwinds Orion.
 ### Modules
 | Name                                       | Description                                          |
 |--------------------------------------------|------------------------------------------------------|
-| solarwinds.orion.orion_custom_property     | Manage custom properties on Node.                    |
-| solarwinds.orion.orion_node                | Creates, Removes, Manage, or Mute Node.              |
-| solarwinds.orion.orion_node_application    | Manages APM application templates assigned to Nodes. |
-| solarwinds.orion.orion_node_custom_poller  | Creates/Removes custom pollers on a Node.            |
-| solarwinds.orion.orion_node_info           | Gets info about a Node.                              |
-| solarwinds.orion.orion_node_interface      | Manage interfaces on Nodes.                          |
-| solarwinds.orion.orion_node_poller         | Manage Pollers on Nodes.                             |
-| solarwinds.orion.orion_node_poller_info    | Query info about pollers assigned to a Node.         |
-| solarwinds.orion.orion_update_node         | Updates Node properties.                             |
-| solarwinds.orion.orion_volume              | Manage Volumes on Nodes.                             |
-| solarwinds.orion.orion_volume_info         | Gets info about a Volume assigned to a Node.         |
-| solarwinds.orion.orion_node_ncm            | Adds or Removes an existing node to NCM.             |
-| solarwinds.orion.orion_query               | Run a SWQL query against the orion database.         |
+| jeisenbath.solarwinds.orion_custom_property     | Manage custom properties on Node.                    |
+| jeisenbath.solarwinds.orion_node                | Creates, Removes, Manage, or Mute Node.              |
+| jeisenbath.solarwinds.orion_node_application    | Manages APM application templates assigned to Nodes. |
+| jeisenbath.solarwinds.orion_node_custom_poller  | Creates/Removes custom pollers on a Node.            |
+| jeisenbath.solarwinds.orion_node_info           | Gets info about a Node.                              |
+| jeisenbath.solarwinds.orion_node_interface      | Manage interfaces on Nodes.                          |
+| jeisenbath.solarwinds.orion_node_poller         | Manage Pollers on Nodes.                             |
+| jeisenbath.solarwinds.orion_node_poller_info    | Query info about pollers assigned to a Node.         |
+| jeisenbath.solarwinds.orion_update_node         | Updates Node properties.                             |
+| jeisenbath.solarwinds.orion_volume              | Manage Volumes on Nodes.                             |
+| jeisenbath.solarwinds.orion_volume_info         | Gets info about a Volume assigned to a Node.         |
+| jeisenbath.solarwinds.orion_node_ncm            | Adds or Removes an existing node to NCM.             |
+| jeisenbath.solarwinds.orion_query               | Run a SWQL query against the orion database.         |
 
 ### Plugins
 | Name                                   | Description                                   |
 |----------------------------------------|-----------------------------------------------|
-| solarwinds.orion.orion_nodes_inventory | Dynamic Inventory Plugin for Solarwinds Orion |
+| jeisenbath.solarwinds.orion_nodes_inventory | Dynamic Inventory Plugin for Solarwinds Orion |
 
 ### Roles
 | Name                        | Description                    |
 |-----------------------------|--------------------------------|
-| solarwinds.orion.orion_node | Add a node to solarwinds orion |
+| jeisenbath.solarwinds.orion_node | Add a node to solarwinds orion |
 
 ## Tested with Ansible
 
@@ -59,7 +59,7 @@ You can also include it in a `requirements.yml` file and install it with `ansibl
 ```yaml
 ---
 collections:
-  - name: solarwinds.orion
+  - name: jeisenbath.solarwinds
     type: git
     source: https://github.com/jeisenbath/ansible-collection-solarwinds-orion
 ```

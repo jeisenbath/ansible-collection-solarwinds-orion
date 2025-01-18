@@ -39,8 +39,8 @@ options:
         type: bool
         default: False
 extends_documentation_fragment:
-    - solarwinds.orion.orion_auth_options
-    - solarwinds.orion.orion_node_options
+    - jeisenbath.solarwinds.orion_auth_options
+    - jeisenbath.solarwinds.orion_node_options
 requirements:
     - orionsdk
     - requests
@@ -50,7 +50,7 @@ EXAMPLES = r'''
 ---
 
 - name: Discover and add all interfaces to node
-  solarwinds.orion.orion_node_interface:
+  jeisenbath.solarwinds.orion_node_interface:
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_user }}"
     password: "{{ solarwinds_pass }}"
@@ -59,7 +59,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Add all interfaces matching regex pattern "Ethernet [0-9]$"
-  solarwinds.orion.orion_node_interface:
+  jeisenbath.solarwinds.orion_node_interface:
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_user }}"
     password: "{{ solarwinds_pass }}"
@@ -70,7 +70,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Remove an interface from node
-  solarwinds.orion.orion_node_interface:
+  jeisenbath.solarwinds.orion_node_interface:
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_user }}"
     password: "{{ solarwinds_pass }}"
@@ -149,7 +149,7 @@ interfaces:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
+from ansible_collections.jeisenbath.solarwinds.plugins.module_utils.orion import OrionModule, orion_argument_spec
 try:
     import requests
     HAS_REQUESTS = True

@@ -4,6 +4,21 @@ Solarwinds.Orion Release Notes
 
 .. contents:: Topics
 
+v3.0.0
+======
+
+Release Summary
+---------------
+
+Released 2025-01-18
+Migrated collection to jeisenbath.solarwinds namespace in order to publish to Galaxy.
+Versions < 3.0 will stay on old solarwinds.orion namespace, and bugfixes will be ported to stable-2.x branch until 2025-12-31.
+
+Breaking Changes / Porting Guide
+--------------------------------
+
+- Bumped min ansible version to be up to date with supported releases. Older versions may work but will no longer be tested.
+- Migrated collection namespace from solarwinds.orion to jeisenbath.solarwinds
 
 v2.1.1
 ======
@@ -16,7 +31,6 @@ Added ENV variable support for plugins
 Created integration tests for modules
 Adds a CONTRIBUTING doc
 Fix sanity test errors
-
 
 Minor Changes
 -------------
@@ -121,9 +135,9 @@ Major Changes
 New Modules
 -----------
 
-- solarwinds.orion.orion_node_ncm - Manages a node in Solarwinds NCM
-- solarwinds.orion.orion_node_poller_info - Gets info about pollers assigned to a Node in Solarwinds Orion NPM
-- solarwinds.orion.orion_query - Queries the Solarwinds Orion database
+- jeisenbath.solarwinds.orion_node_ncm - Manages a node in Solarwinds NCM
+- jeisenbath.solarwinds.orion_node_poller_info - Gets info about pollers assigned to a Node in Solarwinds Orion NPM
+- jeisenbath.solarwinds.orion_query - Queries the Solarwinds Orion database
 
 v1.2.0
 ======
@@ -147,11 +161,10 @@ Release Summary
 
 | Released 2023-12-1
 
-
 Major Changes
 -------------
 
-- Add dynamic inventory plugin solarwinds.orion.orion_nodes_inventory
+- Add dynamic inventory plugin jeisenbath.solarwinds.orion_nodes_inventory
 
 v1.0.4
 ======
@@ -160,7 +173,6 @@ Release Summary
 ---------------
 
 | Released 2023-09-26
-
 
 Major Changes
 -------------
@@ -180,7 +192,6 @@ Release Summary
 
 | Released 2023-08-27
 
-
 Minor Changes
 -------------
 
@@ -198,7 +209,6 @@ Release Summary
 ---------------
 
 | Released 2023-08-10
-
 
 Minor Changes
 -------------
@@ -221,7 +231,6 @@ Release Summary
 
 | Released 2023-07-14
 
-
 Minor Changes
 -------------
 
@@ -242,17 +251,16 @@ Release Summary
 
 | Released 2023-03-18
 
-
 New Modules
 -----------
 
-- solarwinds.orion.orion_custom_property - Manage custom properties on Node in Solarwinds Orion NPM
-- solarwinds.orion.orion_node - Created/Removes/Edits Nodes in Solarwinds Orion NPM
-- solarwinds.orion.orion_node_application - Manages APM application templates assigned to nodes.
-- solarwinds.orion.orion_node_custom_poller - Creates/Removes custom pollers to a Node in Solarwinds Orion NPM
-- solarwinds.orion.orion_node_info - Gets info about a Node in Solarwinds Orion NPM
-- solarwinds.orion.orion_node_interface - Manage interfaces on Nodes in Solarwinds Orion NPM
-- solarwinds.orion.orion_node_poller - Manage Pollers on Nodes in Solarwinds Orion NPM
-- solarwinds.orion.orion_update_node - Updates Node in Solarwinds Orion NPM
-- solarwinds.orion.orion_volume - Manage Volumes on Nodes in Solarwinds Orion NPM
-- solarwinds.orion.orion_volume_info - Gets info about a Volume in Solarwinds Orion NPM
+- jeisenbath.solarwinds.orion_custom_property - Manage custom properties on Node in Solarwinds Orion NPM
+- jeisenbath.solarwinds.orion_node - Created/Removes/Edits Nodes in Solarwinds Orion NPM
+- jeisenbath.solarwinds.orion_node_application - Manages APM application templates assigned to nodes.
+- jeisenbath.solarwinds.orion_node_custom_poller - Creates/Removes custom pollers to a Node in Solarwinds Orion NPM
+- jeisenbath.solarwinds.orion_node_info - Gets info about a Node in Solarwinds Orion NPM
+- jeisenbath.solarwinds.orion_node_interface - Manage interfaces on Nodes in Solarwinds Orion NPM
+- jeisenbath.solarwinds.orion_node_poller - Manage Pollers on Nodes in Solarwinds Orion NPM
+- jeisenbath.solarwinds.orion_update_node - Updates Node in Solarwinds Orion NPM
+- jeisenbath.solarwinds.orion_volume - Manage Volumes on Nodes in Solarwinds Orion NPM
+- jeisenbath.solarwinds.orion_volume_info - Gets info about a Volume in Solarwinds Orion NPM

@@ -32,7 +32,7 @@ options:
         required: false
         type: str
 extends_documentation_fragment:
-    - solarwinds.orion.orion_auth_options
+    - jeisenbath.solarwinds.orion_auth_options
 requirements:
     - orionsdk
     - requests
@@ -43,7 +43,7 @@ EXAMPLES = r'''
 ---
 
 - name: Run a query for the top 10 nodes in Orion.Nodes
-  solarwinds.orion.orion_query:
+  jeisenbath.solarwinds.orion_query:
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_user }}"
     password: "{{ solarwinds_pass }}"
@@ -82,7 +82,7 @@ results:
 
 import csv
 from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule
+from ansible_collections.jeisenbath.solarwinds.plugins.module_utils.orion import OrionModule
 try:
     import requests
     HAS_REQUESTS = True

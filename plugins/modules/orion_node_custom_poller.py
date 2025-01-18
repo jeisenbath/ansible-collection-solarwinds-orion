@@ -14,7 +14,7 @@ short_description: Creates/Removes custom pollers to a Node in Solarwinds Orion 
 description:
     - This module will add or remove a custom poller to a Node in Solarwinds Orion NPM.
     - The custom poller must already exist to be added to the node.
-    - Note this module is different from M(solarwinds.orion.orion_node_poller), which manages standard Orion pollers.
+    - Note this module is different from M(jeisenbath.solarwinds.orion_node_poller), which manages standard Orion pollers.
 version_added: "1.0.0"
 author: "Josh M. Eisenbath (@jeisenbath)"
 options:
@@ -32,8 +32,8 @@ options:
         required: True
         type: str
 extends_documentation_fragment:
-    - solarwinds.orion.orion_auth_options
-    - solarwinds.orion.orion_node_options
+    - jeisenbath.solarwinds.orion_auth_options
+    - jeisenbath.solarwinds.orion_node_options
 requirements:
     - orionsdk
     - requests
@@ -43,7 +43,7 @@ EXAMPLES = r'''
 ---
 
 - name: Add custom pollers to node
-  solarwinds.orion.orion_node_custom_poller:
+  jeisenbath.solarwinds.orion_node_custom_poller:
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_user }}"
     password: "{{ solarwinds_pass }}"
@@ -76,7 +76,7 @@ orion_node:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
+from ansible_collections.jeisenbath.solarwinds.plugins.module_utils.orion import OrionModule, orion_argument_spec
 try:
     import requests
     HAS_REQUESTS = True

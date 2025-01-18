@@ -1,7 +1,7 @@
 ---
 # tasks file for orion_node
 - name: Create node
-  solarwinds.orion.orion_node:
+  jeisenbath.solarwinds.orion_node:
     hostname: "{{ orion_node_solarwinds_server }}"
     username: "{{ orion_node_solarwinds_username }}"
     password: "{{ orion_node_solarwinds_password }}"
@@ -22,7 +22,7 @@
 
 - name: Add SNMP pollers to node if polling method is SNMP
   when: orion_node_polling_method == 'SNMP'
-  solarwinds.orion.orion_node_poller:
+  jeisenbath.solarwinds.orion_node_poller:
     hostname: "{{ orion_node_solarwinds_server }}"
     username: "{{ orion_node_solarwinds_username }}"
     password: "{{ orion_node_solarwinds_password }}"
@@ -35,7 +35,7 @@
 
 - name: Add Custom Pollers when orion_node_custom_pollers is defined
   when: orion_node_polling_method == 'SNMP' and orion_node_custom_pollers is defined
-  solarwinds.orion.orion_node_custom_poller:
+  jeisenbath.solarwinds.orion_node_custom_poller:
     hostname: "{{ orion_node_solarwinds_server }}"
     username: "{{ orion_node_solarwinds_username }}"
     password: "{{ orion_node_solarwinds_password }}"
@@ -47,7 +47,7 @@
 
 - name: Add interfaces to node if polling method is SNMP and orion_node_interfaces list of interfaces is defined
   when: orion_node_polling_method == 'SNMP' and orion_node_interfaces is defined and not orion_node_discover_interfaces
-  solarwinds.orion.orion_node_interface:
+  jeisenbath.solarwinds.orion_node_interface:
     hostname: "{{ orion_node_solarwinds_server }}"
     username: "{{ orion_node_solarwinds_username }}"
     password: "{{ orion_node_solarwinds_password }}"
@@ -59,7 +59,7 @@
 
 - name: Discover and add interfaces if orion_node_discover_interfaces is true
   when: orion_node_polling_method == 'SNMP' and orion_node_discover_interfaces
-  solarwinds.orion.orion_node_interface:
+  jeisenbath.solarwinds.orion_node_interface:
     hostname: "{{ orion_node_solarwinds_server }}"
     username: "{{ orion_node_solarwinds_username }}"
     password: "{{ orion_node_solarwinds_password }}"
@@ -69,7 +69,7 @@
 
 - name: Add volumes to node if orion_node_volumes is defined and polling method is SNMP
   when: orion_node_polling_method == 'SNMP' and orion_node_volumes is defined
-  solarwinds.orion.orion_volume:
+  jeisenbath.solarwinds.orion_volume:
     hostname: "{{ orion_node_solarwinds_server }}"
     username: "{{ orion_node_solarwinds_username }}"
     password: "{{ orion_node_solarwinds_password }}"
@@ -82,7 +82,7 @@
 
 - name: Add APM Application template to node if orion_node_applications is defined
   when: orion_node_applications is defined
-  solarwinds.orion.orion_node_application:
+  jeisenbath.solarwinds.orion_node_application:
     hostname: "{{ orion_node_solarwinds_server }}"
     username: "{{ orion_node_solarwinds_username }}"
     password: "{{ orion_node_solarwinds_password }}"
@@ -94,7 +94,7 @@
 
 - name: Add Custom Properties when orion_node_custom_properties is defined
   when: orion_node_custom_properties is defined
-  solarwinds.orion.orion_custom_property:
+  jeisenbath.solarwinds.orion_custom_property:
     hostname: "{{ orion_node_solarwinds_server }}"
     username: "{{ orion_node_solarwinds_username }}"
     password: "{{ orion_node_solarwinds_password }}"
@@ -107,7 +107,7 @@
 
 - name: Add Hardware Health poller if orion_node_hardware_health_poller is defined
   when: orion_node_hardware_health_poller is defined
-  solarwinds.orion.orion_node_hardware_health:
+  jeisenbath.solarwinds.orion_node_hardware_health:
     hostname: "{{ orion_node_solarwinds_server }}"
     username: "{{ orion_node_solarwinds_username }}"
     password: "{{ orion_node_solarwinds_password }}"
@@ -118,7 +118,7 @@
 
 - name: Add node to NCM if orion_node_ncm is true
   when: orion_node_ncm
-  solarwinds.orion.orion_node_ncm:
+  jeisenbath.solarwinds.orion_node_ncm:
     hostname: "{{ orion_node_solarwinds_server }}"
     username: "{{ orion_node_solarwinds_username }}"
     password: "{{ orion_node_solarwinds_password }}"
