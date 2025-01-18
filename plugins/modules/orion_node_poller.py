@@ -137,17 +137,14 @@ def main():
     if not node:
         module.fail_json(skipped=True, msg='Node not found')
 
+    changed = False
     if module.params['state'] == 'present':
         try:
             poller = orion.get_poller('N', str(node['nodeid']), module.params['poller'])
-            if poller and poller['Enabled'] == module.params['enabled']:
-                module.exit_json(changed=False, orion_node=node)
-            else:
-                if module.check_mode:
-                    module.exit_json(changed=True, orion_node=node)
-                else:
+            if not poller or not poller['Enabled'] == module.params['enabled']:
+                if not module.check_mode:
                     orion.add_poller('N', str(node['nodeid']), module.params['poller'], module.params['enabled'])
-                    module.exit_json(changed=True, orion_node=node)
+                changed = True
         except Exception as OrionException:
             module.fail_json(msg='Failed to add poller: {0}'.format(str(OrionException)))
 
@@ -155,17 +152,13 @@ def main():
         try:
             poller = orion.get_poller('N', str(node['nodeid']), module.params['poller'])
             if poller:
-                if module.check_mode:
-                    module.exit_json(changed=True, orion_node=node)
-                else:
+                if not module.check_mode:
                     orion.remove_poller('N', str(node['nodeid']), module.params['poller'])
-                    module.exit_json(changed=True, orion_node=node)
-            else:
-                module.exit_json(changed=False, orion_node=node)
+                changed = True
         except Exception as OrionException:
             module.fail_json(msg='Failed to remove poller: {0}'.format(str(OrionException)))
 
-    module.exit_json(changed=False)
+    module.exit_json(changed=changed, orion_node=node)
 
 
 if __name__ == "__main__":

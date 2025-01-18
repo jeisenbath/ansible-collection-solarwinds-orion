@@ -110,6 +110,7 @@ def main():
     if not node:
         module.fail_json(skipped=True, msg='Node not found')
 
+    changed = False
     interfaces = []
     try:
         interface_query = orion.swis.query(
@@ -120,7 +121,7 @@ def main():
     except Exception as e:
         module.fail_json(msg="Failed to retrieve interfaces: {0}".format(str(e)))
 
-    module.exit_json(changed=False, orion_node=node, interfaces=interfaces)
+    module.exit_json(changed=changed, orion_node=node, interfaces=interfaces)
 
 
 if __name__ == "__main__":

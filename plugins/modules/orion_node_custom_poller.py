@@ -105,6 +105,7 @@ def main():
     if not node:
         module.fail_json(skipped=True, msg='Node not found')
 
+    changed = False
     if module.params['state'] == 'present':
         try:
             if not orion.get_custom_poller_id(module.params['custom_poller']):
@@ -113,31 +114,22 @@ def main():
             module.fail_json(msg='Failed to query for custom poller: {0}'.format(str(OrionException)))
 
         try:
-            if orion.get_custom_poller_uri(node, module.params['custom_poller']):
-                module.exit_json(changed=False, orion_node=node)
-            else:
-                if module.check_mode:
-                    module.exit_json(changed=True, orion_node=node)
-                else:
+            if not orion.get_custom_poller_uri(node, module.params['custom_poller']):
+                if not module.check_mode:
                     orion.add_custom_poller(node, module.params['custom_poller'])
-                    module.exit_json(changed=True, orion_node=node)
+                changed = True
         except Exception as OrionException:
             module.fail_json(msg='Failed to create custom poller: {0}'.format(str(OrionException)))
     elif module.params['state'] == 'absent':
         try:
-            if not orion.get_custom_poller_uri(node, module.params['custom_poller']):
-                module.exit_json(changed=False, orion_node=node)
-            else:
-                if module.check_mode:
-                    module.exit_json(changed=True, orion_node=node)
-                else:
+            if orion.get_custom_poller_uri(node, module.params['custom_poller']):
+                if not module.check_mode:
                     orion.remove_custom_poller(node, module.params['custom_poller'])
-                    module.exit_json(changed=True, orion_node=node)
+                changed = True
         except Exception as OrionException:
             module.fail_json(msg='Failed to remove custom poller: {0}'.format(str(OrionException)))
-    # TODO create custom pollers
-    else:
-        module.exit_json(changed=False)
+
+    module.exit_json(changed=changed, orion_node=node)
 
 
 if __name__ == "__main__":

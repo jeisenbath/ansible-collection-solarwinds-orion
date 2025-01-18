@@ -116,35 +116,27 @@ def main():
     if not node:
         module.fail_json(skipped=True, msg='Node not found')
 
+    changed = False
     if module.params['state'] == 'present':
         try:
             prop_name, prop_value = orion.get_node_custom_property_value(node, module.params['property_name'])
-            if prop_value == module.params['property_value']:
-                module.exit_json(changed=False, orion_node=node)
-            else:
-                if module.check_mode:
-                    module.exit_json(changed=True, orion_node=node)
-                else:
+            if prop_value != module.params['property_value']:
+                if not module.check_mode:
                     orion.add_custom_property(node, module.params['property_name'], module.params['property_value'])
-                    module.exit_json(changed=True, orion_node=node)
+                changed = True
         except Exception as OrionException:
             module.fail_json(msg='Failed to add custom properties: {0}'.format(OrionException))
     elif module.params['state'] == 'absent':
         try:
             prop_name, prop_value = orion.get_node_custom_property_value(node, module.params['property_name'])
             if prop_value:
-                if module.check_mode:
-                    module.exit_json(changed=True, orion_node=node)
-                else:
+                if not module.check_mode:
                     orion.add_custom_property(node, module.params['property_name'], None)
-                    module.exit_json(changed=True, orion_node=node)
-            else:
-                module.exit_json(changed=False, orion_node=node)
+                changed = True
         except Exception as OrionException:
             module.fail_json(msg='Failed to remove custom property from node: {0}'.format(OrionException))
-    # TODO create/update custom properties and their values within solarwinds?
 
-    module.exit_json(changed=False)
+    module.exit_json(changed=changed, orion_node=node)
 
 
 if __name__ == "__main__":
