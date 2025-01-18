@@ -141,14 +141,6 @@ except ImportError:
     HAS_REQUESTS = False
 except Exception:
     raise Exception
-try:
-    import orionsdk
-    from orionsdk import SwisClient
-    HAS_ORION = True
-except ImportError:
-    HAS_ORION = False
-except Exception:
-    raise Exception
 
 
 def main():
@@ -176,9 +168,6 @@ def main():
         required_one_of=[('name', 'node_id', 'ip_address')],
     )
 
-    if not HAS_ORION:
-        module.fail_json(msg='orionsdk required for this module')
-
     orion = OrionModule(module)
 
     node = orion.get_node()
@@ -186,37 +175,29 @@ def main():
         module.fail_json(skipped=True, msg='Node not found')
 
     volume = orion.get_volume(node, module.params['volume'])
-
+    changed = False
     if module.params['state'] == 'present':
-        if volume:
-            module.exit_json(changed=False, orion_node=node, orion_volume=volume)
-        else:
+        if not volume:
             try:
-                if module.check_mode:
-                    module.exit_json(changed=True, orion_node=node, orion_volume=volume)
-                else:
+                if not module.check_mode:
                     orion.add_volume(node, module.params['volume'])
                     volume = orion.get_volume(node, module.params['volume'])
                     orion.add_poller('V', str(volume['volumeid']), 'V.Status.SNMP.Generic', True)
                     orion.add_poller('V', str(volume['volumeid']), 'V.Details.SNMP.Generic', True)
                     orion.add_poller('V', str(volume['volumeid']), 'V.Statistics.SNMP.Generic', True)
-                    module.exit_json(changed=True, orion_node=node, orion_volume=volume)
+                changed = True
             except Exception as OrionException:
                 module.fail_json(msg='Failed to add volume: {0}'.format(str(OrionException)))
     elif module.params['state'] == 'absent':
-        if not volume:
-            module.exit_json(changed=False, orion_node=node, orion_volume=volume)
-        else:
+        if volume:
             try:
-                if module.check_mode:
-                    module.exit_json(changed=True, orion_node=node, orion_volume=volume)
-                else:
+                if not module.check_mode:
                     orion.remove_volume(node, module.params['volume'])
-                    module.exit_json(changed=True, orion_node=node, orion_volume=volume)
+                changed = True
             except Exception as OrionException:
                 module.fail_json(msg='Failed to remove volume: {0}'.format(str(OrionException)))
-    else:
-        module.exit_json(changed=False)
+
+    module.exit_json(changed=changed, orion_node=node, orion_volume=volume)
 
 
 if __name__ == "__main__":

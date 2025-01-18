@@ -116,14 +116,6 @@ except ImportError:
     HAS_REQUESTS = False
 except Exception:
     raise Exception
-try:
-    import orionsdk
-    from orionsdk import SwisClient
-    HAS_ORION = True
-except ImportError:
-    HAS_ORION = False
-except Exception:
-    raise Exception
 
 
 def main():
@@ -139,26 +131,20 @@ def main():
         required_one_of=[('name', 'node_id', 'ip_address')],
     )
 
-    if not HAS_ORION:
-        module.fail_json(msg='orionsdk required for this module')
-
     orion = OrionModule(module)
 
     node = orion.get_node()
     if not node:
         module.fail_json(skipped=True, msg='Node not found')
 
+    changed = False
     if module.params['state'] == 'present':
         try:
             poller = orion.get_poller('N', str(node['nodeid']), module.params['poller'])
-            if poller and poller['Enabled'] == module.params['enabled']:
-                module.exit_json(changed=False, orion_node=node)
-            else:
-                if module.check_mode:
-                    module.exit_json(changed=True, orion_node=node)
-                else:
+            if not poller or not poller['Enabled'] == module.params['enabled']:
+                if not module.check_mode:
                     orion.add_poller('N', str(node['nodeid']), module.params['poller'], module.params['enabled'])
-                    module.exit_json(changed=True, orion_node=node)
+                changed = True
         except Exception as OrionException:
             module.fail_json(msg='Failed to add poller: {0}'.format(str(OrionException)))
 
@@ -166,17 +152,13 @@ def main():
         try:
             poller = orion.get_poller('N', str(node['nodeid']), module.params['poller'])
             if poller:
-                if module.check_mode:
-                    module.exit_json(changed=True, orion_node=node)
-                else:
+                if not module.check_mode:
                     orion.remove_poller('N', str(node['nodeid']), module.params['poller'])
-                    module.exit_json(changed=True, orion_node=node)
-            else:
-                module.exit_json(changed=False, orion_node=node)
+                changed = True
         except Exception as OrionException:
             module.fail_json(msg='Failed to remove poller: {0}'.format(str(OrionException)))
 
-    module.exit_json(changed=False)
+    module.exit_json(changed=changed, orion_node=node)
 
 
 if __name__ == "__main__":

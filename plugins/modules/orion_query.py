@@ -81,7 +81,7 @@ results:
 '''
 
 import csv
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule
 try:
     import requests
@@ -89,14 +89,6 @@ try:
     requests.packages.urllib3.disable_warnings()
 except ImportError:
     HAS_REQUESTS = False
-except Exception:
-    raise Exception
-try:
-    import orionsdk
-    from orionsdk import SwisClient
-    HAS_ORION = True
-except ImportError:
-    HAS_ORION = False
 except Exception:
     raise Exception
 
@@ -112,9 +104,9 @@ def write_to_csv(nodes, csv_file_path):
 
 def main():
     argument_spec = dict(
-        hostname=dict(required=True),
-        username=dict(required=True, no_log=True),
-        password=dict(required=True, no_log=True),
+        hostname=dict(fallback=(env_fallback, ['SOLARWINDS_SERVER']), required=False),
+        username=dict(fallback=(env_fallback, ['SOLARWINDS_USERNAME']), required=False, no_log=True),
+        password=dict(fallback=(env_fallback, ['SOLARWINDS_PASSWORD']), required=False, no_log=True),
         port=dict(required=False, type='str', default='17774'),
         verify=dict(required=False, type='bool', default=False),
         query=dict(required=True, type='str'),
@@ -124,9 +116,6 @@ def main():
         argument_spec,
         supports_check_mode=True,
     )
-
-    if not HAS_ORION:
-        module.fail_json(msg='orionsdk required for this module')
 
     orion = OrionModule(module)
 

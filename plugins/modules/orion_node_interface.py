@@ -158,14 +158,6 @@ except ImportError:
     HAS_REQUESTS = False
 except Exception:
     raise Exception
-try:
-    import orionsdk
-    from orionsdk import SwisClient
-    HAS_ORION = True
-except ImportError:
-    HAS_ORION = False
-except Exception:
-    raise Exception
 
 
 def main():
@@ -181,9 +173,6 @@ def main():
         required_one_of=[('name', 'node_id', 'ip_address')],
     )
 
-    if not HAS_ORION:
-        module.fail_json(msg='orionsdk required for this module')
-
     orion = OrionModule(module)
 
     node = orion.get_node()
@@ -198,14 +187,14 @@ def main():
             if not module.params['interface']:
                 for interface in discovered:
                     if not orion.get_interface(node, interface['Caption']):
-                        changed = True
                         interfaces.append(interface)
                         if not module.check_mode:
                             orion.add_interface(node, interface['Caption'], False, discovered)
+                        changed = True
             else:
                 get_int = orion.get_interface(node, module.params['interface'])
                 if not get_int:
-                    if module.check_mode:
+                    if not module.check_mode:
                         changed = True
                     else:
                         interfaces = orion.add_interface(node, module.params['interface'], module.params['regex'], discovered)
@@ -218,17 +207,17 @@ def main():
             if not module.params['interface']:
                 for interface in discovered:
                     if orion.get_interface(node, interface['Caption']):
-                        changed = True
                         interfaces.append(interface)
                         if not module.check_mode:
                             orion.remove_interface(node, interface['Caption'])
+                        changed = True
             else:
                 get_int = orion.get_interface(node, module.params['interface'])
                 if get_int:
-                    changed = True
                     interfaces.append(get_int)
                     if not module.check_mode:
                         orion.remove_interface(node, module.params['interface'])
+                    changed = True
 
         except Exception as OrionException:
             module.fail_json(msg='Failed to remove interface: {0}'.format(str(OrionException)))

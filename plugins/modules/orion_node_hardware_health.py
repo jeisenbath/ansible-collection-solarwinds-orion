@@ -106,11 +106,7 @@ except ImportError:
     HAS_REQUESTS = False
 except Exception:
     raise Exception
-try:
-    from orionsdk import SwisClient
-    HAS_ORIONSDK = True
-except ImportError:
-    HAS_ORIONSDK = False
+
 
 # Mapping of polling method names to their corresponding IDs
 POLLING_METHOD_MAP = {
@@ -151,9 +147,6 @@ def main():
         ],
     )
 
-    if not HAS_ORIONSDK:
-        module.fail_json(msg="The orionsdk module is required")
-
     orion = OrionModule(module)
     node = orion.get_node()
     if not node:
@@ -165,20 +158,16 @@ def main():
         if module.params['state'] == 'present':
             polling_method_id = POLLING_METHOD_MAP[module.params['polling_method']]
             if not hh_poller:
-                if module.check_mode:
-                    changed = True
-                else:
+                if not module.check_mode:
                     orion.swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'EnableHardwareHealth', node['netobjectid'], polling_method_id)
-                    changed = True
+                changed = True
             elif hh_poller[0]['PollingMethod'] != polling_method_id:
                 module.fail_json(msg="HardwareHealth montior exists, but does not match provided polling_method parameter.")
         elif module.params['state'] == 'absent':
             if hh_poller:
-                if module.check_mode:
-                    changed = True
-                else:
+                if not module.check_mode:
                     orion.swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'DisableHardwareHealth', node['netobjectid'])
-                    changed = True
+                changed = True
     except Exception as e:
         module.fail_json(msg=str(e))
 

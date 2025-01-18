@@ -94,14 +94,6 @@ except ImportError:
     HAS_REQUESTS = False
 except Exception:
     raise Exception
-try:
-    import orionsdk
-    from orionsdk import SwisClient
-    HAS_ORION = True
-except ImportError:
-    HAS_ORION = False
-except Exception:
-    raise Exception
 
 
 def main():
@@ -112,15 +104,13 @@ def main():
         required_one_of=[('name', 'node_id', 'ip_address')],
     )
 
-    if not HAS_ORION:
-        module.fail_json(msg='orionsdk required for this module')
-
     orion = OrionModule(module)
 
     node = orion.get_node()
     if not node:
         module.fail_json(skipped=True, msg='Node not found')
 
+    changed = False
     interfaces = []
     try:
         interface_query = orion.swis.query(
@@ -131,7 +121,7 @@ def main():
     except Exception as e:
         module.fail_json(msg="Failed to retrieve interfaces: {0}".format(str(e)))
 
-    module.exit_json(changed=False, orion_node=node, interfaces=interfaces)
+    module.exit_json(changed=changed, orion_node=node, interfaces=interfaces)
 
 
 if __name__ == "__main__":

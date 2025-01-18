@@ -1,0 +1,38 @@
+---
+# Integration tests for orion_node_interface_info module
+- name: Create test node
+  orion_node:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: present
+    name: "{{ orion_test_node_name }}"
+    ip_address: "{{ orion_test_node_ip_address }}"
+    polling_method: SNMP
+    snmp_version: 2
+    ro_community_string: "{{ orion_test_node_ro_community_string }}"
+  delegate_to: localhost
+
+- name: Add interfaces to test node
+  orion_node_interface:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: present
+    name: "{{ orion_test_node_name }}"
+  delegate_to: localhost
+
+- name: Include tests
+  ansible.builtin.include_tasks: "{{ item }}"
+  loop:
+    - info.yml
+
+- name: Remove test node
+  orion_node:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: absent
+    name: "{{ orion_test_node_name }}"
+  delegate_to: localhost
+...

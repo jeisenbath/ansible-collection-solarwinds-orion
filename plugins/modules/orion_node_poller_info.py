@@ -96,14 +96,6 @@ except ImportError:
     HAS_REQUESTS = False
 except Exception:
     raise Exception
-try:
-    import orionsdk
-    from orionsdk import SwisClient
-    HAS_ORION = True
-except ImportError:
-    HAS_ORION = False
-except Exception:
-    raise Exception
 
 
 def main():
@@ -114,19 +106,20 @@ def main():
         required_one_of=[('name', 'node_id', 'ip_address')],
     )
 
-    if not HAS_ORION:
-        module.fail_json(msg='orionsdk required for this module')
-
     orion = OrionModule(module)
 
     node = orion.get_node()
+    if not node:
+        module.fail_json(skipped=True, msg='Node not found')
+
+    changed = False
     if node:
         query = """SELECT p.PollerType, p.Enabled
          from Orion.Nodes n left join Orion.Pollers as p on p.NetObjectID = n.NodeId
           where n.NodeId = '{0}'""".format(node['nodeid'])
         pollers = orion.swis_query(query)
 
-    module.exit_json(changed=False, orion_node=node, pollers=pollers)
+    module.exit_json(changed=changed, orion_node=node, pollers=pollers)
 
 
 if __name__ == "__main__":

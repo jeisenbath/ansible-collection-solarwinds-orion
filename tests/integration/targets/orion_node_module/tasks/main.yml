@@ -1,0 +1,8 @@
+# Integration tests for orion_node module
+
+- name: Include tests
+  ansible.builtin.include_tasks: "{{ item }}"
+  loop:
+    - icmp_node.yml
+    - snmp_node.yml
+...

@@ -1,0 +1,84 @@
+---
+- name: (SNMP v2) Create node (check mode)
+  orion_node: &add_snmp_node
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: present
+    name: "{{ orion_test_node_name }}"
+    ip_address: "{{ orion_test_node_ip_address }}"
+    polling_method: SNMP
+    snmp_version: 2
+    ro_community_string: "{{ orion_test_node_ro_community_string }}"
+  delegate_to: localhost
+  check_mode: true
+  register: snmp_add_01
+
+- name: (SNMP v2) Create node
+  orion_node:
+    <<: *add_snmp_node
+  delegate_to: localhost
+  register: snmp_add_02
+
+- name: (SNMP v2) Create node (check) (idempotence)
+  orion_node:
+    <<: *add_snmp_node
+  delegate_to: localhost
+  check_mode: true
+  register: snmp_add_03
+
+- name: (SNMP v2) Create node (idempotence)
+  orion_node:
+    <<: *add_snmp_node
+  delegate_to: localhost
+  register: snmp_add_04
+
+- name: (SNMP v2) Create node asserts
+  ansible.builtin.assert:
+    that:
+      - snmp_add_01.changed
+      - snmp_add_02.changed
+      - snmp_add_02.orion_node.caption == orion_test_node_name
+      - snmp_add_02.orion_node.ipaddress == orion_test_node_ip_address
+      - snmp_add_02.orion_node.objectsubtype == "SNMP"
+      - not snmp_add_03.changed
+      - not snmp_add_04.changed
+
+- name: (SNMP v2) Delete node (check)
+  orion_node: &remove_snmp_node
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: absent
+    name: "{{ orion_test_node_name }}"
+  delegate_to: localhost
+  check_mode: true
+  register: snmp_delete_01
+
+- name: (SNMP v2) Delete node
+  orion_node:
+    <<: *remove_snmp_node
+  delegate_to: localhost
+  register: snmp_delete_02
+
+- name: (SNMP v2) Delete node (check) (idempotence)
+  orion_node:
+    <<: *remove_snmp_node
+  delegate_to: localhost
+  check_mode: true
+  register: snmp_delete_03
+
+- name: (SNMP v2) Delete node (idempotence)
+  orion_node:
+    <<: *remove_snmp_node
+  delegate_to: localhost
+  register: snmp_delete_04
+
+- name: (SNMP v2) Delete node asserts
+  ansible.builtin.assert:
+    that:
+      - snmp_delete_01.changed
+      - snmp_delete_02.changed
+      - not snmp_delete_03.changed
+      - not snmp_delete_04.changed
+...
