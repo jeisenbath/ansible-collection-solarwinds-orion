@@ -13,7 +13,7 @@ module: orion_node_poller
 short_description: Manage Pollers on Nodes in Solarwinds Orion NPM
 description:
     - Create/Remove Pollers on Nodes in Orion NPM
-    - Note this module is different from M(solarwinds.orion.orion_node_custom_poller), which manages user created custom Orion pollers.
+    - Note this module is different from M(jeisenbath.solarwinds.orion_node_custom_poller), which manages user created custom Orion pollers.
 version_added: "1.0.0"
 author: "Josh M. Eisenbath (@jeisenbath)"
 options:
@@ -36,8 +36,8 @@ options:
         type: bool
         default: True
 extends_documentation_fragment:
-    - solarwinds.orion.orion_auth_options
-    - solarwinds.orion.orion_node_options
+    - jeisenbath.solarwinds.orion_auth_options
+    - jeisenbath.solarwinds.orion_node_options
 requirements:
     - orionsdk
     - requests
@@ -46,7 +46,7 @@ requirements:
 EXAMPLES = r'''
 ---
 - name: Add Linux SNMP pollers to node
-  solarwinds.orion.orion_node_poller:
+  jeisenbath.solarwinds.orion_node_poller:
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_user }}"
     password: "{{ solarwinds_pass }}"
@@ -64,7 +64,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Disable Topology Layer 3 poller on node
-  solarwinds.orion.orion_node_poller:
+  jeisenbath.solarwinds.orion_node_poller:
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_user }}"
     password: "{{ solarwinds_pass }}"
@@ -75,7 +75,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Remove IPv6 Routing Table poller on node
-  solarwinds.orion.orion_node_poller:
+  jeisenbath.solarwinds.orion_node_poller:
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_user }}"
     password: "{{ solarwinds_pass }}"
@@ -107,7 +107,7 @@ orion_node:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.solarwinds.orion.plugins.module_utils.orion import OrionModule, orion_argument_spec
+from ansible_collections.jeisenbath.solarwinds.plugins.module_utils.orion import OrionModule, orion_argument_spec
 try:
     import requests
     HAS_REQUESTS = True

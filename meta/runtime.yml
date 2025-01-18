@@ -1,1 +1,1 @@
-requires_ansible: ">=2.9" # noqa: meta-runtime[unsupported-version]
+requires_ansible: ">=2.15"
