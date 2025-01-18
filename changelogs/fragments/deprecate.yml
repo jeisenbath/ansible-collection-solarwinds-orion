@@ -1,3 +1,0 @@
-deprecated_features:
-  - Starting with version 3.0, Collection has been moved to jeisenbath.solarwinds namespace in order to publish to Ansible Galaxy.
-  - Bugfixes will be ported to stable-2.x branch for this collection when applicable to existing plugins until 2026.

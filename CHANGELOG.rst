@@ -4,6 +4,31 @@ Solarwinds.Orion Release Notes
 
 .. contents:: Topics
 
+
+v2.1.1
+======
+
+Release Summary
+---------------
+
+Released 2025-01-18
+Added ENV variable support for plugins
+Created integration tests for modules
+Adds a CONTRIBUTING doc
+Fix sanity test errors
+
+
+Minor Changes
+-------------
+
+- Add support for Environment Variables for hostname, username, and password
+
+Deprecated Features
+-------------------
+
+- Bugfixes will be ported to stable-2.x branch for this collection when applicable to existing plugins until 2026.
+- Starting with version 3.0, Collection has been moved to jeisenbath.solarwinds namespace in order to publish to Ansible Galaxy.
+
 v2.1.0
 ======
 
@@ -122,6 +147,7 @@ Release Summary
 
 | Released 2023-12-1
 
+
 Major Changes
 -------------
 
@@ -134,6 +160,7 @@ Release Summary
 ---------------
 
 | Released 2023-09-26
+
 
 Major Changes
 -------------
@@ -153,6 +180,7 @@ Release Summary
 
 | Released 2023-08-27
 
+
 Minor Changes
 -------------
 
@@ -170,6 +198,7 @@ Release Summary
 ---------------
 
 | Released 2023-08-10
+
 
 Minor Changes
 -------------
@@ -192,6 +221,7 @@ Release Summary
 
 | Released 2023-07-14
 
+
 Minor Changes
 -------------
 
@@ -211,6 +241,7 @@ Release Summary
 ---------------
 
 | Released 2023-03-18
+
 
 New Modules
 -----------
