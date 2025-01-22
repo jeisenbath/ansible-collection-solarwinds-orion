@@ -8,21 +8,23 @@ Collection for managing Nodes in Solarwinds Orion.
 
 <!--start collection content-->
 ### Modules
-| Name                                       | Description                                          |
-|--------------------------------------------|------------------------------------------------------|
-| jeisenbath.solarwinds.orion_custom_property     | Manage custom properties on Node.                    |
-| jeisenbath.solarwinds.orion_node                | Creates, Removes, Manage, or Mute Node.              |
-| jeisenbath.solarwinds.orion_node_application    | Manages APM application templates assigned to Nodes. |
-| jeisenbath.solarwinds.orion_node_custom_poller  | Creates/Removes custom pollers on a Node.            |
-| jeisenbath.solarwinds.orion_node_info           | Gets info about a Node.                              |
-| jeisenbath.solarwinds.orion_node_interface      | Manage interfaces on Nodes.                          |
-| jeisenbath.solarwinds.orion_node_poller         | Manage Pollers on Nodes.                             |
-| jeisenbath.solarwinds.orion_node_poller_info    | Query info about pollers assigned to a Node.         |
-| jeisenbath.solarwinds.orion_update_node         | Updates Node properties.                             |
-| jeisenbath.solarwinds.orion_volume              | Manage Volumes on Nodes.                             |
-| jeisenbath.solarwinds.orion_volume_info         | Gets info about a Volume assigned to a Node.         |
-| jeisenbath.solarwinds.orion_node_ncm            | Adds or Removes an existing node to NCM.             |
-| jeisenbath.solarwinds.orion_query               | Run a SWQL query against the orion database.         |
+| Name                                       | Description                                                 |
+|--------------------------------------------|-------------------------------------------------------------|
+| jeisenbath.solarwinds.orion_custom_property       | Manage custom properties on Node.                    |
+| jeisenbath.solarwinds.orion_node                  | Creates, Removes, Manage, or Mute Node.              |
+| jeisenbath.solarwinds.orion_node_application      | Manages APM application templates assigned to Nodes. |
+| jeisenbath.solarwinds.orion_node_custom_poller    | Creates/Removes custom pollers on a Node.            |
+| jeisenbath.solarwinds.orion_node_hardware_health  | Creates/Removes Hardware Health poller on a Node.    |
+| jeisenbath.solarwinds.orion_node_info             | Gets info about a Node.                              |
+| jeisenbath.solarwinds.orion_node_interface        | Manage interfaces on Nodes.                          |
+| jeisenbath.solarwinds.orion_node_interface_info   | Query info about interfaces on a Node.               |
+| jeisenbath.solarwinds.orion_node_poller           | Manage Pollers on Nodes.                             |
+| jeisenbath.solarwinds.orion_node_poller_info      | Query info about pollers assigned to a Node.         |
+| jeisenbath.solarwinds.orion_update_node           | Updates Node properties.                             |
+| jeisenbath.solarwinds.orion_volume                | Manage Volumes on Nodes.                             |
+| jeisenbath.solarwinds.orion_volume_info           | Gets info about a Volume assigned to a Node.         |
+| jeisenbath.solarwinds.orion_node_ncm              | Adds or Removes an existing node to NCM.             |
+| jeisenbath.solarwinds.orion_query                 | Run a SWQL query against the orion database.         |
 
 ### Plugins
 | Name                                   | Description                                   |
