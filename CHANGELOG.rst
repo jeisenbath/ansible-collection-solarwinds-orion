@@ -5,6 +5,19 @@ Solarwinds.Orion Release Notes
 .. contents:: Topics
 
 
+v2.1.2
+======
+
+Release Summary
+---------------
+
+Released 2025-01-30
+
+Bugfixes
+--------
+
+- orion_node_interface - fixed a bug with adding a defined interface. Check mode was adding the interface, while non-check mode wasn't.
+
 v2.1.1
 ======
 
