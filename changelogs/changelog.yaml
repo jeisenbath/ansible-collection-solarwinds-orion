@@ -242,3 +242,12 @@ releases:
     - env.yml
     - summary.yml
     release_date: '2025-01-18'
+  2.1.2:
+    changes:
+      bugfixes:
+      - orion_node_interface - fixed a bug with adding a defined interface. Check
+        mode was adding the interface, while non-check mode wasn't.
+      release_summary: Released 2025-01-30
+    fragments:
+    - bugfix.yml
+    release_date: '2025-01-30'

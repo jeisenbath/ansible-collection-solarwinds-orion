@@ -194,7 +194,7 @@ def main():
             else:
                 get_int = orion.get_interface(node, module.params['interface'])
                 if not get_int:
-                    if not module.check_mode:
+                    if module.check_mode:
                         changed = True
                     else:
                         interfaces = orion.add_interface(node, module.params['interface'], module.params['regex'], discovered)
