@@ -51,8 +51,8 @@ orion_node:
         "status": 1,
         "statusdescription": "Node status is Up.",
         "unmanaged": false,
-        "unmanagefrom": "1899-12-30T00:00:00+00:00",
-        "unmanageuntil": "1899-12-30T00:00:00+00:00",
+        "unmanagefrom": "1899-12-30TO00:00:00+00:00",
+        "unmanageuntil": "1899-12-30TO00:00:00+00:00",
         "uri": "swis://host.domain.com/Orion/Orion.Nodes/NodeID=12345"
     }
 interfaces:
