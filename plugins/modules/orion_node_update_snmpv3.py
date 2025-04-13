@@ -1,6 +1,7 @@
-
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -12,10 +13,9 @@ short_description: Update SNMPv3 credentials for a node in SolarWinds Orion
 description:
     - Update SNMPv3 credentials for an existing node in SolarWinds Orion.
     - This module retrieves the current SNMPv3 credential record, updates any provided fields, and calls the SWIS API to update the entire credential set.
-    - **Important:** The SWIS API requires that you provide the complete set of SNMPv3 credential parameters. Even if you only want to update the username, you must supply all other fields.
 version_added: "3.1.0"
 author:
-    - "Your Name (@yourhandle)"
+    - "Andrew Bailey (@andyjb8)"
 extends_documentation_fragment:
     - jeisenbath.solarwinds.orion_auth_options
     - jeisenbath.solarwinds.orion_node_options
@@ -33,7 +33,6 @@ options:
             - SNMPv3 authentication key.
         required: false
         type: str
-        no_log: true
     snmpv3_auth_method:
         description:
             - SNMPv3 authentication method.
@@ -45,7 +44,6 @@ options:
             - SNMPv3 privacy key.
         required: false
         type: str
-        no_log: true
     snmpv3_priv_method:
         description:
             - SNMPv3 privacy method.
@@ -123,6 +121,7 @@ except ImportError:
 except Exception as e:
     raise e
 
+
 def main():
     # Merge common Orion arguments with SNMPv3-specific options.
     argument_spec = orion_argument_spec()
@@ -152,7 +151,7 @@ def main():
 
     # Query for current SNMPv3 credentials for this node.
     cred_query = """
-    SELECT 
+    SELECT
         c.ID as CredentialID,
         c.Name as CredentialName,
         m.Username,
@@ -244,6 +243,7 @@ def main():
             module.fail_json(msg="Failed to update SNMPv3 credentials: {0}".format(e))
 
     module.exit_json(changed=changed, orion_node=node)
+
 
 if __name__ == '__main__':
     main()
