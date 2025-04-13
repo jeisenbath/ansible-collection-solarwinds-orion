@@ -223,32 +223,27 @@ def main():
         updated['PrivacyKeyIsPassword'] = module.params['priv_key_is_password']
         changed = True
 
-    if not changed:
-        module.exit_json(changed=False, orion_node=node)
-
-    if module.check_mode:
-        module.exit_json(changed=True, orion_node=node)
-
     # Call the API to update SNMPv3 credentials.
-    try:
-        orion.swis.invoke(
-            'Orion.Credential',
-            'UpdateSNMPv3Credentials',
-            current_creds['CredentialID'],
-            updated['Name'],
-            updated['Username'],
-            updated['Context'],
-            updated['AuthenticationMethod'],
-            updated['AuthenticationKey'],
-            updated['AuthenticationKeyIsPassword'],
-            updated['PrivacyMethod'],
-            updated['PrivacyKey'],
-            updated['PrivacyKeyIsPassword']
-        )
-    except Exception as e:
-        module.fail_json(msg="Failed to update SNMPv3 credentials: {0}".format(e))
+    if changed and not module.check_mode:
+        try:
+            orion.swis.invoke(
+                'Orion.Credential',
+                'UpdateSNMPv3Credentials',
+                current_creds['CredentialID'],
+                updated['Name'],
+                updated['Username'],
+                updated['Context'],
+                updated['AuthenticationMethod'],
+                updated['AuthenticationKey'],
+                updated['AuthenticationKeyIsPassword'],
+                updated['PrivacyMethod'],
+                updated['PrivacyKey'],
+                updated['PrivacyKeyIsPassword']
+            )
+        except Exception as e:
+            module.fail_json(msg="Failed to update SNMPv3 credentials: {0}".format(e))
 
-    module.exit_json(changed=True, orion_node=node)
+    module.exit_json(changed=changed, orion_node=node)
 
 if __name__ == '__main__':
     main()
