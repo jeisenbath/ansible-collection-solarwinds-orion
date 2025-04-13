@@ -1,0 +1,52 @@
+---
+- name: Update credential (check)
+  orion_node_update_snmpv3: &update_snmpv3_username
+    hostname: "{{ solarwinds_server }}"
+    username: "{{ solarwinds_user }}"
+    password: "{{ solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    snmpv3_username: "{{ orion_test_node_updated_snmpv3_username }}"
+  delegate_to: localhost
+  check_mode: true
+  register: update_snmpv3_username_01
+
+- name: Update credential
+  orion_node_update_snmpv3:
+    <<: *update_snmpv3_username
+  delegate_to: localhost
+  register: update_snmpv3_username_02
+
+- name: Update credential (check) (idempotence)
+  orion_node_update_snmpv3:
+    <<: *update_snmpv3_username
+  delegate_to: localhost
+  check_mode: true
+  register: update_snmpv3_username_03
+
+- name: Update credential (idempotence)
+  orion_node_update_snmpv3:
+    <<: *update_snmpv3_username
+  delegate_to: localhost
+  register: update_snmpv3_username_04
+
+- name: Query SNMPv3 credentials
+  orion_query:
+    hostname: "{{ solarwinds_server }}"
+    username: "{{ solarwinds_user }}"
+    password: "{{ solarwinds_pass }}"
+    query: |
+      SELECT Username
+      FROM Orion.SNMPv3Credentials
+      WHERE NodeID = "{{ update_snmpv3_username_02.orion_node.node_id }}"
+  delegate_to: localhost
+  register: update_snmpv3_query
+
+- name: Update credential asserts
+  ansible.builtin.assert:
+    that:
+      - update_snmpv3_username_01.changed
+      - update_snmpv3_username_02.changed
+      - not update_snmpv3_username_03.changed
+      - not update_snmpv3_username_04.changed
+      - update_snmpv3_username_02.orion_node is defined
+      - update_snmpv3_query.results[0].Username == orion_test_node_updated_snmpv3_username

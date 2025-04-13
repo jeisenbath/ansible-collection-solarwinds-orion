@@ -1,0 +1,30 @@
+# Integration tests for orion_node_update_snmpv3 module
+- name: Create test node
+  orion_node:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: present
+    name: "{{ orion_test_node_name }}"
+    ip_address: "{{ orion_test_node_ip_address }}"
+    polling_method: SNMP
+    snmp_version: 3
+    snmpv3_username: "{{ orion_test_node_snmpv3_username }}"
+    snmpv3_auth_key: "{{ orion_test_node_snmpv3_auth_key }}"
+    snmpv3_priv_key: "{{ orion_test_node_snmpv3_priv_key }}"
+  delegate_to: localhost
+
+- name: Include tests
+  ansible.builtin.include_tasks: "{{ item }}"
+  loop:
+    - update.yml
+
+- name: Remove test node
+  orion_node:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: absent
+    name: "{{ orion_test_node_name }}"
+  delegate_to: localhost
+...
