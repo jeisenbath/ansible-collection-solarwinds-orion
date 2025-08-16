@@ -1,0 +1,67 @@
+---
+- name: Create test node
+  orion_node:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: present
+    name: "{{ orion_test_node_name }}"
+    ip_address: "{{ orion_test_node_ip_address }}"
+    polling_method: ICMP
+  delegate_to: localhost
+
+- name: Assign Credential (check)
+  jeisenbath.solarwinds.orion_credential_set: &assign_credential
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: assigned
+    type: snmpv3
+    snmpv3:
+      username: "{{ orion_test_node_snmpv3_username }}"
+      auth_key: "{{ orion_test_node_snmpv3_auth_key }}"
+      priv_key: "{{ orion_test_node_snmpv3_priv_key }}"
+    credential_name: "{{ orion_test_node_snmpv3_credential_set }}"
+    ip_address: "{{ orion_test_node_ip_address }}"
+  delegate_to: localhost
+  check_mode: true
+  register: assign_snmpv3_01
+
+- name: Assign Credential
+  jeisenbath.solarwinds.orion_credential_set:
+    <<: *assign_credential
+  delegate_to: localhost
+  register: assign_snmpv3_02
+
+- name: Assign Credential (check) (idempotence)
+  jeisenbath.solarwinds.orion_credential_set:
+    <<: *assign_credential
+  delegate_to: localhost
+  check_mode: true
+  register: assign_snmpv3_03
+
+- name: Assign Credential (idempotence)
+  jeisenbath.solarwinds.orion_credential_set:
+    <<: *assign_credential
+  delegate_to: localhost
+  register: assign_snmpv3_04
+
+- name: Assign Credential asserts
+  ansible.builtin.assert:
+    that:
+      - assign_snmpv3_01.changed
+      - assign_snmpv3_02.changed
+      - assign_snmpv3_02.orion_node is defined
+      - assign_snmpv3_02.credentials is defined
+      - not assign_snmpv3_03.changed
+      - not assign_snmpv3_04.changed
+
+- name: Remove test node
+  orion_node:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: absent
+    name: "{{ orion_test_node_name }}"
+  delegate_to: localhost
+...

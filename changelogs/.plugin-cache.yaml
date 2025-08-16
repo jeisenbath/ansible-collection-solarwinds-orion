@@ -14,6 +14,11 @@ plugins:
       version_added: null
   lookup: {}
   module:
+    orion_credential_set:
+      description: Manage Credential Sets for Solarwinds.
+      name: orion_credential_set
+      namespace: ''
+      version_added: 3.1.0
     orion_custom_property:
       description: Manage custom properties on Node in Solarwinds Orion NPM
       name: orion_custom_property
@@ -94,4 +99,4 @@ plugins:
   shell: {}
   strategy: {}
   vars: {}
-version: 3.0.1
+version: 3.1.0
