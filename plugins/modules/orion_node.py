@@ -336,7 +336,9 @@ def add_node(module, orion):
                 'auth_key_is_pwd': props['SNMPV3AuthKeyIsPwd'],
             }
         try:
-            validate_snmp3_credentials(orion, validateNode, validateProperties, module.params['snmp_port'])
+            validated = validate_snmp3_credentials(orion, validateNode, validateProperties, module.params['snmp_port'])
+            if not validated:
+                module.fail_json(msg='Failed to validate credentials on node.')
         except Exception as OrionException:
             module.fail_json(msg='Failed validate credentails for node: {0}'.format(str(OrionException)))
     # Add Node

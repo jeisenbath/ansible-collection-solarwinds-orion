@@ -257,7 +257,9 @@ def main():
         try:
             if module.params['type'] == 'snmpv3':
                 nodeSettingName = 'ROSNMPCredentialID'
-                validate_snmp3_credentials(orion, node, module.params['snmpv3'])
+                validated = validate_snmp3_credentials(orion, node, module.params['snmpv3'])
+                if not validated:
+                    module.fail_json(msg='Failed to validate credentials on node.')
             elif module.params['type'] == 'wmi':
                 nodeSettingName = 'WMICredential'
             assigned_cred = orion.swis_query(
