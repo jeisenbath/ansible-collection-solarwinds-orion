@@ -5,4 +5,5 @@
   loop:
     - icmp_node.yml
     - snmp_node.yml
+    - snmpv3_node.yml
 ...
