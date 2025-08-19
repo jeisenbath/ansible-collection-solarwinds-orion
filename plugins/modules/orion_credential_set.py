@@ -142,7 +142,7 @@ EXAMPLES = r'''
       username: "{{ snmpv3_username }}"
       auth_key: "{{ snmpv3_auth_key }}"
       priv_key: "{{ snmpv3_priv_key }}"
-    credential_name: "{{ snmpv3_credential_set }}"
+    credential_name: "{{ snmpv3_credential_set_name }}"
     ip_address: "{{ node_ip_address }}"
   delegate_to: localhost
 
