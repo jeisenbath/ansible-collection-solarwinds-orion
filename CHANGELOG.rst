@@ -11,7 +11,7 @@ v3.1.0
 Release Summary
 ---------------
 
-Released TBD
+Released 2025-08-25
 
 New Modules
 -----------
