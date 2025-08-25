@@ -58,24 +58,6 @@ EXAMPLES = r'''
       Community: "{{ ro_community_string }}"
   delegate_to: localhost
 
-- name: Update node to SNMPv3 polling. Note you will also need to add SNMP pollers if updating from ICMP
-  jeisenbath.solarwinds.orion_update_node:
-    hostname: "{{ solarwinds_server }}"
-    username: "{{ solarwinds_user }}"
-    password: "{{ solarwinds_pass }}"
-    name: "{{ node_name }}"
-    properties:
-      ObjectSubType: SNMP
-      SNMPVersion: 3
-      SNMPV3Username: "{{ snmpv3_username }}"
-      SNMPV3AuthMethod: "{{ snmpv3_auth_method }}"
-      SNMPV3AuthKey: "{{ snmpv3_auth_passphrase }}"
-      SNMPV3AuthKeyIsPwd: True
-      SNMPV3PrivMethod: "{{ snmpv3_priv_method }}"
-      SNMPV3PrivKey: "{{ snmpv3_priv_passphrase] }}"
-      SNMPV3PrivKeyIsPwd: True
-  delegate_to: localhost
-
 '''
 
 RETURN = r'''

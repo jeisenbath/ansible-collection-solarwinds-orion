@@ -269,3 +269,13 @@ releases:
     fragments:
     - bugfixes.yml
     release_date: '2025-01-30'
+  3.1.0:
+    changes:
+      release_summary: Released 2025-08-25
+    fragments:
+    - release_summary.yml
+    modules:
+    - description: Manage Credential Sets for Solarwinds.
+      name: orion_credential_set
+      namespace: ''
+    release_date: '2025-08-25'

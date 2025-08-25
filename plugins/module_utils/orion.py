@@ -93,7 +93,7 @@ class OrionModule:
     def get_node(self):
         node = {}
         fields = """NodeID, Caption, Unmanaged, UnManageFrom, UnManageUntil, Uri,
-                  ObjectSubType, IP_Address, Status, StatusDescription, LastSystemUptimePollUtc"""
+                  ObjectSubType, IP_Address, Status, StatusDescription, LastSystemUptimePollUtc, EngineID"""
 
         if self.module.params['node_id']:
             results = self.swis.query(
@@ -121,6 +121,7 @@ class OrionModule:
             node['status'] = results['results'][0]['Status']
             node['statusdescription'] = results['results'][0]['StatusDescription']
             node['lastsystemuptimepollutc'] = results['results'][0]['LastSystemUptimePollUtc']
+            node['engineid'] = results['results'][0]['EngineID']
         return node
 
     def add_custom_property(self, node, prop_name, prop_value):
