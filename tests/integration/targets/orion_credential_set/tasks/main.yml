@@ -1,0 +1,8 @@
+---
+# Integration test for orion_credential_set module
+- name: Include tests
+  ansible.builtin.include_tasks: "{{ item }}"
+  loop:
+    - snmpv3.yml
+    - assign.yml
+...

@@ -5,6 +5,19 @@ Solarwinds.Orion Release Notes
 .. contents:: Topics
 
 
+v3.1.0
+======
+
+Release Summary
+---------------
+
+Released 2025-08-25
+
+New Modules
+-----------
+
+- jeisenbath.solarwinds.orion_credential_set - Manage Credential Sets for Solarwinds.
+
 v3.0.1
 ======
 

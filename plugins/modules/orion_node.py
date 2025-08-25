@@ -234,6 +234,7 @@ orion_node:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.jeisenbath.solarwinds.plugins.module_utils.orion import OrionModule, orion_argument_spec
+from ansible_collections.jeisenbath.solarwinds.plugins.module_utils.credential import validate_snmp3_credentials
 try:
     from datetime import datetime, timedelta
     HAS_DATETIME = True
@@ -319,6 +320,27 @@ def add_node(module, orion):
         else:
             props['SNMPV3AuthKeyIsPwd'] = True
 
+    # Validate credentials
+    if props['ObjectSubType'] == 'SNMP' and props['SNMPVersion'] == '3':
+        validateNode = {
+            "ipaddress": props['IPAddress'],
+            "engineid": props['EngineID']
+        }
+        validateProperties = {
+                "username": props['SNMPV3Username'],
+                'priv_method': props['SNMPV3PrivMethod'],
+                'priv_key': props['SNMPV3PrivKey'],
+                'priv_key_is_pwd': props['SNMPV3PrivKeyIsPwd'],
+                'auth_key': props['SNMPV3AuthKey'],
+                'auth_method': props['SNMPV3AuthMethod'],
+                'auth_key_is_pwd': props['SNMPV3AuthKeyIsPwd'],
+            }
+        try:
+            validated = validate_snmp3_credentials(orion, validateNode, validateProperties, module.params['snmp_port'])
+            if not validated:
+                module.fail_json(msg='Failed to validate credentials on node.')
+        except Exception as OrionException:
+            module.fail_json(msg='Failed validate credentails for node: {0}'.format(str(OrionException)))
     # Add Node
     try:
         __SWIS__.create('Orion.Nodes', **props)

@@ -1,0 +1,65 @@
+---
+- name: Update a host from ICMP or SNMPv2 polling to SNMPv3
+  hosts: "{{ target | default('localhost') }}"
+
+  tasks:
+    - name: Update polling method to SNMPv3
+      jeisenbath.solarwinds.orion_update_node:
+        hostname: "{{ solarwinds_server }}"
+        username: "{{ solarwinds_username }}"
+        password: "{{ solarwinds_password }}"
+        name: "{{ node_name }}"
+        properties:
+          ObjectSubType: SNMP
+          SNMPVersion: 3
+      delegate_to: localhost
+
+    - name: Create SNMPv3 Credential Set
+      jeisenbath.solarwinds.orion_credential_set:
+        hostname: "{{ solarwinds_server }}"
+        username: "{{ solarwinds_username }}"
+        password: "{{ solarwinds_password }}"
+        state: present
+        type: snmpv3
+        credential_name: "{{ snmpv3_credential_set_name }}"
+        snmpv3:
+          username: "{{ snmpv3_username }}"
+          auth_key: "{{ snmpv3_auth_key }}"
+          priv_key: "{{ snmpv3_priv_key }}"
+      delegate_to: localhost
+
+    - name: Assign Credential Set to node
+      jeisenbath.solarwinds.orion_credential_set:
+        hostname: "{{ solarwinds_server }}"
+        username: "{{ solarwinds_username }}"
+        password: "{{ solarwinds_password }}"
+        state: assigned
+        type: snmpv3
+        snmpv3:
+          username: "{{ snmpv3_username }}"
+          auth_key: "{{ snmpv3_auth_key }}"
+          priv_key: "{{ snmpv3_priv_key }}"
+        credential_name: "{{ snmpv3_credential_set_name }}"
+        caption: "{{ node_name }}"
+      delegate_to: localhost
+
+    - name: Add SNMP pollers to node
+      jeisenbath.solarwinds.orion_node_poller:
+        hostname: "{{ solarwinds_server }}"
+        username: "{{ solarwinds_username }}"
+        password: "{{ solarwinds_password }}"
+        name: "{{ node_name }}"
+        state: present
+        poller: "{{ item.name }}"
+        enabled: "{{ item.enabled }}"
+      loop:
+        - name: N.Status.ICMP.Native
+          enabled: 'True'
+        - name: N.ResponseTime.ICMP.Native
+          enabled: 'True'
+        - name: N.Details.SNMP.Generic
+          enabled: 'True'
+        - name: N.Uptime.SNMP.Generic
+          enabled: 'True'
+      delegate_to: localhost
+...

@@ -1,0 +1,45 @@
+---
+- name: Create SNMPv3 Credential Set (check)
+  jeisenbath.solarwinds.orion_credential_set: &create_credential
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    state: present
+    type: snmpv3
+    credential_name: "{{ orion_test_node_snmpv3_credential_set }}"
+    snmpv3:
+      username: "{{ orion_test_node_snmpv3_username }}"
+      auth_key: "{{ orion_test_node_snmpv3_auth_key }}"
+      priv_key: "{{ orion_test_node_snmpv3_priv_key }}"
+  delegate_to: localhost
+  check_mode: true
+  register: create_snmpv3_01
+
+- name: Create SNMPv3 Credential Set
+  jeisenbath.solarwinds.orion_credential_set:
+    <<: *create_credential
+  delegate_to: localhost
+  register: create_snmpv3_02
+
+- name: Create SNMPv3 Credential Set (check) (idempotence)
+  jeisenbath.solarwinds.orion_credential_set:
+    <<: *create_credential
+  delegate_to: localhost
+  check_mode: true
+  register: create_snmpv3_03
+
+- name: Create SNMPv3 Credential Set (idempotence)
+  jeisenbath.solarwinds.orion_credential_set:
+    <<: *create_credential
+  delegate_to: localhost
+  register: create_snmpv3_04
+
+- name: Asserts
+  ansible.builtin.assert:
+    that:
+      - create_snmpv3_01.changed
+      - create_snmpv3_02.changed
+      - create_snmpv3_02.credential is defined
+      - not create_snmpv3_03.changed
+      - not create_snmpv3_04.changed
+...

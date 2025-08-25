@@ -4,4 +4,5 @@ tests/output
 tests/integration/integration_config.yml
 tests/integration/inventory
 plugins/doc_fragments/__pycache__/
+plugins/modules/__pycache__/
 .vscode/

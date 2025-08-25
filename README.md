@@ -25,6 +25,7 @@ Collection for managing Nodes in Solarwinds Orion.
 | jeisenbath.solarwinds.orion_volume_info           | Gets info about a Volume assigned to a Node.         |
 | jeisenbath.solarwinds.orion_node_ncm              | Adds or Removes an existing node to NCM.             |
 | jeisenbath.solarwinds.orion_query                 | Run a SWQL query against the orion database.         |
+| jeisenbath.solarwinds.orion_credential_set        | Create and Assign SNMPv3, WMI Credential Sets        |
 
 ### Plugins
 | Name                                   | Description                                   |
