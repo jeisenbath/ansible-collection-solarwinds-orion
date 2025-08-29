@@ -17,7 +17,7 @@ description:
     - The target node must already exist in SolarWinds Orion and be managed by NCM.
     - Uses NCM APIs (ImportConfig, UploadConfig, DownloadConfig) for configuration management.
 version_added: "1.4.0"
-author: "Andrew Bailey"
+author: "Andrew Bailey (@Andyjb8)"
 options:
     config_content:
         description:
@@ -60,20 +60,10 @@ EXAMPLES = r'''
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_user }}"
     password: "{{ solarwinds_pass }}"
-    name: "CORE-SW-01"
+    name: "{{ node_name }}"
     config_content: "{{ device_config_backup_content }}"
     config_type: "Running"
     method: import
-  delegate_to: localhost
-
-- name: Import router configuration from file
-  jeisenbath.solarwinds.orion_ncm_config:
-    hostname: "{{ solarwinds_server }}"
-    username: "{{ solarwinds_user }}"
-    password: "{{ solarwinds_pass }}"
-    ip_address: "192.168.1.100"
-    config_content: "{{ lookup('file', '/path/to/device_config.txt') }}"
-    config_type: "Running"
   delegate_to: localhost
 
 - name: Upload configuration to device via NCM
@@ -81,7 +71,7 @@ EXAMPLES = r'''
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_user }}"
     password: "{{ solarwinds_pass }}"
-    node_id: "12345"
+    name: "{{ node_name }}"
     config_content: "{{ new_device_config }}"
     method: upload
   delegate_to: localhost
@@ -91,7 +81,7 @@ EXAMPLES = r'''
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_user }}"
     password: "{{ solarwinds_pass }}"
-    name: "CORE-SW-01"
+    name: "{{ node_name }}"
     config_type: "Running"
     method: download
   delegate_to: localhost
