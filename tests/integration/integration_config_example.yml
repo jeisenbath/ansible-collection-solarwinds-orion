@@ -13,6 +13,10 @@ orion_test_node_custom_poller: "{{ node_custom_poller }}"
 orion_test_node_hardware_health_polling_method: "{{ hardware_health_polling_method }}"
 orion_test_node_ncm_profile: "{{ ncm_profile }}"
 orion_test_node_ncm_profile_update: "{{ ncm_profile_update }}"
+orion_test_node_snmpv3_credential_set: "{{ snmpv3_credentail_set }}"
+orion_test_node_snmpv3_username: "{{ snmpv3_username }}"
+orion_test_node_snmpv3_auth_key: "{{ snmpv3_auth_key }}"
+orion_test_node_snmpv3_priv_key: "{{ snmpv3_priv_key }}"
 
 # NCM Config module test variables
 orion_test_config_type: "{{ config_type | default('Running') }}"
