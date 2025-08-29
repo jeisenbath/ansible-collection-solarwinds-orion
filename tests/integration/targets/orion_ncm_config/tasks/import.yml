@@ -1,0 +1,37 @@
+---
+# Test configuration import functionality
+- name: Import config (check mode)
+  orion_ncm_config:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    method: import
+    config_type: Manual
+    config_content: "{{ orion_test_config_content }}"
+  delegate_to: localhost
+  check_mode: true
+  register: import_01
+
+- name: Import config
+  orion_ncm_config:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    method: import
+    config_type: Manual
+    config_content: "{{ orion_test_config_content }}"
+  delegate_to: localhost
+  register: import_02
+
+
+- name: Import asserts
+  ansible.builtin.assert:
+    that:
+      - import_01.changed  # Check mode shows what would change
+      - import_02.changed
+      - import_02.ncm_result is defined
+      - import_02.ncm_result.node_id is defined
+      - import_02.ncm_result.success == true
+      - import_02.config_history is defined

@@ -1,0 +1,35 @@
+---
+# Test configuration upload functionality
+- name: Upload config (check mode)
+  orion_ncm_config:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    method: upload
+    config_type: Running
+    config_content: "{{ orion_test_upload_config_content }}"
+  delegate_to: localhost
+  check_mode: true
+  register: upload_01
+
+- name: Upload config
+  orion_ncm_config:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    method: upload
+    config_type: Running
+    config_content: "{{ orion_test_upload_config_content }}"
+  delegate_to: localhost
+  register: upload_02
+
+- name: Upload asserts
+  ansible.builtin.assert:
+    that:
+      - upload_01.changed  # Check mode shows what would change
+      - upload_02.changed
+      - upload_02.ncm_result is defined
+      - upload_02.ncm_result.node_id is defined
+      - upload_02.ncm_result.success == true
