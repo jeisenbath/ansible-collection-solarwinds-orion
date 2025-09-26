@@ -17,3 +17,46 @@ orion_test_node_snmpv3_credential_set: "{{ snmpv3_credentail_set }}"
 orion_test_node_snmpv3_username: "{{ snmpv3_username }}"
 orion_test_node_snmpv3_auth_key: "{{ snmpv3_auth_key }}"
 orion_test_node_snmpv3_priv_key: "{{ snmpv3_priv_key }}"
+
+# NCM Config module test variables
+orion_test_config_type: "{{ config_type | default('Running') }}"
+orion_test_config_content: |
+  !
+  ! Test configuration import via Ansible
+  ! Generated: {{ ansible_date_time.iso8601 if ansible_date_time is defined else '2025-08-29' }}
+  !
+  version 15.2
+  service timestamps debug datetime msec
+  service timestamps log datetime msec
+  !
+  hostname {{ node_name | default('TEST-DEVICE') }}
+  !
+  interface GigabitEthernet0/0
+   description Test Interface
+   no shutdown
+  !
+  interface GigabitEthernet0/1
+   description Another Test Interface
+   shutdown
+  !
+  line con 0
+   logging synchronous
+  line vty 0 4
+   transport input ssh
+  !
+  end
+
+
+orion_test_upload_config_content: |
+  !
+  ! Test configuration upload via Ansible
+  ! Generated: {{ ansible_date_time.iso8601 if ansible_date_time is defined else '2025-08-29' }}
+  !
+  hostname test-device
+  !
+  interface GigabitEthernet0/1
+   description Test interface updated by Ansible
+   ip address 192.168.1.1 255.255.255.0
+   no shutdown
+  !
+  end
