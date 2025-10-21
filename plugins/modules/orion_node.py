@@ -128,8 +128,10 @@ options:
             - Required when SNMP version is 3.
         type: str
         choices:
-            - SHA1
             - MD5
+            - SHA1
+            - SHA256
+            - SHA512
         required: false
     snmpv3_auth_key:
         description:
@@ -465,7 +467,7 @@ def main():
         snmp_version=dict(required=False, default=None, choices=['2', '3']),
         snmpv3_credential_set=dict(required=False, default=None, type='str'),
         snmpv3_username=dict(required=False, type='str'),
-        snmpv3_auth_method=dict(required=False, type='str', choices=['SHA1', 'MD5']),
+        snmpv3_auth_method=dict(required=False, type='str', choices=['MD5', 'SHA1', 'SHA256', 'SHA512']),
         snmpv3_auth_key=dict(required=False, type='str', no_log=True),
         snmpv3_auth_key_is_pwd=dict(required=False, type='bool'),
         snmpv3_priv_method=dict(required=False, type='str', choices=['DES56', 'AES128', 'AES192', 'AES256']),
