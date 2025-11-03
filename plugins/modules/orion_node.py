@@ -166,6 +166,15 @@ options:
             - Confusingly, value of True corresponds to web GUI checkbox being unchecked.
         type: bool
         required: false
+    validate_snmp_required:
+        description:
+            - Whether SNMP validation must pass before adding the node.
+            - If True (default), module will fail if SNMP validation fails.
+            - If False, node will be added even if SNMP validation fails (with warning).
+            - This mirrors the SolarWinds web interface behavior of allowing nodes with failed SNMP.
+        type: bool
+        default: true
+        required: false
     wmi_credential_set:
         description:
             - 'Credential Name already configured in NPM  Found under "Manage Windows Credentials" section of the Orion website (Settings).'
@@ -202,6 +211,24 @@ EXAMPLES = '''
     ro_community_string: "{{ snmp_ro_community_string }}"
   delegate_to: localhost
 
+- name: Add an SNMPv3 node even if SNMP validation fails (for testing)
+  jeisenbath.solarwinds.orion_node:
+    hostname: "{{ solarwinds_server }}"
+    username: "{{ solarwinds_username }}"
+    password: "{{ solarwinds_password }}"
+    name: "{{ node_name }}"
+    state: present
+    ip_address: "{{ node_ip_address }}"
+    polling_method: SNMP
+    snmp_version: "3"
+    snmpv3_username: "{{ snmpv3_username }}"
+    snmpv3_auth_method: "SHA1"
+    snmpv3_auth_key: "{{ snmpv3_auth_key }}"
+    snmpv3_priv_method: "AES128"
+    snmpv3_priv_key: "{{ snmpv3_priv_key }}"
+    validate_snmp_required: false
+  delegate_to: localhost
+
 - name: Mute node in Solarwinds for 30 minutes
   jeisenbath.solarwinds.orion_node:
     hostname: "{{ solarwinds_host }}"
@@ -230,8 +257,28 @@ orion_node:
         "unmanaged": false,
         "unmanagefrom": "1899-12-30T00:00:00+00:00",
         "unmanageuntil": "1899-12-30T00:00:00+00:00",
-        "uri": "swis://host.domain.com/Orion/Orion.Nodes/NodeID=12345"
+        "uri": "swis://host.domain.com/Orion/Orion.Nodes/NodeID=12345",
+        "snmp_validation_passed": false,
+        "snmp_validation_error": "SNMP validation failed - device did not respond to SNMP poll"
     }
+    contains:
+        snmp_validation_passed:
+            description: Whether SNMP validation passed during node creation.
+            returned: when state=present and SNMPv3 is used
+            type: bool
+        snmp_validation_error:
+            description: Error message if SNMP validation failed.
+            returned: when state=present, SNMPv3 is used, and validation fails
+            type: str
+warnings:
+    description: List of warning messages about the operation.
+    returned: when validate_snmp_required=false and SNMP validation fails
+    type: list
+    sample: ["WARNING: Node was added but SNMP validation failed - device did not respond to SNMP poll"]
+changed:
+    description: Whether the module made any changes.
+    returned: always
+    type: bool
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -323,6 +370,8 @@ def add_node(module, orion):
             props['SNMPV3AuthKeyIsPwd'] = True
 
     # Validate credentials
+    snmp_validation_passed = True
+    snmp_validation_error = None
     if props['ObjectSubType'] == 'SNMP' and props['SNMPVersion'] == '3':
         validateNode = {
             "ipaddress": props['IPAddress'],
@@ -340,9 +389,15 @@ def add_node(module, orion):
         try:
             validated = validate_snmp3_credentials(orion, validateNode, validateProperties, module.params['snmp_port'])
             if not validated:
-                module.fail_json(msg='Failed to validate credentials on node.')
+                snmp_validation_passed = False
+                snmp_validation_error = 'SNMP validation failed - device did not respond to SNMP poll'
+                if module.params['validate_snmp_required']:
+                    module.fail_json(msg='Failed to validate credentials on node.')
         except Exception as OrionException:
-            module.fail_json(msg='Failed validate credentails for node: {0}'.format(str(OrionException)))
+            snmp_validation_passed = False
+            snmp_validation_error = 'SNMP validation exception: {0}'.format(str(OrionException))
+            if module.params['validate_snmp_required']:
+                module.fail_json(msg='Failed validate credentails for node: {0}'.format(str(OrionException)))
     # Add Node
     try:
         __SWIS__.create('Orion.Nodes', **props)
@@ -391,6 +446,11 @@ def add_node(module, orion):
             orion.add_poller('N', str(node['nodeid']), k, pollers_enabled[k])
         except Exception as OrionException:
             module.fail_json(msg='Failed to create pollers on node: {0}'.format(str(OrionException)))
+
+    # Add validation results to node info
+    node['snmp_validation_passed'] = snmp_validation_passed
+    if not snmp_validation_passed:
+        node['snmp_validation_error'] = snmp_validation_error
 
     return node
 
@@ -475,6 +535,7 @@ def main():
         snmpv3_priv_key_is_pwd=dict(required=False, type='bool'),
         snmp_port=dict(required=False, default='161'),
         snmp_allow_64=dict(required=False, default=True, type='bool'),
+        validate_snmp_required=dict(required=False, default=True, type='bool'),
         wmi_credential_set=dict(required=False, no_log=True),
         polling_engine=dict(required=False),
     )
@@ -500,10 +561,17 @@ def main():
     node = orion.get_node()
 
     changed = False
+    warnings = []
+    
     if module.params['state'] == 'present':
         if not node:
             if not module.check_mode:
                 node = add_node(module, orion)
+                # Check if SNMP validation failed but node was still added
+                if hasattr(node, 'get') and not node.get('snmp_validation_passed', True):
+                    warnings.append("WARNING: Node was added but SNMP validation failed - {0}".format(
+                        node.get('snmp_validation_error', 'Unknown SNMP validation error')
+                    ))
             changed = True
     elif module.params['state'] == 'absent':
         if node:
@@ -536,7 +604,12 @@ def main():
                     unmute_node(module, node)
                 changed = True
 
-    module.exit_json(changed=changed, orion_node=node)
+    # Prepare exit response
+    response = {'changed': changed, 'orion_node': node}
+    if warnings:
+        response['warnings'] = warnings
+        
+    module.exit_json(**response)
 
 
 if __name__ == "__main__":
