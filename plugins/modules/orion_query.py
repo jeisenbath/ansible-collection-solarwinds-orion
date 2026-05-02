@@ -120,6 +120,8 @@ def main():
     orion = OrionModule(module)
 
     results = orion.swis_query(module.params['query'])
+    if results is None:
+        results = []
     if module.params['csv_path']:
         write_to_csv(results, module.params['csv_path'])
 
