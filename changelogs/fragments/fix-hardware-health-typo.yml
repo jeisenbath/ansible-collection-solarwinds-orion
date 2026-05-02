@@ -1,0 +1,2 @@
+bugfixes:
+  - orion_node_hardware_health module - Fix typo in error message "montior" to "monitor".
