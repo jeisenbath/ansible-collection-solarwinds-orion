@@ -90,7 +90,7 @@ try:
 except ImportError:
     HAS_REQUESTS = False
 except Exception:
-    raise Exception
+    raise
 
 
 def write_to_csv(nodes, csv_file_path):

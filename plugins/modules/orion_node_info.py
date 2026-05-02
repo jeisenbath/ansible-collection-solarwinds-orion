@@ -66,7 +66,7 @@ try:
 except ImportError:
     HAS_DATEUTIL = False
 except Exception:
-    raise Exception
+    raise
 try:
     import requests
     HAS_REQUESTS = True
@@ -74,7 +74,7 @@ try:
 except ImportError:
     HAS_REQUESTS = False
 except Exception:
-    raise Exception
+    raise
 
 
 def main():

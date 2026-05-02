@@ -162,7 +162,7 @@ try:
 except ImportError:
     HAS_REQUESTS = False
 except Exception:
-    raise Exception
+    raise
 
 
 def get_config_history(orion, node, limit=5):

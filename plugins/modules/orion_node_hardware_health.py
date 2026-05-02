@@ -105,7 +105,7 @@ try:
 except ImportError:
     HAS_REQUESTS = False
 except Exception:
-    raise Exception
+    raise
 
 
 # Mapping of polling method names to their corresponding IDs

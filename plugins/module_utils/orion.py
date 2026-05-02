@@ -26,7 +26,7 @@ try:
 except ImportError:
     HAS_DATEUTIL = False
 except Exception:
-    raise Exception
+    raise
 
 try:
     import orionsdk
@@ -35,7 +35,7 @@ try:
 except ImportError:
     HAS_ORION = False
 except Exception:
-    raise Exception
+    raise
 
 
 def orion_argument_spec():
