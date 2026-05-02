@@ -26,8 +26,6 @@ orion_node_snmp_pollers:
     enabled: true
 orion_node_discover_interfaces: false
 orion_node_ncm: false
-orion_node_snmp_port: 161
-orion_node_snmp_allow_64: true
 ```
 
 Variables required depending on the values of defaults
@@ -46,6 +44,8 @@ orion_node_snmpv3_priv_key:
 
 Optional variables, define these if you need to configure
 ```yaml
+orion_node_snmp_port: string, SNMP port (module default: 161)
+orion_node_snmp_allow_64: bool, allow 64-bit SNMP counters (module default: true)
 orion_node_custom_pollers: list, additional custom UnDP pollers
 orion_node_interfaces: list, interfaces to monitor
 orion_node_volumes: list, volumes to monitor
