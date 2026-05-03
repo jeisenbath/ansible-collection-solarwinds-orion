@@ -37,9 +37,9 @@ options:
     method:
         description:
             - Method to use for configuration operations.
-            - 'import' - Import configuration into NCM archive for historical purposes.
-            - 'upload' - Upload configuration to the device (if supported).
-            - 'download' - Download current configuration from the device into NCM archive.
+            - C(import) imports configuration into NCM archive for historical purposes.
+            - C(upload) uploads configuration to the device (if supported).
+            - C(download) downloads current configuration from the device into NCM archive.
         required: false
         type: str
         choices: ['import', 'upload', 'download']
@@ -153,7 +153,6 @@ config_history:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.jeisenbath.solarwinds.plugins.module_utils.orion import OrionModule, orion_argument_spec
-import datetime
 
 try:
     import requests
@@ -162,18 +161,18 @@ try:
 except ImportError:
     HAS_REQUESTS = False
 except Exception:
-    raise Exception
+    raise
 
 
 def get_config_history(orion, node, limit=5):
     """
     Get recent configuration history for a node from NCM.
-    
+
     Args:
         orion: OrionModule instance
         node: Orion node object
         limit: Maximum number of history entries to return (default: 5)
-        
+
     Returns:
         List of configuration history entries, or empty list if unavailable
     """
@@ -190,18 +189,18 @@ def get_config_history(orion, node, limit=5):
 def normalize_ncm_node_id(ncm_node_id):
     """
     Normalize NCM node ID to a proper GUID string format.
-    
+
     Args:
         ncm_node_id: The NCM node ID to normalize
-        
+
     Returns:
         str: Normalized GUID string
-        
+
     Raises:
         Exception: If the node ID format is invalid
     """
     import uuid
-    
+
     if isinstance(ncm_node_id, str):
         try:
             # Validate and normalize the GUID
@@ -222,7 +221,7 @@ def main():
         config_type=dict(required=False, type='str', default='Manual'),
         method=dict(required=False, choices=['import', 'upload', 'download'], default='import'),
     )
-    
+
     # initialize the custom Ansible module
     module = AnsibleModule(
         argument_spec,
@@ -233,7 +232,7 @@ def main():
     # Validate config_content requirement based on method
     method = module.params['method']
     config_content = module.params['config_content']
-    
+
     if method in ['import', 'upload'] and not config_content:
         module.fail_json(msg=f"config_content is required when method is '{method}'")
 
@@ -264,15 +263,15 @@ def main():
             'config_type': config_type,
             'check_mode': True
         }
-        
+
         if method == 'download':
             check_result['operation'] = f'Configuration would be downloaded from device {node["caption"]}'
         else:
             check_result['operation'] = f'Configuration would be processed for device {node["caption"]}'
-            
+
         module.exit_json(
-            changed=True, 
-            orion_node=node, 
+            changed=True,
+            orion_node=node,
             ncm_result=check_result,
             msg="Check mode: no changes made."
         )
@@ -283,25 +282,26 @@ def main():
             try:
                 # Normalize NCM NodeID to proper GUID format
                 normalized_node_id = normalize_ncm_node_id(ncm_node_id)
-                
+
                 # Prepare parameters exactly like the working Python example
                 config_type_str = str(config_type) if config_type else "Running"
                 config_text = str(config_content)
                 title = "manual-import"
                 comments = "Imported via Ansible API"
-                
+
                 # Call ImportConfig with the exact parameter order from working example
-                result = orion.swis.invoke('Cirrus.ConfigArchive', 'ImportConfig',
-                                         normalized_node_id, 
-                                         config_type_str, 
-                                         config_text,
-                                         title,
-                                         comments)
-                
+                result = orion.swis.invoke(
+                    'Cirrus.ConfigArchive', 'ImportConfig',
+                    normalized_node_id,
+                    config_type_str,
+                    config_text,
+                    title,
+                    comments)
+
                 import_result = {
-                    'success': True, 
-                    'result': result, 
-                    'node_id': ncm_node_id, 
+                    'success': True,
+                    'result': result,
+                    'node_id': ncm_node_id,
                     'method': 'ImportConfig',
                     'parameters_used': {
                         'node_id': normalized_node_id,
@@ -311,9 +311,9 @@ def main():
                         'config_length': len(config_text)
                     }
                 }
-                
+
                 config_history = get_config_history(orion, node, limit=5)
-                
+
                 module.exit_json(
                     changed=True,
                     orion_node=node,
@@ -321,7 +321,7 @@ def main():
                     config_history=config_history,
                     msg=f'Configuration successfully imported to NCM for node {node["caption"]}'
                 )
-                
+
             except Exception as import_error:
                 module.fail_json(
                     msg=f'Failed to import configuration to NCM: {str(import_error)}',
@@ -338,24 +338,25 @@ def main():
             try:
                 # Normalize NCM NodeID to proper GUID format
                 normalized_node_id = normalize_ncm_node_id(ncm_node_id)
-                
+
                 # Prepare parameters for UploadConfig
                 config_type_str = str(config_type) if config_type else "Running"
                 config_text = str(config_content)
-                
+
                 # Call UploadConfig with array of NCM node IDs, config type, content, and boolean flag
                 # UploadConfig expects: NodeID[], ConfigType, ConfigContent, ShowProgress (boolean)
                 show_progress = True  # Show progress in NCM
-                result = orion.swis.invoke('Cirrus.ConfigArchive', 'UploadConfig',
-                                         [normalized_node_id],  # Array of node IDs
-                                         config_type_str,
-                                         config_text,
-                                         show_progress)
-                
+                result = orion.swis.invoke(
+                    'Cirrus.ConfigArchive', 'UploadConfig',
+                    [normalized_node_id],
+                    config_type_str,
+                    config_text,
+                    show_progress)
+
                 upload_result = {
-                    'success': True, 
-                    'result': result, 
-                    'node_id': ncm_node_id, 
+                    'success': True,
+                    'result': result,
+                    'node_id': ncm_node_id,
                     'method': 'UploadConfig',
                     'parameters_used': {
                         'node_id': normalized_node_id,
@@ -363,14 +364,14 @@ def main():
                         'config_length': len(config_text)
                     }
                 }
-                
+
                 module.exit_json(
                     changed=True,
                     orion_node=node,
                     ncm_result=upload_result,
                     msg=f'Configuration successfully uploaded to device {node["caption"]} via NCM'
                 )
-                
+
             except Exception as upload_error:
                 module.fail_json(
                     msg=f'Failed to upload configuration to device via NCM: {str(upload_error)}',
@@ -387,19 +388,20 @@ def main():
             # Download configuration from device via NCM
             try:
                 normalized_node_id = normalize_ncm_node_id(ncm_node_id)
-                
+
                 # Prepare config type (default to Running if not specified)
                 config_type_str = str(config_type) if config_type else "Running"
-                
+
                 # Call DownloadConfig with the NCM node ID and config type
-                result = orion.swis.invoke('Cirrus.ConfigArchive', 'DownloadConfig',
-                                         [normalized_node_id], 
-                                         config_type_str)
-                
+                result = orion.swis.invoke(
+                    'Cirrus.ConfigArchive', 'DownloadConfig',
+                    [normalized_node_id],
+                    config_type_str)
+
                 download_result = {
-                    'success': True, 
-                    'result': result, 
-                    'node_id': ncm_node_id, 
+                    'success': True,
+                    'result': result,
+                    'node_id': ncm_node_id,
                     'method': 'DownloadConfig',
                     'parameters_used': {
                         'node_id': normalized_node_id,
@@ -407,9 +409,9 @@ def main():
                         'operation': f'Configuration downloaded from device {node["caption"]}'
                     }
                 }
-                
+
                 config_history = get_config_history(orion, node, limit=5)
-                
+
                 module.exit_json(
                     changed=True,
                     orion_node=node,
@@ -417,7 +419,7 @@ def main():
                     config_history=config_history,
                     msg=f'Configuration successfully downloaded from device {node["caption"]} via NCM'
                 )
-                
+
             except Exception as download_error:
                 module.fail_json(
                     msg=f'Failed to download configuration from device via NCM: {str(download_error)}',
