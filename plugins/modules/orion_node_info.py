@@ -100,7 +100,7 @@ def main():
             orion.poll_now(node)
             node = orion.get_node()
         elif last_poll:
-            time_since_poll = parser.parse(last_poll).replace(tzinfo=None) - datetime.utcnow()
+            time_since_poll = datetime.utcnow() - parser.parse(last_poll).replace(tzinfo=None)
             if time_since_poll.seconds > 300:
                 orion.poll_now(node)
                 node = orion.get_node()
