@@ -290,7 +290,7 @@ try:
 except ImportError:
     HAS_DATETIME = False
 except Exception:
-    raise Exception
+    raise
 try:
     import requests
     HAS_REQUESTS = True
@@ -298,7 +298,7 @@ try:
 except ImportError:
     HAS_REQUESTS = False
 except Exception:
-    raise Exception
+    raise
 
 
 def add_credential_set(node, credential_set_name, credential_set_type):
