@@ -139,7 +139,7 @@ def main():
             else:
                 # if the node is not already in NCM, add the node and update the connection profile
                 if module.check_mode:
-                    module.exit_json(changed=False, orion_node=node)
+                    module.exit_json(changed=True, orion_node=node)
                 else:
                     # add the node to NCM
                     orion.add_node_to_ncm(node)
@@ -147,12 +147,8 @@ def main():
                     ncm_node = orion.get_ncm_node(node)
                     profile_dict = index_connection_profiles(orion)
                     # update the connection profile
-                    was_changed = orion.update_ncm_node_connection_profile(profile_dict, module.params['profile_name'], ncm_node)
+                    orion.update_ncm_node_connection_profile(profile_dict, module.params['profile_name'], ncm_node)
                     module.exit_json(changed=True, orion_node=node)
-                    if was_changed:
-                        module.exit_json(changed=True, orion_node=node)
-                    else:
-                        module.exit_json(changed=False, orion_node=node)
         except Exception as OrionException:
             module.fail_json(msg='Failed to add or update node in NCM: {0}'.format(OrionException))
 
