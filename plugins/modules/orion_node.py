@@ -397,7 +397,7 @@ def add_node(module, orion):
             snmp_validation_passed = False
             snmp_validation_error = 'SNMP validation exception: {0}'.format(str(OrionException))
             if module.params['validate_snmp_required']:
-                module.fail_json(msg='Failed validate credentails for node: {0}'.format(str(OrionException)))
+                module.fail_json(msg='Failed to validate credentials for node: {0}'.format(str(OrionException)))
     # Add Node
     try:
         __SWIS__.create('Orion.Nodes', **props)
@@ -512,7 +512,7 @@ def unmute_node(module, node):
     try:
         __SWIS__.invoke('Orion.AlertSuppression', 'ResumeAlerts', [node['uri']])
     except Exception as OrionException:
-        module.fail_json(msg='Error muting node: {0}'.format(str(OrionException)))
+        module.fail_json(msg='Error unmuting node: {0}'.format(str(OrionException)))
 
 
 def main():
