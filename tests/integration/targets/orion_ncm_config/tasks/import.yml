@@ -25,6 +25,18 @@
   delegate_to: localhost
   register: import_02
 
+- name: Import config with explicit config_title and comments
+  orion_ncm_config:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    method: import
+    config_content: "{{ orion_test_config_content }}"
+    config_title: ansible-test explicit title
+    comments: ansible-test explicit comments
+  delegate_to: localhost
+  register: import_03
 
 - name: Import asserts
   ansible.builtin.assert:
@@ -35,3 +47,41 @@
       - import_02.ncm_result.node_id is defined
       - import_02.ncm_result.success == true
       - import_02.config_history is defined
+      # config_title defaults to <node caption>-<timestamp>, comments to the
+      # documented default value
+      - import_02.ncm_result.parameters_used.title.startswith(orion_test_node_name)
+      - import_02.ncm_result.parameters_used.comments == 'Imported via Ansible API'
+      - import_03.changed
+      - import_03.ncm_result.success == true
+      - import_03.ncm_result.parameters_used.title == 'ansible-test explicit title'
+      - import_03.ncm_result.parameters_used.comments == 'ansible-test explicit comments'
+
+# Read the explicit-title entry back from the archive to verify the ImportConfig
+# argument order end to end: config_title is the entry's display name in the NCM
+# config list, comments landed in Comments, the archived body is the imported
+# configuration text, and NCM stamps imported entries with config type
+# 'Imported' regardless of config_type.
+- name: Read imported entry back from the NCM config archive
+  orion_query:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    query: >-
+      SELECT ConfigTitle, Comments, Config, ConfigType
+      FROM Cirrus.ConfigArchive
+      WHERE NodeID = '{{ import_03.ncm_result.parameters_used.node_id }}'
+      AND ConfigTitle = 'ansible-test explicit title'
+  delegate_to: localhost
+  register: import_04
+  until: import_04.results | length > 0
+  retries: 6
+  delay: 5
+
+- name: Archive entry asserts
+  ansible.builtin.assert:
+    that:
+      - import_04.results | length == 1
+      - import_04.results[0].ConfigTitle == 'ansible-test explicit title'
+      - import_04.results[0].Comments == 'ansible-test explicit comments'
+      - import_04.results[0].ConfigType == 'Imported'
+      - orion_test_config_content | trim in import_04.results[0].Config

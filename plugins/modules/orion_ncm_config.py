@@ -28,12 +28,32 @@ options:
         type: str
     config_type:
         description:
-            - The type of configuration being imported or downloaded.
+            - The type of configuration being downloaded or uploaded.
             - Common values include 'Running', 'Startup', 'Manual', etc.
             - For device-specific types, consult your NCM documentation.
+            - Not used by C(import), which always records the entry with
+              config type 'Imported'.
         required: false
         type: str
         default: 'Manual'
+    config_title:
+        description:
+            - Title for the imported config archive entry, shown as the
+              entry's name in the NCM config list.
+            - Only used by C(import).
+            - Defaults to the node caption followed by a timestamp,
+              C(<caption>-<YYYY-MM-DD_HHMMSS>).
+        required: false
+        type: str
+        version_added: "3.2.0"
+    comments:
+        description:
+            - Comments stored on the imported config archive entry.
+            - Only used by C(import).
+        required: false
+        type: str
+        default: 'Imported via Ansible API'
+        version_added: "3.2.0"
     method:
         description:
             - Method to use for configuration operations.
@@ -62,18 +82,17 @@ EXAMPLES = r'''
     password: "{{ solarwinds_pass }}"
     name: "{{ node_name }}"
     config_content: "{{ device_config_backup_content }}"
-    config_type: "Running"
+    config_title: "{{ node_name }}-daily-backup"
     method: import
   delegate_to: localhost
 
-- name: Import router configuration from file
+- name: Import router configuration from file, titled <caption>-<timestamp>
   jeisenbath.solarwinds.orion_ncm_config:
     hostname: "{{ solarwinds_server }}"
     username: "{{ solarwinds_user }}"
     password: "{{ solarwinds_pass }}"
     ip_address: "192.168.1.100"
     config_content: "{{ lookup('file', '/path/to/device_config.txt') }}"
-    config_type: "Running"
   delegate_to: localhost
 
 - name: Upload configuration to device via NCM
@@ -128,9 +147,8 @@ ncm_result:
         "method": "ImportConfig",
         "parameters_used": {
             "node_id": "12345678-abcd-ef01-2345-6789abcdef01",
-            "config_type": "Cisco",
-            "title": "daily-backup",
-            "comments": "Daily configuration backup import",
+            "title": "CORE-SW-01-2025-08-28_131627",
+            "comments": "Imported via Ansible API",
             "config_length": 2048
         }
     }
@@ -150,6 +168,8 @@ config_history:
         }
     ]
 '''
+
+import datetime
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.jeisenbath.solarwinds.plugins.module_utils.orion import OrionModule, orion_argument_spec
@@ -219,6 +239,8 @@ def main():
     argument_spec.update(
         config_content=dict(required=False, type='str', no_log=False),
         config_type=dict(required=False, type='str', default='Manual'),
+        config_title=dict(required=False, type='str'),
+        comments=dict(required=False, type='str', default='Imported via Ansible API'),
         method=dict(required=False, choices=['import', 'upload', 'download'], default='import'),
     )
 
@@ -283,20 +305,23 @@ def main():
                 # Normalize NCM NodeID to proper GUID format
                 normalized_node_id = normalize_ncm_node_id(ncm_node_id)
 
-                # Prepare parameters exactly like the working Python example
-                config_type_str = str(config_type) if config_type else "Running"
                 config_text = str(config_content)
-                title = "manual-import"
-                comments = "Imported via Ansible API"
+                title = module.params['config_title']
+                if not title:
+                    title = f"{node['caption']}-{datetime.datetime.now().strftime('%Y-%m-%d_%H%M%S')}"
+                comments = str(module.params['comments'])
 
-                # Call ImportConfig with the exact parameter order from working example
+                # ImportConfig positional parameters are (nodeId, configTitle,
+                # comments, configText): the title becomes the entry's display
+                # name in the NCM config list, and NCM stamps the entry's
+                # ConfigType as 'Imported' itself, so config_type plays no
+                # part in imports.
                 result = orion.swis.invoke(
                     'Cirrus.ConfigArchive', 'ImportConfig',
                     normalized_node_id,
-                    config_type_str,
-                    config_text,
                     title,
-                    comments)
+                    comments,
+                    config_text)
 
                 import_result = {
                     'success': True,
@@ -305,7 +330,6 @@ def main():
                     'method': 'ImportConfig',
                     'parameters_used': {
                         'node_id': normalized_node_id,
-                        'config_type': config_type_str,
                         'title': title,
                         'comments': comments,
                         'config_length': len(config_text)
