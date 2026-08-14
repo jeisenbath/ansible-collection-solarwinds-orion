@@ -5,7 +5,7 @@ bugfixes:
     comments, configText), so imports were archiving the literal string
     'manual-import' as the config body, filing the real configuration into
     the Comments field, and titling every entry with the config_type value.
-minor_changes:
+major_changes:
   - orion_ncm_config - add ``config_title`` (defaults to
     ``<node caption>-<YYYY-MM-DD_HHMMSS>``) and ``comments`` options for the
     import method, and document that NCM stamps imported entries with config
