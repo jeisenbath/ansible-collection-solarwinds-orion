@@ -1,3 +1,2 @@
 bugfixes:
   - orion_node_ncm module - Fix check_mode returning changed=False when node would be added to NCM.
-  - orion_node_ncm module - Remove unreachable dead code after premature exit_json when adding node to NCM.

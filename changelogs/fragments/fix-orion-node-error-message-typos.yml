@@ -1,3 +1,0 @@
-bugfixes:
-  - orion_node module - Fix unmute_node error message that incorrectly said "Error muting node" instead of "Error unmuting node".
-  - orion_node module - Fix typo in credential validation error message ("Failed validate credentails" to "Failed to validate credentials").

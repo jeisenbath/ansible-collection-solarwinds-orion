@@ -1,2 +1,0 @@
-bugfixes:
-  - orion_node_ncm integration test - Fix duplicate assertion that checked update_ncm_01.changed twice instead of also checking update_ncm_02.changed.

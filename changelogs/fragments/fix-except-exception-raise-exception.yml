@@ -1,2 +1,0 @@
-bugfixes:
-  - multiple modules - Fix ``except Exception`` blocks that re-raised a bare ``Exception()`` without the original message or traceback. Changed to bare ``raise`` to preserve the original exception context.

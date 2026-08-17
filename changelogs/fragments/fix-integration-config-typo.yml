@@ -1,2 +1,0 @@
-bugfixes:
-  - integration tests - Fix typo in integration_config_example.yml variable name ``snmpv3_credentail_set`` to ``snmpv3_credential_set``.

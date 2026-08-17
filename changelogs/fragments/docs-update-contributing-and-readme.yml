@@ -1,4 +1,0 @@
-minor_changes:
-  - CONTRIBUTING.md - Update clone path and branch to match v3.x namespace (jeisenbath/solarwinds, devel-3.x). Fix "motifying" typo.
-  - README.md - Update tested Ansible versions to match meta/runtime.yml requirement (ansible-core 2.15+).
-  - roles/orion_node README - Move snmp_port and snmp_allow_64 from defaults section to optional variables, since they are not in defaults/main.yml.

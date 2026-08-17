@@ -1,5 +1,0 @@
-bugfixes:
-  - orion_ncm_config - Fixed DOCUMENTATION YAML syntax error in method description that caused ansible-test sanity failures.
-  - orion_ncm_config - Removed unused ``import datetime`` statement.
-  - orion_ncm_config - Fixed ``except Exception`` re-raise to preserve original traceback.
-  - orion_ncm_config - Fixed PEP8 trailing whitespace and continuation line indentation issues.
