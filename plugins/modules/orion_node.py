@@ -378,14 +378,14 @@ def add_node(module, orion):
             "engineid": props['EngineID']
         }
         validateProperties = {
-                "username": props['SNMPV3Username'],
-                'priv_method': props['SNMPV3PrivMethod'],
-                'priv_key': props['SNMPV3PrivKey'],
-                'priv_key_is_pwd': props['SNMPV3PrivKeyIsPwd'],
-                'auth_key': props['SNMPV3AuthKey'],
-                'auth_method': props['SNMPV3AuthMethod'],
-                'auth_key_is_pwd': props['SNMPV3AuthKeyIsPwd'],
-            }
+            "username": props['SNMPV3Username'],
+            'priv_method': props['SNMPV3PrivMethod'],
+            'priv_key': props['SNMPV3PrivKey'],
+            'priv_key_is_pwd': props['SNMPV3PrivKeyIsPwd'],
+            'auth_key': props['SNMPV3AuthKey'],
+            'auth_method': props['SNMPV3AuthMethod'],
+            'auth_key_is_pwd': props['SNMPV3AuthKeyIsPwd'],
+        }
         try:
             validated = validate_snmp3_credentials(orion, validateNode, validateProperties, module.params['snmp_port'])
             if not validated:
@@ -562,7 +562,7 @@ def main():
 
     changed = False
     warnings = []
-    
+
     if module.params['state'] == 'present':
         if not node:
             if not module.check_mode:
@@ -608,7 +608,7 @@ def main():
     response = {'changed': changed, 'orion_node': node}
     if warnings:
         response['warnings'] = warnings
-        
+
     module.exit_json(**response)
 
 
