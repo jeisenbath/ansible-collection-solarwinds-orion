@@ -18,6 +18,9 @@
     snmpv3_priv_key: "{{ orion_node_snmpv3_priv_key | default(omit) }}"
     snmp_port: "{{ orion_node_snmp_port | default(omit) }}"
     snmp_allow_64: "{{ orion_node_snmp_allow_64 | default(omit) }}"
+    poll_interval: "{{ orion_node_poll_interval | default(omit) }}"
+    stat_collection: "{{ orion_node_stat_collection | default(omit) }}"
+    rediscovery_interval: "{{ orion_node_rediscovery_interval | default(omit) }}"
     enable_asset_inventory: "{{ orion_node_enable_asset_inventory | default(omit) }}"
     validate_snmp_required: "{{ orion_node_validate_snmp_required | default(omit) }}"
   delegate_to: localhost

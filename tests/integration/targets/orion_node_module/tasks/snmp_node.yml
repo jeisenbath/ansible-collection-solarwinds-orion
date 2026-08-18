@@ -11,6 +11,9 @@
     snmp_version: 2
     ro_community_string: "{{ orion_test_node_ro_community_string }}"
     enable_asset_inventory: true
+    poll_interval: 121
+    stat_collection: 16
+    rediscovery_interval: 61
   delegate_to: localhost
   check_mode: true
   register: snmp_add_01
@@ -54,6 +57,9 @@
       - snmp_add_02.orion_node.caption == orion_test_node_name
       - snmp_add_02.orion_node.ipaddress == orion_test_node_ip_address
       - snmp_add_02.orion_node.objectsubtype == "SNMP"
+      - snmp_add_02.orion_node.pollinterval == 121
+      - snmp_add_02.orion_node.statcollection == 16
+      - snmp_add_02.orion_node.rediscoveryinterval == 61
       - snmp_add_query_01 | length > 0
       - not snmp_add_03.changed
       - not snmp_add_04.changed

@@ -85,6 +85,12 @@ options:
         default: ICMP
         required: false
         type: str
+    poll_interval:
+        description:
+            - The interval in seconds for polling the status and response time for node.
+        type: int
+        required: false
+        default: 120
     ro_community_string:
         description:
             - SNMP Read-Only Community string.
@@ -172,6 +178,18 @@ options:
             - Confusingly, value of True corresponds to web GUI checkbox being unchecked.
         type: bool
         required: false
+    stat_collection:
+        description:
+            - The interval in minutes to gather statistics for node.
+        type: int
+        required: false
+        default: 15
+    rediscovery_interval:
+        description:
+            - The interval in minutes for polling the network to detect any re-indexed interfaces.
+        type: int
+        required: false
+        default: 30
     validate_snmp_required:
         description:
             - Whether SNMP validation must pass before adding the node.
@@ -335,6 +353,9 @@ def add_node(module, orion):
         'AgentPort': module.params['snmp_port'],
         'Allow64BitCounters': module.params['snmp_allow_64'],
         'External': False,
+        'PollInterval': module.params['poll_interval'],
+        'StatCollection': module.params['stat_collection'],
+        'RediscoveryInterval': module.params['rediscovery_interval'],
     }
 
     if module.params['polling_engine']:
@@ -549,6 +570,9 @@ def main():
         wmi_credential_set=dict(required=False, no_log=True),
         polling_engine=dict(required=False),
         enable_asset_inventory=dict(required=False, type='bool', default=False),
+        poll_interval=dict(required=False, type='int', default=120),
+        stat_collection=dict(required=False, type='int', default=15),
+        rediscovery_interval=dict(required=False, type='int', default=30),
     )
 
     module = AnsibleModule(
