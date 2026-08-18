@@ -26,8 +26,6 @@ orion_node_snmp_pollers:
     enabled: true
 orion_node_discover_interfaces: false
 orion_node_ncm: false
-orion_node_snmp_port: 161
-orion_node_snmp_allow_64: true
 ```
 
 Variables required depending on the values of defaults
@@ -46,6 +44,8 @@ orion_node_snmpv3_priv_key:
 
 Optional variables, define these if you need to configure
 ```yaml
+orion_node_snmp_port: string, SNMP port (module default 161)
+orion_node_snmp_allow_64: bool, allow 64-bit SNMP counters (module default true)
 orion_node_custom_pollers: list, additional custom UnDP pollers
 orion_node_interfaces: list, interfaces to monitor
 orion_node_volumes: list, volumes to monitor
@@ -53,6 +53,11 @@ orion_node_applications: list, APM templates to add to node
 orion_node_custom_properties: list, elements are dicts (name, value), custom property names and values to set
 orion_node_hardware_health_poller: string, Name of the Hardware Health poller to enable on node
 orion_node_ncm_profile_name: string, Name of NCM profile if managing node in NCM
+orion_node_enable_asset_inventory: bool, Set to true to enable Asset Inventory polling
+orion_node_validate_snmp_required: bool, Set to false to disable forced SNMP validation
+orion_node_poll_interval: int, Polling interval for status and response time in seconds (module default 120)
+orion_node_stat_collection: int, Stat collection interval in minutes (module default 15)
+orion_node_rediscovery_interval: int, Rediscovery interval in minutes (module default 30)
 ```
 
 

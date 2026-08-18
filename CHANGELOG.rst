@@ -5,6 +5,39 @@ Solarwinds.Orion Release Notes
 .. contents:: Topics
 
 
+v3.2.0
+======
+
+Release Summary
+---------------
+
+Released 2026-08-17
+
+Major Changes
+-------------
+
+- orion_node module - add option enable_asset_inventory option to enable asset inventory polling
+- orion_node module - add option validate_snmp_required option to test snmp credentials when adding nodes
+- orion_node module - add polling options poll_interval, stat_collection, and rediscovery_interval
+
+Minor Changes
+-------------
+
+- orion_node module - add SHA256 and SHA512 to snmpv3_auth_method options
+
+Bugfixes
+--------
+
+- fix orion_custom_property idempotency for boolean custom properties
+- orion_node_info module - Fix inverted timedelta calculation that caused poll_now to trigger on nearly every run instead of only when last poll was more than 5 minutes ago.
+- orion_node_ncm module - Fix check_mode returning changed=False when node would be added to NCM.
+- orion_query module - Fix crash when writing CSV with empty query results. swis_query returns None for empty results which caused a TypeError in write_to_csv.
+
+New Modules
+-----------
+
+- jeisenbath.solarwinds.orion_ncm_config - Manage device configurations with SolarWinds NCM
+
 v3.1.0
 ======
 

@@ -19,6 +19,12 @@ author:
     - "Jarett D Chaiken (@jdchaiken)"
     - "Josh M. Eisenbath (@jeisenbath)"
 options:
+    enable_asset_inventory:
+        description:
+            - Enable polling in Asset Inventory.
+        required: false
+        type: bool
+        default: false
     state:
         description:
             - The desired state of the node.
@@ -79,6 +85,12 @@ options:
         default: ICMP
         required: false
         type: str
+    poll_interval:
+        description:
+            - The interval in seconds for polling the status and response time for node.
+        type: int
+        required: false
+        default: 120
     ro_community_string:
         description:
             - SNMP Read-Only Community string.
@@ -128,8 +140,10 @@ options:
             - Required when SNMP version is 3.
         type: str
         choices:
-            - SHA1
             - MD5
+            - SHA1
+            - SHA256
+            - SHA512
         required: false
     snmpv3_auth_key:
         description:
@@ -163,6 +177,27 @@ options:
             - SNMPv3 Privacy Password is a key.
             - Confusingly, value of True corresponds to web GUI checkbox being unchecked.
         type: bool
+        required: false
+    stat_collection:
+        description:
+            - The interval in minutes to gather statistics for node.
+        type: int
+        required: false
+        default: 15
+    rediscovery_interval:
+        description:
+            - The interval in minutes for polling the network to detect any re-indexed interfaces.
+        type: int
+        required: false
+        default: 30
+    validate_snmp_required:
+        description:
+            - Whether SNMP validation must pass before adding the node.
+            - If True (default), module will fail if SNMP validation fails.
+            - If False, node will be added even if SNMP validation fails (with warning).
+            - This mirrors the SolarWinds web interface behavior of allowing nodes with failed SNMP.
+        type: bool
+        default: true
         required: false
     wmi_credential_set:
         description:
@@ -200,6 +235,24 @@ EXAMPLES = '''
     ro_community_string: "{{ snmp_ro_community_string }}"
   delegate_to: localhost
 
+- name: Add an SNMPv3 node even if SNMP validation fails (for testing)
+  jeisenbath.solarwinds.orion_node:
+    hostname: "{{ solarwinds_server }}"
+    username: "{{ solarwinds_username }}"
+    password: "{{ solarwinds_password }}"
+    name: "{{ node_name }}"
+    state: present
+    ip_address: "{{ node_ip_address }}"
+    polling_method: SNMP
+    snmp_version: "3"
+    snmpv3_username: "{{ snmpv3_username }}"
+    snmpv3_auth_method: "SHA1"
+    snmpv3_auth_key: "{{ snmpv3_auth_key }}"
+    snmpv3_priv_method: "AES128"
+    snmpv3_priv_key: "{{ snmpv3_priv_key }}"
+    validate_snmp_required: false
+  delegate_to: localhost
+
 - name: Mute node in Solarwinds for 30 minutes
   jeisenbath.solarwinds.orion_node:
     hostname: "{{ solarwinds_host }}"
@@ -228,8 +281,28 @@ orion_node:
         "unmanaged": false,
         "unmanagefrom": "1899-12-30T00:00:00+00:00",
         "unmanageuntil": "1899-12-30T00:00:00+00:00",
-        "uri": "swis://host.domain.com/Orion/Orion.Nodes/NodeID=12345"
+        "uri": "swis://host.domain.com/Orion/Orion.Nodes/NodeID=12345",
+        "snmp_validation_passed": false,
+        "snmp_validation_error": "SNMP validation failed - device did not respond to SNMP poll"
     }
+    contains:
+        snmp_validation_passed:
+            description: Whether SNMP validation passed during node creation.
+            returned: when state=present and SNMPv3 is used
+            type: bool
+        snmp_validation_error:
+            description: Error message if SNMP validation failed.
+            returned: when state=present, SNMPv3 is used, and validation fails
+            type: str
+warnings:
+    description: List of warning messages about the operation.
+    returned: when validate_snmp_required=false and SNMP validation fails
+    type: list
+    sample: ["WARNING: Node was added but SNMP validation failed - device did not respond to SNMP poll"]
+changed:
+    description: Whether the module made any changes.
+    returned: always
+    type: bool
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -241,7 +314,7 @@ try:
 except ImportError:
     HAS_DATETIME = False
 except Exception:
-    raise Exception
+    raise
 try:
     import requests
     HAS_REQUESTS = True
@@ -249,7 +322,7 @@ try:
 except ImportError:
     HAS_REQUESTS = False
 except Exception:
-    raise Exception
+    raise
 
 
 def add_credential_set(node, credential_set_name, credential_set_type):
@@ -280,6 +353,9 @@ def add_node(module, orion):
         'AgentPort': module.params['snmp_port'],
         'Allow64BitCounters': module.params['snmp_allow_64'],
         'External': False,
+        'PollInterval': module.params['poll_interval'],
+        'StatCollection': module.params['stat_collection'],
+        'RediscoveryInterval': module.params['rediscovery_interval'],
     }
 
     if module.params['polling_engine']:
@@ -321,26 +397,34 @@ def add_node(module, orion):
             props['SNMPV3AuthKeyIsPwd'] = True
 
     # Validate credentials
+    snmp_validation_passed = True
+    snmp_validation_error = None
     if props['ObjectSubType'] == 'SNMP' and props['SNMPVersion'] == '3':
         validateNode = {
             "ipaddress": props['IPAddress'],
             "engineid": props['EngineID']
         }
         validateProperties = {
-                "username": props['SNMPV3Username'],
-                'priv_method': props['SNMPV3PrivMethod'],
-                'priv_key': props['SNMPV3PrivKey'],
-                'priv_key_is_pwd': props['SNMPV3PrivKeyIsPwd'],
-                'auth_key': props['SNMPV3AuthKey'],
-                'auth_method': props['SNMPV3AuthMethod'],
-                'auth_key_is_pwd': props['SNMPV3AuthKeyIsPwd'],
-            }
+            "username": props['SNMPV3Username'],
+            'priv_method': props['SNMPV3PrivMethod'],
+            'priv_key': props['SNMPV3PrivKey'],
+            'priv_key_is_pwd': props['SNMPV3PrivKeyIsPwd'],
+            'auth_key': props['SNMPV3AuthKey'],
+            'auth_method': props['SNMPV3AuthMethod'],
+            'auth_key_is_pwd': props['SNMPV3AuthKeyIsPwd'],
+        }
         try:
             validated = validate_snmp3_credentials(orion, validateNode, validateProperties, module.params['snmp_port'])
             if not validated:
-                module.fail_json(msg='Failed to validate credentials on node.')
+                snmp_validation_passed = False
+                snmp_validation_error = 'SNMP validation failed - device did not respond to SNMP poll'
+                if module.params['validate_snmp_required']:
+                    module.fail_json(msg='Failed to validate credentials on node.')
         except Exception as OrionException:
-            module.fail_json(msg='Failed validate credentails for node: {0}'.format(str(OrionException)))
+            snmp_validation_passed = False
+            snmp_validation_error = 'SNMP validation exception: {0}'.format(str(OrionException))
+            if module.params['validate_snmp_required']:
+                module.fail_json(msg='Failed to validate credentials for node: {0}'.format(str(OrionException)))
     # Add Node
     try:
         __SWIS__.create('Orion.Nodes', **props)
@@ -389,6 +473,15 @@ def add_node(module, orion):
             orion.add_poller('N', str(node['nodeid']), k, pollers_enabled[k])
         except Exception as OrionException:
             module.fail_json(msg='Failed to create pollers on node: {0}'.format(str(OrionException)))
+
+    # Add validation results to node info
+    node['snmp_validation_passed'] = snmp_validation_passed
+    if not snmp_validation_passed:
+        node['snmp_validation_error'] = snmp_validation_error
+
+    # Enable Asset inventory
+    if module.params['enable_asset_inventory']:
+        orion.manage_asset_inventory([node['nodeid']], module.params['enable_asset_inventory'])
 
     return node
 
@@ -450,7 +543,7 @@ def unmute_node(module, node):
     try:
         __SWIS__.invoke('Orion.AlertSuppression', 'ResumeAlerts', [node['uri']])
     except Exception as OrionException:
-        module.fail_json(msg='Error muting node: {0}'.format(str(OrionException)))
+        module.fail_json(msg='Error unmuting node: {0}'.format(str(OrionException)))
 
 
 def main():
@@ -465,7 +558,7 @@ def main():
         snmp_version=dict(required=False, default=None, choices=['2', '3']),
         snmpv3_credential_set=dict(required=False, default=None, type='str'),
         snmpv3_username=dict(required=False, type='str'),
-        snmpv3_auth_method=dict(required=False, type='str', choices=['SHA1', 'MD5']),
+        snmpv3_auth_method=dict(required=False, type='str', choices=['MD5', 'SHA1', 'SHA256', 'SHA512']),
         snmpv3_auth_key=dict(required=False, type='str', no_log=True),
         snmpv3_auth_key_is_pwd=dict(required=False, type='bool'),
         snmpv3_priv_method=dict(required=False, type='str', choices=['DES56', 'AES128', 'AES192', 'AES256']),
@@ -473,8 +566,13 @@ def main():
         snmpv3_priv_key_is_pwd=dict(required=False, type='bool'),
         snmp_port=dict(required=False, default='161'),
         snmp_allow_64=dict(required=False, default=True, type='bool'),
+        validate_snmp_required=dict(required=False, default=True, type='bool'),
         wmi_credential_set=dict(required=False, no_log=True),
         polling_engine=dict(required=False),
+        enable_asset_inventory=dict(required=False, type='bool', default=False),
+        poll_interval=dict(required=False, type='int', default=120),
+        stat_collection=dict(required=False, type='int', default=15),
+        rediscovery_interval=dict(required=False, type='int', default=30),
     )
 
     module = AnsibleModule(
@@ -498,10 +596,17 @@ def main():
     node = orion.get_node()
 
     changed = False
+    warnings = []
+
     if module.params['state'] == 'present':
         if not node:
             if not module.check_mode:
                 node = add_node(module, orion)
+                # Check if SNMP validation failed but node was still added
+                if hasattr(node, 'get') and not node.get('snmp_validation_passed', True):
+                    warnings.append("WARNING: Node was added but SNMP validation failed - {0}".format(
+                        node.get('snmp_validation_error', 'Unknown SNMP validation error')
+                    ))
             changed = True
     elif module.params['state'] == 'absent':
         if node:
@@ -534,7 +639,12 @@ def main():
                     unmute_node(module, node)
                 changed = True
 
-    module.exit_json(changed=changed, orion_node=node)
+    # Prepare exit response
+    response = {'changed': changed, 'orion_node': node}
+    if warnings:
+        response['warnings'] = warnings
+
+    module.exit_json(**response)
 
 
 if __name__ == "__main__":

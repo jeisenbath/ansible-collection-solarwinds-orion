@@ -105,7 +105,7 @@ try:
 except ImportError:
     HAS_REQUESTS = False
 except Exception:
-    raise Exception
+    raise
 
 
 # Mapping of polling method names to their corresponding IDs
@@ -162,7 +162,7 @@ def main():
                     orion.swis.invoke('Orion.HardwareHealth.HardwareInfoBase', 'EnableHardwareHealth', node['netobjectid'], polling_method_id)
                 changed = True
             elif hh_poller[0]['PollingMethod'] != polling_method_id:
-                module.fail_json(msg="HardwareHealth montior exists, but does not match provided polling_method parameter.")
+                module.fail_json(msg="HardwareHealth monitor exists, but does not match provided polling_method parameter.")
         elif module.params['state'] == 'absent':
             if hh_poller:
                 if not module.check_mode:

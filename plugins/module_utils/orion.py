@@ -26,7 +26,7 @@ try:
 except ImportError:
     HAS_DATEUTIL = False
 except Exception:
-    raise Exception
+    raise
 
 try:
     import orionsdk
@@ -35,7 +35,7 @@ try:
 except ImportError:
     HAS_ORION = False
 except Exception:
-    raise Exception
+    raise
 
 
 def orion_argument_spec():
@@ -93,7 +93,8 @@ class OrionModule:
     def get_node(self):
         node = {}
         fields = """NodeID, Caption, Unmanaged, UnManageFrom, UnManageUntil, Uri,
-                  ObjectSubType, IP_Address, Status, StatusDescription, LastSystemUptimePollUtc, EngineID"""
+                  ObjectSubType, IP_Address, Status, StatusDescription, LastSystemUptimePollUtc, EngineID,
+                  PollInterval, StatCollection, RediscoveryInterval"""
 
         if self.module.params['node_id']:
             results = self.swis.query(
@@ -122,6 +123,9 @@ class OrionModule:
             node['statusdescription'] = results['results'][0]['StatusDescription']
             node['lastsystemuptimepollutc'] = results['results'][0]['LastSystemUptimePollUtc']
             node['engineid'] = results['results'][0]['EngineID']
+            node['pollinterval'] = results['results'][0]['PollInterval']
+            node['statcollection'] = results['results'][0]['StatCollection']
+            node['rediscoveryinterval'] = results['results'][0]['RediscoveryInterval']
         return node
 
     def add_custom_property(self, node, prop_name, prop_value):
@@ -433,3 +437,10 @@ class OrionModule:
 
     def poll_now(self, node):
         self.swis.invoke('Orion.Nodes', 'PollNow', node['netobjectid'])
+
+    def manage_asset_inventory(self, nodes: list, enabled: bool):
+        if enabled:
+            swisVerb = 'EnablePollingForNodes'
+        else:
+            swisVerb = 'DisablePollingForNodes'
+        self.swis.invoke('Orion.AssetInventory.Polling', swisVerb, nodes)

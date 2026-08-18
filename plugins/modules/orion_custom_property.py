@@ -91,7 +91,7 @@ try:
 except ImportError:
     HAS_REQUESTS = False
 except Exception:
-    raise Exception
+    raise
 
 
 def main():
@@ -120,7 +120,7 @@ def main():
     if module.params['state'] == 'present':
         try:
             prop_name, prop_value = orion.get_node_custom_property_value(node, module.params['property_name'])
-            if prop_value != module.params['property_value']:
+            if str(prop_value) != str(module.params['property_value']):
                 if not module.check_mode:
                     orion.add_custom_property(node, module.params['property_name'], module.params['property_value'])
                 changed = True

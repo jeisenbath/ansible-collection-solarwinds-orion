@@ -5,6 +5,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+
 def get_credentials(orion, name):
     credential = {}
     query = f"""
@@ -19,6 +20,7 @@ def get_credentials(orion, name):
         credential['CredentialType'] = results['results'][0]['CredentialType']
     return credential
 
+
 def create_snmpv3_credentials(orion, name, snmp3_props: dict, context: str = '', owner: str = 'Orion'):
     result = orion.swis.invoke(
         'Orion.Credential', 'CreateSNMPv3Credentials', name, snmp3_props['username'], context,
@@ -27,9 +29,11 @@ def create_snmpv3_credentials(orion, name, snmp3_props: dict, context: str = '',
         owner)
     return result
 
+
 def create_username_password_credentials(orion, name, wmiProps: dict, owner):
     result = orion.swis.invoke('Orion.Credential', 'CreateUsernamePasswordCredentials', name, wmiProps['username'], wmiProps['password'], owner)
     return result
+
 
 def validate_snmp3_credentials(orion, node, properties, port: int = 161):
     snmp3_credentials = {
@@ -52,6 +56,7 @@ def validate_snmp3_credentials(orion, node, properties, port: int = 161):
         node['engineid'],
     )
     return result
+
 
 def assign_credentials_to_node(orion, node, credentialSet, nodeSetting):
     properties = {

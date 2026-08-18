@@ -10,10 +10,10 @@ Use the [Ansible Release and Maintenance](https://docs.ansible.com/ansible/lates
    - Checkout the devel- branch of the current major version.
 
 ```
-$ mkdir -p ~/.ansible/collections/ansible_collections/solarwinds
-$ git clone *your_repo* ~/.ansible/collections/ansible_collections/solarwinds/orion
-$ cd ~/.ansible/collections/ansible_collections/solarwinds/orion
-$ git checkout devel-2.x
+$ mkdir -p ~/.ansible/collections/ansible_collections/jeisenbath
+$ git clone *your_repo* ~/.ansible/collections/ansible_collections/jeisenbath/solarwinds
+$ cd ~/.ansible/collections/ansible_collections/jeisenbath/solarwinds
+$ git checkout devel-3.x
 ```
 
 ### Testing your code
@@ -24,7 +24,7 @@ $ git checkout devel-2.x
     - Copying the test/integration/integration_config_example.yml into integration_config.yml
     - Update the values in integration_config.yml to match your testing environment  
     - If your change includes any files from module_utils, run a full integration test with ansible-test integration.  
-    - If you are motifying a single module, or creating a new one, run ansible-test integration *target* to test only that specific resource.  
+    - If you are modifying a single module, or creating a new one, run ansible-test integration *target* to test only that specific resource.  
 
 ## Pull requests
 

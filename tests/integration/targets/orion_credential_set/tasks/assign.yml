@@ -52,7 +52,7 @@
       - assign_snmpv3_01.changed
       - assign_snmpv3_02.changed
       - assign_snmpv3_02.orion_node is defined
-      - assign_snmpv3_02.credentials is defined
+      - assign_snmpv3_02.credential is defined
       - not assign_snmpv3_03.changed
       - not assign_snmpv3_04.changed
 

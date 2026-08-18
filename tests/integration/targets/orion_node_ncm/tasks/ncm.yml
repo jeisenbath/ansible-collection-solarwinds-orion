@@ -57,7 +57,7 @@
       - not add_ncm_04.changed
       - add_ncm_02.orion_node is defined
       - update_ncm_01.changed
-      - update_ncm_01.changed
+      - update_ncm_02.changed
 
 - name: Remove node from NCM (check)
   orion_node_ncm: &remove_ncm
