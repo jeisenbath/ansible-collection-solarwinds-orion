@@ -433,3 +433,10 @@ class OrionModule:
 
     def poll_now(self, node):
         self.swis.invoke('Orion.Nodes', 'PollNow', node['netobjectid'])
+
+    def manage_asset_inventory(self, nodes: list, enabled: bool):
+        if enabled:
+            swisVerb = 'EnablePollingForNodes'
+        else:
+            swisVerb = 'DisablePollingForNodes'
+        self.swis.invoke('Orion.AssetInventory.Polling', swisVerb, nodes)

@@ -19,6 +19,12 @@ author:
     - "Jarett D Chaiken (@jdchaiken)"
     - "Josh M. Eisenbath (@jeisenbath)"
 options:
+    enable_asset_inventory:
+        description:
+            - Enable polling in Asset Inventory.
+        required: false
+        type: bool
+        default: false
     state:
         description:
             - The desired state of the node.
@@ -452,6 +458,10 @@ def add_node(module, orion):
     if not snmp_validation_passed:
         node['snmp_validation_error'] = snmp_validation_error
 
+    # Enable Asset inventory
+    if module.params['enable_asset_inventory']:
+        orion.manage_asset_inventory([node['nodeid']], module.params['enable_asset_inventory'])
+
     return node
 
 
@@ -538,6 +548,7 @@ def main():
         validate_snmp_required=dict(required=False, default=True, type='bool'),
         wmi_credential_set=dict(required=False, no_log=True),
         polling_engine=dict(required=False),
+        enable_asset_inventory=dict(required=False, type='bool', default=False),
     )
 
     module = AnsibleModule(

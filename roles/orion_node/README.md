@@ -53,6 +53,8 @@ orion_node_applications: list, APM templates to add to node
 orion_node_custom_properties: list, elements are dicts (name, value), custom property names and values to set
 orion_node_hardware_health_poller: string, Name of the Hardware Health poller to enable on node
 orion_node_ncm_profile_name: string, Name of NCM profile if managing node in NCM
+orion_node_enable_asset_inventory: bool, Set to true to enable Asset Inventory polling
+orion_node_validate_snmp_required: bool, Set to false to disable forced SNMP validation
 ```
 
 

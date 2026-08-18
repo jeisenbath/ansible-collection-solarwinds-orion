@@ -18,6 +18,8 @@
     snmpv3_priv_key: "{{ orion_node_snmpv3_priv_key | default(omit) }}"
     snmp_port: "{{ orion_node_snmp_port | default(omit) }}"
     snmp_allow_64: "{{ orion_node_snmp_allow_64 | default(omit) }}"
+    enable_asset_inventory: "{{ orion_node_enable_asset_inventory | default(omit) }}"
+    validate_snmp_required: "{{ orion_node_validate_snmp_required | default(omit) }}"
   delegate_to: localhost
 
 - name: Add SNMP pollers to node if polling method is SNMP
