@@ -1,2 +1,0 @@
-bugfixes:
-  - orion_query module - Fix crash when writing CSV with empty query results. swis_query returns None for empty results which caused a TypeError in write_to_csv.

@@ -1,2 +1,0 @@
-bugfixes:
-  - orion_node_ncm module - Fix check_mode returning changed=False when node would be added to NCM.

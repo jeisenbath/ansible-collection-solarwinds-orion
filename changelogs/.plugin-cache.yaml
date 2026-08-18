@@ -24,6 +24,11 @@ plugins:
       name: orion_custom_property
       namespace: ''
       version_added: 1.0.0
+    orion_ncm_config:
+      description: Manage device configurations with SolarWinds NCM
+      name: orion_ncm_config
+      namespace: ''
+      version_added: 3.2.0
     orion_node:
       description: Created/Removes/Edits Nodes in Solarwinds Orion NPM
       name: orion_node
@@ -99,4 +104,4 @@ plugins:
   shell: {}
   strategy: {}
   vars: {}
-version: 3.1.0
+version: 3.2.0

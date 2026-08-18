@@ -1,2 +1,0 @@
-bugfixes:
-  - orion_node_info module - Fix inverted timedelta calculation that caused poll_now to trigger on nearly every run instead of only when last poll was more than 5 minutes ago.
