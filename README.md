@@ -11,6 +11,7 @@ Collection for managing Nodes in Solarwinds Orion.
 | Name                                       | Description                                                 |
 |--------------------------------------------|-------------------------------------------------------------|
 | jeisenbath.solarwinds.orion_custom_property       | Manage custom properties on Node.                    |
+| jeisenbath.solarwinds.orion_ncm_config            | Manages configurations in NCM.                       |
 | jeisenbath.solarwinds.orion_node                  | Creates, Removes, Manage, or Mute Node.              |
 | jeisenbath.solarwinds.orion_node_application      | Manages APM application templates assigned to Nodes. |
 | jeisenbath.solarwinds.orion_node_custom_poller    | Creates/Removes custom pollers on a Node.            |
@@ -40,10 +41,10 @@ Collection for managing Nodes in Solarwinds Orion.
 ## Tested with Ansible
 
 <!-- List the versions of Ansible the collection has been tested with. Must match what is in galaxy.yml. -->
-2.9
-2.12.2
-2.13.3
-2.14.2
+ansible-core 2.15
+ansible-core 2.16
+ansible-core 2.17
+ansible-core 2.18
 
 ## External requirements
 

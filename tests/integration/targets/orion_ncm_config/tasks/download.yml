@@ -1,0 +1,34 @@
+---
+# Test configuration download functionality
+- name: Download config (check mode)
+  orion_ncm_config:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    method: download
+    config_type: Running
+  delegate_to: localhost
+  check_mode: true
+  register: download_01
+
+- name: Download config
+  orion_ncm_config:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    method: download
+    config_type: Running
+  delegate_to: localhost
+  register: download_02
+
+- name: Download asserts
+  ansible.builtin.assert:
+    that:
+      - download_01.changed  # Check mode shows what would change
+      - download_02.changed
+      - download_02.ncm_result is defined
+      - download_02.ncm_result.node_id is defined
+      - download_02.ncm_result.success == true
+      - download_02.config_history is defined
