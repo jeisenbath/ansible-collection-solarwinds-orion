@@ -253,7 +253,7 @@ from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.jeisenbath.solarwinds.plugins.module_utils.orion import OrionModule
 from ansible_collections.jeisenbath.solarwinds.plugins.module_utils.credential import get_credentials
 from time import sleep
-from datetime import datetime, timezone
+from datetime import datetime
 try:
     import requests
     HAS_REQUESTS = True
@@ -345,7 +345,7 @@ def discover_node(module, orion):
 
     interfacesPluginConfig = build_interface_plugin_conf(module, orion)
     discoveryProfile = {
-        'Name': "ansible_orion_discover_node: {0}".format(datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')),
+        'Name': "ansible_orion_discover_node: {0}".format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
         'EngineID': pollingEngine,
         'JobTimeoutSeconds': module.params['job_timeout_seconds'],
         'SearchTimeoutMiliseconds': module.params['search_timeout'],
