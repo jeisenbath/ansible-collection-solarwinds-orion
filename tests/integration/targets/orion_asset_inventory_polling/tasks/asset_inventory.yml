@@ -1,0 +1,100 @@
+---
+- name: Add asset inventory polling to node (check)
+  orion_asset_inventory_polling: &add_ai
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    state: present
+  delegate_to: localhost
+  check_mode: true
+  register: add_ai_01
+
+- name: Add asset inventory polling to node
+  orion_asset_inventory_polling:
+    <<: *add_ai
+  delegate_to: localhost
+  register: add_ai_02
+
+- name: Add asset inventory polling to node (check) (idempotence)
+  orion_asset_inventory_polling:
+    <<: *add_ai
+  delegate_to: localhost
+  check_mode: true
+  register: add_ai_03
+
+- name: Add asset inventory polling to node (idempotence)
+  orion_asset_inventory_polling:
+    <<: *add_ai
+  delegate_to: localhost
+  register: add_ai_04
+
+- name: Query for node in Orion.AssetInventory.Polling
+  orion_query:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    query: |
+      SELECT Enabled FROM Orion.AssetInventory.Polling WHERE NodeID = '{{ add_ai_02.orion_node.nodeid }}'
+  delegate_to: localhost
+  register: add_ai_query
+
+- name: Add asset inventory polling asserts
+  ansible.builtin.assert:
+    that:
+      - add_ai_01.changed
+      - add_ai_02.changed
+      - not add_ai_03.changed
+      - not add_ai_04.changed
+      - add_ai_02.orion_node is defined
+      - add_ai_query.results
+
+- name: Remove asset inventory polling from node (check)
+  orion_asset_inventory_polling: &remove_ai
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    name: "{{ orion_test_node_name }}"
+    state: absent
+  delegate_to: localhost
+  check_mode: true
+  register: remove_ai_01
+
+- name: Remove asset inventory polling from node
+  orion_asset_inventory_polling:
+    <<: *remove_ai
+  delegate_to: localhost
+  register: remove_ai_02
+
+- name: Remove asset inventory polling from node (check) (idempotence)
+  orion_asset_inventory_polling:
+    <<: *remove_ai
+  delegate_to: localhost
+  check_mode: true
+  register: remove_ai_03
+
+- name: Remove asset inventory polling from node (idempotence)
+  orion_asset_inventory_polling:
+    <<: *remove_ai
+  delegate_to: localhost
+  register: remove_ai_04
+
+- name: Query for node in Orion.AssetInventory.Polling
+  orion_query:
+    hostname: "{{ orion_test_solarwinds_server }}"
+    username: "{{ orion_test_solarwinds_username }}"
+    password: "{{ orion_test_solarwinds_password }}"
+    query: |
+      SELECT Enabled FROM Orion.AssetInventory.Polling WHERE NodeID = '{{ remove_ai_02.orion_node.nodeid }}'
+  delegate_to: localhost
+  register: remove_ai_query
+
+- name: Remove asset inventory polling asserts
+  ansible.builtin.assert:
+    that:
+      - remove_ai_01.changed
+      - remove_ai_02.changed
+      - not remove_ai_03.changed
+      - not remove_ai_04.changed
+      - not remove_ai_query.results
+...

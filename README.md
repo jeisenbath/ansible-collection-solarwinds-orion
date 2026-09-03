@@ -28,6 +28,7 @@ Collection for managing Nodes in Solarwinds Orion.
 | jeisenbath.solarwinds.orion_query                 | Run a SWQL query against the orion database.         |
 | jeisenbath.solarwinds.orion_credential_set        | Create and Assign SNMPv3, WMI Credential Sets        |
 | jeisenbath.solarwinds.orion_discover_node         | Discover a Node by IP Address                        |
+| jeisenbath.solarwinds.orion_asset_inventory       | Manage Asset Inventory polling on nodes              |
 
 ### Plugins
 | Name                                   | Description                                   |
