@@ -227,7 +227,7 @@ def normalize_ncm_node_id(ncm_node_id):
             guid_obj = uuid.UUID(ncm_node_id)
             return str(guid_obj)
         except ValueError:
-            raise Exception(f"Invalid NCM NodeID format: {ncm_node_id}")
+            raise Exception("Invalid NCM NodeID format: {0}".format(ncm_node_id))
     else:
         return str(ncm_node_id)
 
@@ -256,7 +256,7 @@ def main():
     config_content = module.params['config_content']
 
     if method in ['import', 'upload'] and not config_content:
-        module.fail_json(msg=f"config_content is required when method is '{method}'")
+        module.fail_json(msg="config_content is required when method is '{0}'".format(method))
 
     # create an OrionModule object using our custom Ansible module
     orion = OrionModule(module)
@@ -287,9 +287,9 @@ def main():
         }
 
         if method == 'download':
-            check_result['operation'] = f'Configuration would be downloaded from device {node["caption"]}'
+            check_result['operation'] = 'Configuration would be downloaded from device {0}'.format(node["caption"])
         else:
-            check_result['operation'] = f'Configuration would be processed for device {node["caption"]}'
+            check_result['operation'] = 'Configuration would be processed for device {0}'.format(node["caption"])
 
         module.exit_json(
             changed=True,
@@ -308,7 +308,7 @@ def main():
                 config_text = str(config_content)
                 title = module.params['config_title']
                 if not title:
-                    title = f"{node['caption']}-{datetime.datetime.now().strftime('%Y-%m-%d_%H%M%S')}"
+                    title = "{0}-{1}".format(node["caption"], datetime.datetime.now().strftime('%Y-%m-%d_%H%M%S'))
                 comments = str(module.params['comments'])
 
                 # ImportConfig positional parameters are (nodeId, configTitle,
@@ -343,12 +343,12 @@ def main():
                     orion_node=node,
                     ncm_result=import_result,
                     config_history=config_history,
-                    msg=f'Configuration successfully imported to NCM for node {node["caption"]}'
+                    msg='Configuration successfully imported to NCM for node {0}'.format(node["caption"])
                 )
 
             except Exception as import_error:
                 module.fail_json(
-                    msg=f'Failed to import configuration to NCM: {str(import_error)}',
+                    msg='Failed to import configuration to NCM: {0}'.format(str(import_error)),
                     orion_node=node,
                     ncm_result={
                         'success': False,
@@ -393,12 +393,12 @@ def main():
                     changed=True,
                     orion_node=node,
                     ncm_result=upload_result,
-                    msg=f'Configuration successfully uploaded to device {node["caption"]} via NCM'
+                    msg='Configuration successfully uploaded to device {0} via NCM'.format(node["caption"])
                 )
 
             except Exception as upload_error:
                 module.fail_json(
-                    msg=f'Failed to upload configuration to device via NCM: {str(upload_error)}',
+                    msg='Failed to upload configuration to device via NCM: {0}'.format(str(upload_error)),
                     orion_node=node,
                     ncm_result={
                         'success': False,
@@ -430,7 +430,7 @@ def main():
                     'parameters_used': {
                         'node_id': normalized_node_id,
                         'config_type': config_type_str,
-                        'operation': f'Configuration downloaded from device {node["caption"]}'
+                        'operation': 'Configuration downloaded from device {0}'.format(node["caption"])
                     }
                 }
 
@@ -441,12 +441,12 @@ def main():
                     orion_node=node,
                     ncm_result=download_result,
                     config_history=config_history,
-                    msg=f'Configuration successfully downloaded from device {node["caption"]} via NCM'
+                    msg='Configuration successfully downloaded from device {0} via NCM'.format(node["caption"])
                 )
 
             except Exception as download_error:
                 module.fail_json(
-                    msg=f'Failed to download configuration from device via NCM: {str(download_error)}',
+                    msg='Failed to download configuration from device via NCM: {0}'.format(str(download_error)),
                     orion_node=node,
                     ncm_result={
                         'success': False,
@@ -458,7 +458,7 @@ def main():
 
     except Exception as OrionException:
         module.fail_json(
-            msg=f'Failed to process configuration for NCM: {str(OrionException)}',
+            msg='Failed to process configuration for NCM: {0}'.format(str(OrionException)),
             orion_node=node
         )
 

@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 module: orion_discover_node
 short_description: Discover nodes in Orion NPM.
 description:
-    - "Run Discovery on a single IP, range of IP Addresses, or a Subnet."
+    - "Run Discovery on an IP Address."
 version_added: "3.3.0"
 author:
     - "Josh M. Eisenbath (@jeisenbath)"
@@ -264,8 +264,8 @@ except Exception:
     raise
 
 
-def discovery_status(module, orion, profileId: int, retries: int, delay: int):
-    statusQuery = f'SELECT Status FROM Orion.DiscoveryProfiles WHERE ProfileID = {profileId}'
+def discovery_status(module, orion, profileId, retries, delay):
+    statusQuery = 'SELECT Status FROM Orion.DiscoveryProfiles WHERE ProfileID = {0}'.format(profileId)
     statusMap = {
         0: "Unknown",
         1: "InProgress",
@@ -371,10 +371,10 @@ def discover_node(module, orion):
     return result
 
 
-def get_discovered(orion, profileId: int):
-    dlogQuery = f"SELECT Result, ResultDescription, ErrorMessage, BatchID FROM Orion.DiscoveryLogs WHERE ProfileID = {profileId}"
+def get_discovered(orion, profileId):
+    dlogQuery = "SELECT Result, ResultDescription, ErrorMessage, BatchID FROM Orion.DiscoveryLogs WHERE ProfileID = {0}".format(profileId)
     dlogResult = orion.swis_query(dlogQuery)
-    dlogItemsQuery = f"SELECT EntityType, DisplayName, NetObjectID FROM Orion.DiscoveryLogItems WHERE BatchID = \'{dlogResult[0]['BatchID']}\'"
+    dlogItemsQuery = "SELECT EntityType, DisplayName, NetObjectID FROM Orion.DiscoveryLogItems WHERE BatchID = \'{0}\'".format(dlogResult[0]['BatchID'])
     dlogItems = orion.swis_query(dlogItemsQuery)
     return dlogItems
 
@@ -437,7 +437,7 @@ def main():
                 node = orion.get_node()
                 discovered = get_discovered(orion, discoveryProfileId)
             else:
-                module.fail_json(f'Discovery timed out, status is {discoveredStatus}')
+                module.fail_json('Discovery timed out, status is {0}'.format(discoveredStatus))
         changed = True
 
     response = {'changed': changed, 'orion_node': node}

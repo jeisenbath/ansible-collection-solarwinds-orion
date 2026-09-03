@@ -8,11 +8,11 @@ __metaclass__ = type
 
 def get_credentials(orion, name):
     credential = {}
-    query = f"""
+    query = """
     SELECT ID, Name, CredentialType
     FROM Orion.Credential
-    WHERE Name = '{name}'
-    """
+    WHERE Name = '{0}'
+    """.format(name)
     results = orion.swis.query(query)
     if results['results']:
         credential['ID'] = results['results'][0]['ID']
