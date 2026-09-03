@@ -1,0 +1,103 @@
+---
+- name: Discover a Linux host
+  hosts: "{{ target | default('localhost') }}"
+  gather_facts: true
+
+  vars:
+    solarwinds_conn: &solarwinds_conn
+      hostname: "{{ solarwinds_server }}"
+      username: "{{ solarwinds_username }}"
+      password: "{{ solarwinds_password }}"
+    orion_node_snmpv3_credential_set: your_credential_set
+    orion_node_ip_address: "{{ ansible_facts.default_ipv4.address }}"
+    orion_node_volumes: # list of volumes you DO want to monitor
+      - /
+      - /opt
+      - /var
+      - /home
+    orion_node_snmp_pollers:
+      - name: N.ResponseTime.SNMP.Native
+        enabled: false
+      - name: N.Status.SNMP.Native
+        enabled: false
+      - name: N.ResponseTime.ICMP.Native
+        enabled: true
+      - name: N.Status.ICMP.Native
+        enabled: true
+      - name: N.Details.SNMP.Generic
+        enabled: true
+      - name: N.Uptime.SNMP.Generic
+        enabled: true
+      - name: N.LoadAverage.SNMP.Linux
+        enabled: true
+      - name: N.Cpu.SNMP.HrProcessorLoad
+        enabled: true
+      - name: N.Memory.SNMP.NetSnmpReal
+        enabled: true
+      - name: N.AssetInventory.Snmp.Generic
+        enabled: false
+      - name: N.Topology_Layer3.SNMP.ipNetToPhysical
+        enabled: false
+      - name: N.Topology_Layer3.SNMP.ipNetToMedia
+        enabled: false
+
+  tasks:
+    - name: Run discovery on target node, exclude loopback interface
+      jeisenbath.solarwinds.orion_discover_node:
+        <<: *solarwinds_conn
+        ip_address: "{{ orion_node_ip_address }}"
+        polling_method: SNMP
+        snmp_version: 3
+        snmp_credential_set: "{{ orion_node_snmpv3_credential_set }}"
+        interface_filter:
+          - op: '!Regex'
+            val: '^lo'
+      delegate_to: localhost
+      register: discovered_node
+
+    - name: Update node caption
+      jeisenbath.solarwinds.orion_update_node:
+        <<: *solarwinds_conn
+        ip_address: "{{ orion_node_ip_address }}"
+        properties:
+          caption: "{{ orion_node_caption_name }}"
+      delegate_to: localhost
+
+    - name: Update pollers on node
+      jeisenbath.solarwinds.orion_node_poller:
+        <<: *solarwinds_conn
+        ip_address: "{{ orion_node_ip_address }}"
+        state: present
+        poller: "{{ item.name }}"
+        enabled: "{{ item.enabled }}"
+      loop: "{{ orion_node_snmp_pollers }}"
+      delegate_to: localhost
+
+    - name: Remove from Asset Inventory polling
+      jeisenbath.solarwinds.orion_asset_inventory_polling:
+        <<: *solarwinds_conn
+        ip_address: "{{ orion_node_ip_address }}"
+        state: absent
+      delegate_to: localhost
+
+    - name: Create list of volumes to remove
+      ansible.builtin.set_fact:
+        remove_volumes: >-
+          {{
+            discovered_node.discovered
+            | selectattr('EntityType', 'equalto', 'Orion.Volumes')
+            | map(attribute='DisplayName')
+            | map('regex_replace', '^.* - ', '')
+            | difference(orion_node_volumes)
+          }}
+
+    - name: Remove unwanted volumes
+      jeisenbath.solarwinds.orion_volume:
+        <<: *solarwinds_conn
+        ip_address: "{{ orion_node_ip_address }}"
+        state: absent
+        volume:
+          name: "{{ item }}"
+      loop: "{{ remove_volumes }}"
+      delegate_to: localhost
+...
