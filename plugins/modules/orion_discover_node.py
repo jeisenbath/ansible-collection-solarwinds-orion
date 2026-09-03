@@ -176,6 +176,7 @@ options:
         choices:
             - "2"
             - "3"
+        default: "3"
         required: false
         type: str
     wmi_credential_set:
@@ -406,7 +407,7 @@ def main():
         snmp_timeout=dict(required=False, type='int', default=5000),
         polling_method=dict(required=False, default='SNMP', choices=['SNMP', 'WMI']),
         retries=dict(required=False, type='int', default=60),
-        snmp_version=dict(required=False, default=None, choices=['2', '3']),
+        snmp_version=dict(required=False, default='3', choices=['2', '3']),
         snmp_credential_set=dict(required=False, default=None, type='str'),
         snmp_port=dict(required=False, default='161'),
         wmi_credential_set=dict(required=False, no_log=True),
