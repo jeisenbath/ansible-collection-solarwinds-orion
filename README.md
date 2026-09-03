@@ -27,6 +27,7 @@ Collection for managing Nodes in Solarwinds Orion.
 | jeisenbath.solarwinds.orion_node_ncm              | Adds or Removes an existing node to NCM.             |
 | jeisenbath.solarwinds.orion_query                 | Run a SWQL query against the orion database.         |
 | jeisenbath.solarwinds.orion_credential_set        | Create and Assign SNMPv3, WMI Credential Sets        |
+| jeisenbath.solarwinds.orion_discover_node         | Discover a Node by IP Address                        |
 
 ### Plugins
 | Name                                   | Description                                   |
@@ -41,10 +42,12 @@ Collection for managing Nodes in Solarwinds Orion.
 ## Tested with Ansible
 
 <!-- List the versions of Ansible the collection has been tested with. Must match what is in galaxy.yml. -->
-ansible-core 2.15
 ansible-core 2.16
 ansible-core 2.17
 ansible-core 2.18
+ansible-core 2.19
+ansible-core 2.20
+ansible-core 2.21
 
 ## External requirements
 
@@ -75,13 +78,6 @@ You can also install a specific version of the collection, for example, if you n
 
 ```bash
 ansible-galaxy collection install jeisenbath.solarwinds,v3.0.0
-```
-
-If you are using a version prior to 3.0.0 when the namespace changed from solarwinds.orion to jeisenbath.solarwinds, use this to force update from the stable-2.x branch.
-This branch will be maintained with bugfixes until 2026-01-01
-
-```bash
-ansible-galaxy collection install git+https://github.com/jeisenbath/ansible-collection-solarwinds-orion.git,stable-2.x --force
 ```
 
 See [Ansible Using collections](https://docs.ansible.com/ansible/devel/user_guide/collections_using.html) for more details.
