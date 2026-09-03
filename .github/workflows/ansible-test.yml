@@ -1,4 +1,3 @@
----
 # README FIRST
 # 1. Subscribe to https://github.com/ansible-collections/news-for-maintainers
 #    (click the Watch button on the homepage > Custom > Issues)
@@ -31,20 +30,16 @@
 #    it has to adhere to Python compatibility and CI testing requirements described in
 #    https://docs.ansible.com/ansible/latest/community/collection_contributors/collection_requirements.html.
 
-name: CI
+name: Sanity
 on:
   # Run CI against all pushes (direct commits, also merged PRs), Pull Requests
   push:
     branches:
-      - main
-      - stable-*
+      - devel-*
   pull_request:
-  # Run CI once per week (at 06:00 UTC)
-  # This ensures that even if there haven't been commits that we are still
-  # testing against latest version of ansible-test for each ansible-core
-  # version
-  schedule:
-    - cron: '0 6 * * 0'
+    branches:
+      - main
+      - devel-*
 
 concurrency:
   group: >-
@@ -54,11 +49,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
-###
-# Sanity tests (REQUIRED)
-#
-# https://docs.ansible.com/ansible/latest/dev_guide/testing_sanity.html
+  ###
+  # Sanity tests (REQUIRED)
+  #
+  # https://docs.ansible.com/ansible/latest/dev_guide/testing_sanity.html
 
   sanity:
     name: Sanity (Ⓐ${{ matrix.ansible }})
@@ -76,21 +70,14 @@ jobs:
           # Add new versions announced in
           # https://github.com/ansible-collections/news-for-maintainers in a timely manner,
           # consider dropping testing against EOL versions and versions you don't support.
-          - stable-2.15
           - stable-2.16
           - stable-2.17
           - stable-2.18
-          - devel
-        # - milestone
-    # Ansible-test on various stable branches does not yet work well with cgroups v2.
-    # Since ubuntu-latest now uses Ubuntu 22.04, we need to fall back to the ubuntu-20.04
-    # image for these stable branches. The list of branches where this is necessary will
-    # shrink over time, check out https://github.com/ansible-collections/news-for-maintainers/issues/28
-    # for the latest list.
-    runs-on: >-
-      ${{ contains(fromJson(
-          '["stable-2.9", "stable-2.10", "stable-2.11"]'
-      ), matrix.ansible) && 'ubuntu-20.04' || 'ubuntu-latest' }}
+          - stable-2.19
+          - stable-2.20
+          - stable-2.21
+          - milestone
+    runs-on: ubuntu-latest
     steps:
       # Run sanity tests inside a Docker container.
       # The docker container has all the pinned dependencies that are
@@ -111,10 +98,12 @@ jobs:
           # which should improve CI performance. See limitations on
           # https://github.com/ansible-community/ansible-test-gh-action#pull-request-change-detection
           pull-request-change-detection: false
+          coverage: never # coverage is always very low for sanity tests, and doesn't make much sense
 
-  check:  # This job does nothing and is only used for the branch protection
-          # or multi-stage CI jobs, like making sure that all tests pass before
-          # a publishing job is started.
+  # This job does nothing and is only used for the branch protection
+  # or multi-stage CI jobs, like making sure that all tests pass before
+  # a publishing job is started.
+  sanity-check:
     if: always()
 
     needs:
