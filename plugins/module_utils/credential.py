@@ -21,7 +21,7 @@ def get_credentials(orion, name):
     return credential
 
 
-def create_snmpv3_credentials(orion, name, snmp3_props, context = '', owner = 'Orion'):
+def create_snmpv3_credentials(orion, name, snmp3_props, context='', owner='Orion'):
     result = orion.swis.invoke(
         'Orion.Credential', 'CreateSNMPv3Credentials', name, snmp3_props['username'], context,
         snmp3_props['auth_method'], snmp3_props['auth_key'], snmp3_props['auth_key_is_pwd'],
@@ -35,7 +35,7 @@ def create_username_password_credentials(orion, name, wmiProps, owner):
     return result
 
 
-def validate_snmp3_credentials(orion, node, properties, port = 161):
+def validate_snmp3_credentials(orion, node, properties, port=161):
     snmp3_credentials = {
         'UserName': properties['username'],
         'Context': '',
