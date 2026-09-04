@@ -59,12 +59,6 @@ options:
         required: false
         type: int
         default: 3600
-    name:
-        description:
-            - Name of the node.
-        required: false
-        aliases: [ 'caption' ]
-        type: str
     interface_statuses:
         description:
             - Interface statuses to include in discovery.
@@ -243,8 +237,6 @@ orion_node:
         "unmanagefrom": "1899-12-30T00:00:00+00:00",
         "unmanageuntil": "1899-12-30T00:00:00+00:00",
         "uri": "swis://host.domain.com/Orion/Orion.Nodes/NodeID=12345",
-        "snmp_validation_passed": false,
-        "snmp_validation_error": "SNMP validation failed - device did not respond to SNMP poll"
     }
 discovered:
     description: List of discovered objects for node.
@@ -408,7 +400,6 @@ def main():
         port=dict(required=False, type='str', default='17774'),
         verify=dict(required=False, type='bool', default=False),
         ip_address=dict(required=True, type='str'),
-        name=dict(required=False, aliases=['caption']),
         allow_duplicate_nodes=dict(required=False, type='bool', default=False),
         auto_import=dict(required=False, type='bool', default=True),
         delete_discovery_profile=dict(required=False, type='bool', default=True),
