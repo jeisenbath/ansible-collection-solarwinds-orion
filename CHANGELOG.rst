@@ -5,6 +5,20 @@ Solarwinds.Orion Release Notes
 .. contents:: Topics
 
 
+v3.3.0
+======
+
+Release Summary
+---------------
+
+Released 2026-09-03
+
+New Modules
+-----------
+
+- jeisenbath.solarwinds.orion_asset_inventory_polling - Enable or disable a node to poll Asset Inventory
+- jeisenbath.solarwinds.orion_discover_node - Discover nodes in Orion NPM.
+
 v3.2.0
 ======
 

@@ -310,3 +310,16 @@ releases:
       name: orion_ncm_config
       namespace: ''
     release_date: '2026-08-17'
+  3.3.0:
+    changes:
+      release_summary: Released 2026-09-03
+    fragments:
+    - release_summary-3.3.0.yml
+    modules:
+    - description: Enable or disable a node to poll Asset Inventory
+      name: orion_asset_inventory_polling
+      namespace: ''
+    - description: Discover nodes in Orion NPM.
+      name: orion_discover_node
+      namespace: ''
+    release_date: '2026-09-03'
