@@ -39,8 +39,8 @@
     that:
       - snmp_discover_01.changed
       - snmp_discover_02.changed
-      - snmp_discover_02.orion_node
-      - snmp_discover_02.discovered
+      - snmp_discover_02.orion_node is defined and snmp_discover_02.orion_node | length > 0
+      - snmp_discover_02.discovered is defined and snmp_discover_02.discovered | length > 0
       - snmp_discover_02.discovered | selectattr('DisplayName', 'search', '- lo') | length == 0
       - not snmp_discover_03.changed
       - not snmp_discover_04.changed

@@ -47,7 +47,7 @@
       - not add_ai_03.changed
       - not add_ai_04.changed
       - add_ai_02.orion_node is defined
-      - add_ai_query.results
+      - add_ai_query.results is defined and add_ai_query.results | length > 0
 
 - name: Remove asset inventory polling from node (check)
   orion_asset_inventory_polling: &remove_ai
