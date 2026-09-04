@@ -246,6 +246,27 @@ orion_node:
         "snmp_validation_passed": false,
         "snmp_validation_error": "SNMP validation failed - device did not respond to SNMP poll"
     }
+discovered:
+    description: List of discovered objects for node.
+    returned: when node is discovered successfully.
+    type: list
+    sample: [
+        {
+            "DisplayName": "localhost.localdomain.com",
+            "EntityType": "Orion.Nodes",
+            "NetObjectID": "N:12345"
+        },
+        {
+            "DisplayName": "localhost.localdomain.com - Physical memory",
+            "EntityType": "Orion.Volumes",
+            "NetObjectID": "V:12345"
+        },
+        {
+            "DisplayName": "localhost.localdomain.com - eth0",
+            "EntityType": "Orion.NPM.Interfaces",
+            "NetObjectID": "I:12345"
+        }
+    ]
 '''
 
 
