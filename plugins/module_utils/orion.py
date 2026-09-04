@@ -96,17 +96,17 @@ class OrionModule:
                   ObjectSubType, IP_Address, Status, StatusDescription, LastSystemUptimePollUtc, EngineID,
                   PollInterval, StatCollection, RediscoveryInterval"""
 
-        if self.module.params['node_id']:
-            results = self.swis.query(
-                "SELECT {0} FROM Orion.Nodes WHERE NodeID = '{1}'".format(fields, self.module.params['node_id'])
-            )
-        elif self.module.params['ip_address']:
+        if self.module.params['ip_address']:
             results = self.swis.query(
                 "SELECT {0} FROM Orion.Nodes WHERE IPAddress = '{1}'".format(fields, self.module.params['ip_address'])
             )
         elif self.module.params['name']:
             results = self.swis.query(
                 "SELECT {0} FROM Orion.Nodes WHERE Caption = '{1}'".format(fields, self.module.params['name'])
+            )
+        elif self.module.params['node_id']:
+            results = self.swis.query(
+                "SELECT {0} FROM Orion.Nodes WHERE NodeID = '{1}'".format(fields, self.module.params['node_id'])
             )
 
         if results['results']:
@@ -438,7 +438,7 @@ class OrionModule:
     def poll_now(self, node):
         self.swis.invoke('Orion.Nodes', 'PollNow', node['netobjectid'])
 
-    def manage_asset_inventory(self, nodes: list, enabled: bool):
+    def manage_asset_inventory(self, nodes, enabled):
         if enabled:
             swisVerb = 'EnablePollingForNodes'
         else:

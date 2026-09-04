@@ -1,0 +1,2 @@
+plugins/inventory/orion_nodes_inventory.py pylint:ansible-bad-import-from
+plugins/module_utils/orion.py pylint:ansible-bad-import-from

@@ -8,11 +8,11 @@ __metaclass__ = type
 
 def get_credentials(orion, name):
     credential = {}
-    query = f"""
+    query = """
     SELECT ID, Name, CredentialType
     FROM Orion.Credential
-    WHERE Name = '{name}'
-    """
+    WHERE Name = '{0}'
+    """.format(name)
     results = orion.swis.query(query)
     if results['results']:
         credential['ID'] = results['results'][0]['ID']
@@ -21,7 +21,7 @@ def get_credentials(orion, name):
     return credential
 
 
-def create_snmpv3_credentials(orion, name, snmp3_props: dict, context: str = '', owner: str = 'Orion'):
+def create_snmpv3_credentials(orion, name, snmp3_props, context='', owner='Orion'):
     result = orion.swis.invoke(
         'Orion.Credential', 'CreateSNMPv3Credentials', name, snmp3_props['username'], context,
         snmp3_props['auth_method'], snmp3_props['auth_key'], snmp3_props['auth_key_is_pwd'],
@@ -30,12 +30,12 @@ def create_snmpv3_credentials(orion, name, snmp3_props: dict, context: str = '',
     return result
 
 
-def create_username_password_credentials(orion, name, wmiProps: dict, owner):
+def create_username_password_credentials(orion, name, wmiProps, owner):
     result = orion.swis.invoke('Orion.Credential', 'CreateUsernamePasswordCredentials', name, wmiProps['username'], wmiProps['password'], owner)
     return result
 
 
-def validate_snmp3_credentials(orion, node, properties, port: int = 161):
+def validate_snmp3_credentials(orion, node, properties, port=161):
     snmp3_credentials = {
         'UserName': properties['username'],
         'Context': '',

@@ -14,6 +14,11 @@ plugins:
       version_added: null
   lookup: {}
   module:
+    orion_asset_inventory_polling:
+      description: Enable or disable a node to poll Asset Inventory
+      name: orion_asset_inventory_polling
+      namespace: ''
+      version_added: 3.3.0
     orion_credential_set:
       description: Manage Credential Sets for Solarwinds.
       name: orion_credential_set
@@ -24,6 +29,11 @@ plugins:
       name: orion_custom_property
       namespace: ''
       version_added: 1.0.0
+    orion_discover_node:
+      description: Discover nodes in Orion NPM.
+      name: orion_discover_node
+      namespace: ''
+      version_added: 3.3.0
     orion_ncm_config:
       description: Manage device configurations with SolarWinds NCM
       name: orion_ncm_config
@@ -104,4 +114,4 @@ plugins:
   shell: {}
   strategy: {}
   vars: {}
-version: 3.2.0
+version: 3.3.0
